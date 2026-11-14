@@ -122,7 +122,7 @@
     <h1>The Mail Studio Book</h1>
     <p class="sub">Install it on your own server, get it ready to send, and write your first email campaign. Step by step, no technical background needed.</p>
   </div>
-  <div class="foot">Version 1.0 · mailstudio.email · MIT licence</div>
+  <div class="foot">Version 0.7 · mailstudio.email · MIT licence</div>
 </section>
 
 <!-- ====================================================================== -->
@@ -219,6 +219,7 @@
     <li><strong>Choose the operating system.</strong> Pick <span class="ui">Ubuntu 24.04 LTS</span> (Debian 12 also works).</li>
     <li><strong>Choose the size.</strong> 1 GB of memory and 25 GB of disk is plenty for tens of thousands of subscribers.</li>
     <li><strong>Choose the location</strong> nearest you, for example Sydney or Melbourne.</li>
+    <li><strong>Keep a public IPv4 address.</strong> In the network options, make sure <span class="ui">Public IPv4</span> is on. Some providers offer cheaper IPv6-only or private-network-only servers: Mail Studio can't run on those. IPv6 can be on as well; that's fine.</li>
     <li><strong>Turn on automatic backups or snapshots</strong> if the provider offers them. It's usually a dollar or two a month, and it's the simplest insurance you can buy.</li>
     <li><strong>Set how you'll log in.</strong> An SSH key is more secure; a root password is fine to start with. If you choose a password, make it long and save it in your password manager.</li>
     <li><strong>Create it</strong>, then copy the server's <strong>IPv4 address</strong> from the dashboard. It looks like <code>203.0.113.25</code>. Write it down.</li>
@@ -241,6 +242,10 @@
     </div>
   </div>
   <p>The first time, it asks whether you trust the server: type <code>yes</code>. Then enter the password (nothing appears as you type; that's normal). You're in when you see a prompt ending in <code>#</code>.</p>
+
+  <h2>Check it can reach the internet</h2>
+  <pre>curl -sSI https://github.com | head -1</pre>
+  <p>It should print a line starting <code>HTTP/2 200</code>. If it says <em>Could not connect</em> or <em>Network is unreachable</em>, the server has no public IPv4 address: check the network settings in the provider's dashboard (step 4 above). On a brand-new server it's usually quickest to delete it and create a new one with Public IPv4 on.</p>
 </section>
 
 <section class="chapter" data-toc="Point your address at the server">
@@ -279,7 +284,7 @@
     <p class="lead">One command does the rest: it installs Docker, sets up Mail Studio with a secure https:// address, adds a daily backup and a <code>mailstudio</code> command for looking after it.</p>
   </header>
 
-  <div class="box stop"><span class="box-title">Before the official release</span><p>Until Mail Studio's ready-made image and <code>get.mailstudio.email</code> are published, use <strong>Appendix B</strong> instead: it builds Mail Studio on your server from your copy of the code, then runs the same installer.</p></div>
+  <div class="box warn"><span class="box-title">bash, not sh</span><p>Type the command exactly as shown, ending in <code>| sudo bash</code>. With <code>| sh</code> the installer just tells you to use bash.</p></div>
 
   <ol class="steps">
     <li><strong>On your server, run:</strong>
@@ -327,6 +332,10 @@ Mail Studio is installed.
     <tr><td>“Something else is using port 80 or 443”</td><td>Another web server came with the server image. The message shows its name; stop it as suggested (e.g. <code>systemctl disable --now nginx</code>), then run the installer again.</td></tr>
     <tr><td>“Mail Studio started, but https://… isn't answering yet”</td><td>Usually the provider's firewall is blocking ports 80 and 443 (see Chapter 2), or the A record is wrong. Fix it, then run <code>mailstudio logs caddy</code> to watch Caddy try again. It retries by itself.</td></tr>
     <tr><td>“Run it as root”</td><td>Put <code>sudo</code> before <code>bash</code>, exactly as in step 1.</td></tr>
+    <tr><td>“Mail Studio's installer needs bash”</td><td>You typed <code>| sh</code>. Use <code>| sudo bash</code>, exactly as in step 1.</td></tr>
+    <tr><td>“This server has no public IPv4 address”</td><td>The server was created without one (Chapter 2, step 4). Turn it on in the provider's dashboard and restart the server, or create a new server with Public IPv4 on.</td></tr>
+    <tr><td>“This server can't reach the internet”</td><td>Outgoing connections are blocked. Check the provider's firewall settings for the server: outgoing traffic must be allowed.</td></tr>
+    <tr><td>“The installer stopped unexpectedly (line …)”</td><td>Something nobody planned for. Run the installer again; if it stops at the same place, report it with everything it printed.</td></tr>
   </table>
 
   <div class="box tip"><span class="box-title">Tip</span><p>Running the installer again is always safe. It keeps your data and settings, and fixes up the setup files. It's the first thing to try if you change your address or something seems broken.</p></div>
@@ -689,6 +698,7 @@ Mail Studio is installed.
   </header>
   <table>
     <tr><th style="width:36%">What you see</th><th>Likely cause, and the fix</th></tr>
+    <tr><td>The installer says the server has no public IPv4 address, or can't reach the internet</td><td>See Chapter 2: the server needs Public IPv4 on, and outgoing connections allowed. Check with <code>curl -sSI https://github.com</code>.</td></tr>
     <tr><td>The address doesn't open, or the browser warns it isn't secure</td><td>The certificate couldn't be issued. Check the A record points to the server (Chapter 3), the provider's firewall allows ports 80 and 443, and Cloudflare is set to “DNS only”. Then <code>mailstudio logs caddy</code>; it retries by itself.</td></tr>
     <tr><td>Forgot your password</td><td>On the server, run <code>mailstudio reset-password you@yourbusiness.com</code>. It prints a new password; change it under your name in the sidebar once you're in.</td></tr>
     <tr><td>“Not connected yet” for Amazon SES</td><td>Check the region matches the one you used in AWS, and re-paste both keys. A secret pasted with a space at the end is a common culprit.</td></tr>
@@ -747,7 +757,7 @@ Mail Studio is installed.
   <header>
     <div class="kicker">Appendix B</div>
     <h1>Installing from your own copy of the code</h1>
-    <p class="lead">For installs before the ready-made image and get.mailstudio.email are published, or to run your own changes. The server builds Mail Studio itself, then the normal installer takes over.</p>
+    <p class="lead">For running your own changes, or a version that hasn't been released yet. The server builds Mail Studio itself from the code, then the normal installer takes over.</p>
   </header>
   <div class="box need"><span class="box-title">You'll need</span><p>Chapters 1–3 done (a server, and your address pointing at it), and the address of your Mail Studio Git repository with a way to log in to it if it's private.</p></div>
   <ol class="steps">
@@ -755,7 +765,7 @@ Mail Studio is installed.
 <pre>apt update &amp;&amp; apt install -y git
 curl -fsSL https://get.docker.com | sh</pre></li>
     <li><strong>Get the code</strong> (use your repository's address):
-<pre>git clone https://your-git-server/you/mailstudio.git /opt/mailstudio-src
+<pre>git clone https://github.com/gmelh/MailStudio.git /opt/mailstudio-src
 cd /opt/mailstudio-src</pre></li>
     <li><strong>Build the image</strong> (a few minutes the first time):
 <pre>docker build -t mailstudio:local -f server/Dockerfile .</pre></li>
@@ -770,7 +780,7 @@ docker build -t mailstudio:local -f server/Dockerfile .
 mailstudio update</pre>
   <p><code>mailstudio update</code> backs up and restarts with the newly built image; there's nothing to download for an image built on the server.</p>
   <h2>Switching to the official image later</h2>
-  <p>Edit <code>/opt/mailstudio/.env</code>, change the <code>MAILSTUDIO_IMAGE=</code> line to the published image (e.g. <code>ghcr.io/mailstudio/mailstudio:1</code>), and run <code>mailstudio update</code>. Your data stays as it is.</p>
+  <p>Edit <code>/opt/mailstudio/.env</code>, change the <code>MAILSTUDIO_IMAGE=</code> line to the published image (e.g. <code>ghcr.io/gmelh/mailstudio:latest</code>), and run <code>mailstudio update</code>. Your data stays as it is.</p>
 </section>
 
 <section class="chapter" data-toc="C · The Amazon permissions" data-appendix>

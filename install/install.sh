@@ -20,8 +20,19 @@
 #   --skip-dns-check            don't check the domain points here
 #   --dry-run                   write the files, but don't install or start anything
 
-set -euo pipefail
+# Plain `sh` (dash on Ubuntu) can't run this script. Say so before it trips over Bash syntax.
+if [ -z "${BASH_VERSION:-}" ]; then
+  echo "Mail Studio's installer needs bash. Run it like this:" >&2
+  echo "  curl -fsSL https://get.mailstudio.email | sudo bash" >&2
+  exit 1
+fi
 
+set -Eeuo pipefail
+# Never stop silently: say where it went wrong.
+trap 'printf "\nError: the installer stopped unexpectedly (line %s). Please report this, with the output above.\n" "$LINENO" >&2' ERR
+
+# Until 1.0 the newest release; from 1.0, the major version (`:1`), so a future 2.0
+# with breaking changes never arrives through `mailstudio update` by surprise.
 DEFAULT_IMAGE="ghcr.io/gmelh/mailstudio:latest"
 DEFAULT_DIR="/opt/mailstudio"
 APP_UID=10001  # the container's mailstudio user
@@ -108,12 +119,34 @@ check_system() {
   if [ "$memory_mb" -gt 0 ] && [ "$memory_mb" -lt 900 ]; then
     warn "This server has ${memory_mb} MB of memory. 1 GB or more is recommended."
   fi
-  disk_mb=$(df -Pm "$(dirname "$DIR")" 2>/dev/null | awk 'NR==2 {print $4}')
+  local probe=$DIR  # the nearest folder that exists: on some servers even /opt doesn't yet
+  while [ ! -d "$probe" ]; do probe=$(dirname "$probe"); done
+  disk_mb=$(df -Pm "$probe" 2>/dev/null | awk 'NR==2 {print $4}' || true)
   if [ -n "$disk_mb" ] && [ "$disk_mb" -lt 2048 ]; then
     warn "Only ${disk_mb} MB of disk space is free. 2 GB or more is recommended."
   fi
   # shellcheck disable=SC1091
   ok "$(. /etc/os-release 2>/dev/null && printf '%s' "${PRETTY_NAME:-Linux}"), $(uname -m), ${memory_mb} MB memory"
+}
+
+# Catch servers that can't reach the internet, or have no public IPv4 address, before
+# anything else: otherwise they fail later with confusing download or certificate errors.
+check_internet() {
+  local problem=""
+  if command -v ip >/dev/null 2>&1 && ! ip -4 route show default 2>/dev/null | grep -q .; then
+    problem="This server has no public IPv4 address (it has no IPv4 route to the internet).
+Mail Studio needs one: your domain's A record points to it, and it's how the server downloads
+Docker and Mail Studio. In your hosting provider's dashboard, make sure the server has a public
+IPv4 address (some providers offer IPv6-only or private-network-only servers). Then restart the
+server and run the installer again."
+  elif command -v curl >/dev/null 2>&1 && ! curl -4 -fsS --max-time 15 -o /dev/null https://get.docker.com 2>/dev/null; then
+    problem="This server can't reach the internet: https://get.docker.com didn't answer.
+Check its network and firewall settings in your hosting provider's dashboard (outgoing
+connections must be allowed), then run the installer again."
+  fi
+  [ -z "$problem" ] && return
+  if [ "$DRY_RUN" -eq 1 ]; then warn "(dry run) $problem"; return; fi
+  die "$problem"
 }
 
 choose_domain() {
@@ -138,7 +171,14 @@ choose_domain() {
 install_docker() {
   step "Docker"
   if command -v docker >/dev/null 2>&1 && docker compose version >/dev/null 2>&1; then
-    ok "Docker $(docker version --format '{{.Server.Version}}' 2>/dev/null || echo installed) is ready"
+    local version
+    version=$(docker version --format '{{.Server.Version}}' 2>/dev/null) || version=""
+    if [ -z "$version" ] && [ "$DRY_RUN" -eq 0 ]; then
+      systemctl start docker >/dev/null 2>&1 || true
+      version=$(docker version --format '{{.Server.Version}}' 2>/dev/null) || version=""
+      [ -n "$version" ] || die "Docker is installed but isn't running. Try: systemctl start docker"
+    fi
+    ok "Docker ${version:+$version }is ready"
     return
   fi
   if [ "$DRY_RUN" -eq 1 ]; then say "${dim}(dry run: would install Docker from get.docker.com)${reset}"; return; fi
@@ -429,6 +469,7 @@ main() {
   load_existing
   printf '%sMail Studio installer%s\n' "$bold" "$reset"
   check_system
+  check_internet
   choose_domain
   install_docker
   check_dns

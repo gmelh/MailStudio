@@ -3,7 +3,7 @@
 #   scripts/release-image.sh 1.0.0 [ghcr.io/OWNER/mailstudio]
 set -euo pipefail
 version=${1:?Usage: scripts/release-image.sh VERSION [IMAGE]}
-image=${2:-ghcr.io/mailstudio/mailstudio}
+image=${2:-ghcr.io/gmelh/mailstudio}
 major=${version%%.*}
 minor=${version%.*}
 cd "$(dirname "$0")/.."

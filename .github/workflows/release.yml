@@ -1,8 +1,10 @@
-# Builds the Mail Studio image for Intel/AMD and ARM servers and publishes it when a
-# version tag is pushed (e.g. git tag v1.0.0 && git push --tags).
-# Tags: 1.0.0, 1.0, 1 and latest. The installer runs the major version tag (`:1`).
-# Works on GitHub Actions, and on Gitea Actions with a registry login secret.
-name: Release image
+# Publishes a release when a version tag is pushed (e.g. git tag -a v0.7.0 && git push origin v0.7.0):
+#   1. runs all the checks (ci.yml);
+#   2. builds the image for Intel/AMD and ARM servers and pushes it to GHCR,
+#      tagged 0.7.0, 0.7, latest (and from 1.0 on, the major version too, e.g. 1);
+#      a pre-release tag like v1.0.0-rc.1 gets only its own version tag, never latest;
+#   3. creates a GitHub release with install.sh and its SHA-256 checksum attached.
+name: Release
 
 on:
   push:
@@ -10,14 +12,20 @@ on:
 
 permissions:
   contents: read
-  packages: write
 
 env:
   IMAGE: ghcr.io/${{ github.repository_owner }}/mailstudio
 
 jobs:
+  checks:
+    uses: ./.github/workflows/ci.yml
+
   image:
+    needs: checks
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
     steps:
       - uses: actions/checkout@v4
       - uses: docker/setup-qemu-action@v3
@@ -34,8 +42,8 @@ jobs:
           tags: |
             type=semver,pattern={{version}}
             type=semver,pattern={{major}}.{{minor}}
-            type=semver,pattern={{major}}
-            type=raw,value=latest
+            type=semver,pattern={{major}},enable=${{ !startsWith(github.ref, 'refs/tags/v0.') }}
+            type=raw,value=latest,enable=${{ !contains(github.ref, '-') }}
       - uses: docker/build-push-action@v6
         with:
           context: .
@@ -44,3 +52,41 @@ jobs:
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+  release:
+    needs: image
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - name: Installer and checksum
+        run: |
+          cp install/install.sh install.sh
+          sha256sum install.sh > install.sh.sha256
+      - name: Create the GitHub release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ github.ref_name }}
+        run: |
+          sum=$(cut -d' ' -f1 install.sh.sha256)
+          version=${TAG#v}
+          prerelease=""
+          case $version in *-*) prerelease="--prerelease" ;; esac  # e.g. 1.0.0-rc.1
+          {
+            echo "Install on a fresh Ubuntu or Debian server:"
+            echo
+            echo '```sh'
+            echo 'curl -fsSL https://get.mailstudio.email | sudo bash'
+            echo '```'
+            echo
+            echo "Update an existing install: \`mailstudio update\`"
+            echo
+            echo "Image: \`${IMAGE}:${version}\`"
+            echo
+            echo "install.sh SHA-256: \`${sum}\`"
+          } > notes.md
+          gh release create "$TAG" install.sh install.sh.sha256 \
+            --title "Mail Studio ${version}" --notes-file notes.md $prerelease

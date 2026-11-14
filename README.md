@@ -22,6 +22,28 @@ curl -fsSL https://get.mailstudio.email | sudo bash
 
 Then open the address it gives you and follow **Get set up**. See [install/](install/README.md).
 
+## Working on Mail Studio
+
+You need Python 3.12 and Node 22. In VS Code, open this folder, install the recommended
+extensions when asked, then run **Terminal → Run Task… → setup: everything (run once)**.
+Select `.venv` as the Python interpreter, and press **F5** with **Server (with sending worker)**
+to run it under the debugger at http://localhost:8080, rebuilding the web app as you edit.
+**Web app in Edge** (or Chrome) debugs the browser side; **Tests: this file** runs the open
+test file. **check: everything (as on GitHub)** runs the same checks as `ci.yml`.
+
+Without VS Code:
+
+```sh
+python3 -m venv .venv && .venv/bin/pip install -e "server[dev]"
+(cd web && npm ci && npm run dev) &      # rebuilds web/dist on change
+.venv/bin/mailstudio serve               # http://localhost:8080, data in ./data
+```
+
+To send real test campaigns locally, run Mailpit (`docker compose up -d mailpit`), start the
+server with `MAILSTUDIO_ALLOW_SMTP_SENDING=1` (the VS Code configurations set it), and in
+Settings → Test emails use server `127.0.0.1`, port `1025`, security none. Caught emails
+appear at http://localhost:8025.
+
 ## Status
 
 Phase 1 (sending core), done:

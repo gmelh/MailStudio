@@ -1,0 +1,90 @@
+{
+  // Debug Mail Studio: press F5 and pick one of these from the Run and Debug panel.
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Server (with sending worker)",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "mailstudio.cli",
+      "args": ["serve", "--port", "8080"],
+      "cwd": "${workspaceFolder}",
+      "env": {
+        "MAILSTUDIO_DATA_DIR": "${workspaceFolder}/data",
+        "MAILSTUDIO_BASE_URL": "http://localhost:8080",
+        // Lets campaigns go to a local SMTP catcher such as Mailpit (docker compose up -d mailpit).
+        "MAILSTUDIO_ALLOW_SMTP_SENDING": "1"
+      },
+      "preLaunchTask": "web: watch",
+      "justMyCode": true,
+      "console": "integratedTerminal"
+    },
+    {
+      "name": "Server without worker",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "mailstudio.cli",
+      "args": ["serve", "--port", "8080"],
+      "cwd": "${workspaceFolder}",
+      "env": {
+        "MAILSTUDIO_DATA_DIR": "${workspaceFolder}/data",
+        "MAILSTUDIO_BASE_URL": "http://localhost:8080",
+        "MAILSTUDIO_ALLOW_SMTP_SENDING": "1",
+        "MAILSTUDIO_WORKER": "0"
+      },
+      "preLaunchTask": "web: watch",
+      "justMyCode": true,
+      "console": "integratedTerminal"
+    },
+    {
+      "name": "Worker only",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "mailstudio.cli",
+      "args": ["worker"],
+      "cwd": "${workspaceFolder}",
+      "env": {
+        "MAILSTUDIO_DATA_DIR": "${workspaceFolder}/data",
+        "MAILSTUDIO_BASE_URL": "http://localhost:8080",
+        "MAILSTUDIO_ALLOW_SMTP_SENDING": "1"
+      },
+      "justMyCode": true,
+      "console": "integratedTerminal"
+    },
+    {
+      "name": "Tests: this file",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "pytest",
+      "args": ["-q", "${file}"],
+      "cwd": "${workspaceFolder}/server",
+      "justMyCode": false,
+      "console": "integratedTerminal"
+    },
+    {
+      "name": "Web app in Edge",
+      "type": "msedge",
+      "request": "launch",
+      "url": "http://localhost:8080",
+      "webRoot": "${workspaceFolder}/web/dist",
+      "pathMapping": { "/src/": "${workspaceFolder}/web/src/" },
+      "sourceMaps": true
+    },
+    {
+      "name": "Web app in Chrome",
+      "type": "chrome",
+      "request": "launch",
+      "url": "http://localhost:8080",
+      "webRoot": "${workspaceFolder}/web/dist",
+      "pathMapping": { "/src/": "${workspaceFolder}/web/src/" },
+      "sourceMaps": true
+    }
+  ],
+  "compounds": [
+    {
+      "name": "Everything: server + web app in Edge",
+      "configurations": ["Server (with sending worker)", "Web app in Edge"],
+      "stopAll": true
+    }
+  ]
+}
