@@ -22,7 +22,7 @@
 
 set -euo pipefail
 
-DEFAULT_IMAGE="ghcr.io/mailstudio/mailstudio:1"
+DEFAULT_IMAGE="ghcr.io/gmelh/mailstudio:latest"
 DEFAULT_DIR="/opt/mailstudio"
 APP_UID=10001  # the container's mailstudio user
 
