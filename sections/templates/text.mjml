@@ -1,0 +1,5 @@
+<mj-section css-class="ms-s-{{section_id}}">
+  <mj-column>
+    <mj-text css-class="ms-text">{{#s.heading}}<h3 class="ms-heading" style="{{brand.h3}}">{{s.heading}}</h3>{{/s.heading}}{{{s.body_html}}}</mj-text>
+  </mj-column>
+</mj-section>

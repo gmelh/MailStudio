@@ -1,0 +1,865 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>The Mail Studio Book</title>
+<style>
+  @page { size: A4; margin: 22mm 20mm 24mm 20mm; }
+  :root {
+    --ink: #1f2a3c; --soft: #55627a; --accent: #4768da; --accent-soft: #eef2fd;
+    --green: #1f7a4a; --green-soft: #e8f5ee; --amber: #9a5b00; --amber-soft: #fdf4e3;
+    --red: #b03a33; --red-soft: #fbeceb; --rule: #dfe5ee;
+  }
+  * { box-sizing: border-box; }
+  html { font-size: 10.6pt; }
+  body { margin: 0; font-family: "Lora", Georgia, serif; line-height: 1.6; color: var(--ink); }
+  h1, h2, h3, h4, .label, .toc, figcaption, .box-title, table, .step-num, .part, .kicker, code, pre, kbd {
+    font-family: "Inter", "DejaVu Sans", sans-serif;
+  }
+  code, pre, kbd { font-family: "DejaVu Sans Mono", monospace; }
+  p { margin: 0 0 0.75em; orphans: 3; widows: 3; }
+  a { color: var(--accent); text-decoration: none; }
+  strong { font-weight: 700; }
+
+  /* Parts and chapters */
+  .part {
+    break-before: page; height: 230mm; display: flex; flex-direction: column; justify-content: center;
+    padding-left: 6mm; border-left: 3mm solid var(--accent);
+  }
+  .part .kicker { font-size: 11pt; letter-spacing: .2em; text-transform: uppercase; color: var(--accent); font-weight: 700; }
+  .part h1 { font-size: 34pt; line-height: 1.1; margin: 4mm 0 6mm; letter-spacing: -0.5pt; }
+  .part p { font-size: 12pt; color: var(--soft); max-width: 120mm; }
+  .chapter { break-before: page; }
+  .chapter > header { margin-bottom: 8mm; }
+  .chapter .kicker { font-size: 9pt; letter-spacing: .18em; text-transform: uppercase; color: var(--accent); font-weight: 700; }
+  .chapter h1 { font-size: 24pt; line-height: 1.15; margin: 2mm 0 3mm; letter-spacing: -0.3pt; }
+  .chapter .lead { font-size: 12pt; color: var(--soft); }
+  h2 { font-size: 14pt; margin: 8mm 0 3mm; break-after: avoid; }
+  h3 { font-size: 11.5pt; margin: 6mm 0 2mm; break-after: avoid; }
+
+  /* Numbered steps */
+  ol.steps { list-style: none; counter-reset: step; padding: 0; margin: 4mm 0 5mm; }
+  ol.steps > li {
+    counter-increment: step; position: relative; padding: 0.4mm 0 0 12mm; min-height: 8mm; margin: 0 0 4.5mm; break-inside: avoid;
+  }
+  ol.steps > li::before {
+    content: counter(step); position: absolute; left: 0; top: 0; width: 7.5mm; height: 7.5mm; border-radius: 50%;
+    background: var(--accent); color: #fff; font: 700 10pt/7.5mm "Inter", sans-serif; text-align: center;
+  }
+  ol.steps > li > strong:first-child { font-family: "Inter", sans-serif; }
+  ul { padding-left: 6mm; margin: 0 0 0.75em; }
+  li { margin-bottom: 1.5mm; }
+
+  /* Boxes */
+  .box { border-radius: 3mm; padding: 4mm 5mm; margin: 4mm 0 5mm; break-inside: avoid; background: var(--accent-soft); }
+  .box p:last-child, .box ul:last-child { margin-bottom: 0; }
+  .box-title { font-weight: 700; font-size: 10pt; margin-bottom: 1.5mm; display: block; }
+  .box.need { background: #f4f6fa; border: 0.3mm solid var(--rule); }
+  .box.tip { background: var(--green-soft); } .box.tip .box-title { color: var(--green); }
+  .box.warn { background: var(--amber-soft); } .box.warn .box-title { color: var(--amber); }
+  .box.stop { background: var(--red-soft); } .box.stop .box-title { color: var(--red); }
+  .checklist { list-style: none; padding: 0; }
+  .checklist li { padding-left: 7mm; position: relative; }
+  .checklist li::before { content: "☐"; position: absolute; left: 0; top: -0.3mm; font-family: "DejaVu Sans"; font-size: 12pt; color: var(--soft); }
+
+  /* Code */
+  pre {
+    background: #1f2a3c; color: #eef2f8; border-radius: 2.5mm; padding: 3.5mm 4.5mm; font-size: 8.8pt; line-height: 1.5;
+    white-space: pre-wrap; word-break: break-word; margin: 3mm 0 4mm; break-inside: avoid;
+  }
+  pre .c { color: #9aa8bf; }
+  code { font-size: 0.86em; background: #eef1f6; padding: 0.2mm 1.2mm; border-radius: 1mm; word-break: break-word; }
+  pre code { background: none; padding: 0; font-size: inherit; }
+  kbd { font-size: 0.82em; border: 0.3mm solid #c7cfdc; border-bottom-width: 0.7mm; border-radius: 1mm; padding: 0 1.2mm; background: #fff; }
+  .ui { font-family: "Inter", sans-serif; font-weight: 600; font-size: 0.93em; }
+
+  /* Figures */
+  figure { margin: 4mm 0 6mm; break-inside: avoid; }
+  figure img { display: block; max-width: 100%; max-height: 118mm; width: auto; margin: 0 auto; border: 0.3mm solid var(--rule); border-radius: 2mm; }
+  figure.narrow img { max-width: 62%; }
+  figure.half img { max-width: 80%; }
+  .two figure img { max-height: 95mm; }
+  figcaption { font-size: 8.8pt; color: var(--soft); margin-top: 2mm; text-align: center; }
+
+  /* Tables */
+  table { width: 100%; border-collapse: collapse; font-size: 9pt; margin: 3mm 0 5mm; break-inside: auto; }
+  th { text-align: left; font-weight: 700; color: var(--soft); font-size: 8pt; text-transform: uppercase; letter-spacing: .05em; }
+  th, td { padding: 1.6mm 2.5mm 1.6mm 0; border-bottom: 0.3mm solid var(--rule); vertical-align: top; }
+  tr { break-inside: avoid; }
+  td code { font-size: 8pt; }
+
+  /* Cover */
+  .cover { height: 250mm; display: flex; flex-direction: column; justify-content: space-between; }
+  .cover .mark { font: 800 16pt "Inter", sans-serif; letter-spacing: -0.3pt; }
+  .cover .mark span { color: var(--accent); }
+  .cover h1 { font: 800 44pt/1.02 "Inter", sans-serif; letter-spacing: -1.5pt; margin: 0 0 7mm; }
+  .cover .sub { font-size: 15pt; color: var(--soft); max-width: 130mm; line-height: 1.45; }
+  .cover .band { height: 3mm; width: 40mm; background: var(--accent); margin-bottom: 10mm; }
+  .cover .foot { font: 9.5pt "Inter", sans-serif; color: var(--soft); }
+
+  /* Contents */
+  .toc { break-before: page; }
+  .toc h1 { font-size: 24pt; margin: 0 0 8mm; }
+  .toc .tpart { font-weight: 700; font-size: 9pt; letter-spacing: .15em; text-transform: uppercase; color: var(--accent); margin: 6mm 0 2mm; }
+  .toc .row { display: flex; align-items: baseline; font-size: 11pt; margin: 1.6mm 0; }
+  .toc .row .n { width: 9mm; color: var(--soft); }
+  .toc .row .dots { flex: 1; border-bottom: 0.4mm dotted #b8c1d0; margin: 0 2mm; transform: translateY(-1mm); }
+  .toc .row .pg { width: 8mm; text-align: right; color: var(--soft); }
+
+  .two { display: grid; grid-template-columns: 1fr 1fr; gap: 6mm; }
+  .small { font-size: 9pt; color: var(--soft); }
+  .muted { color: var(--soft); }
+  hr { border: 0; border-top: 0.3mm solid var(--rule); margin: 6mm 0; }
+</style>
+</head>
+<body>
+
+<!-- ====================================================================== -->
+<section class="cover" id="cover">
+  <div class="mark">✉ <span>Mail</span> Studio</div>
+  <div>
+    <div class="band"></div>
+    <h1>The Mail Studio Book</h1>
+    <p class="sub">Install it on your own server, get it ready to send, and write your first email campaign. Step by step, no technical background needed.</p>
+  </div>
+  <div class="foot">Version 1.0 · mailstudio.email · MIT licence</div>
+</section>
+
+<!-- ====================================================================== -->
+<section class="toc" id="toc">
+  <h1>Contents</h1>
+  {{TOC}}
+</section>
+
+<!-- ====================================================================== -->
+<section class="chapter" data-toc="How to use this book">
+  <header>
+    <div class="kicker">Start here</div>
+    <h1>How to use this book</h1>
+    <p class="lead">Mail Studio is email campaign software that runs on a server you rent. You own the server, your subscriber list and everything you send. Nobody charges you per contact.</p>
+  </header>
+
+  <p>This book takes you from nothing to a sent campaign. Work through it in order the first time. Afterwards, Parts 3 and 4 are there to look things up.</p>
+
+  <table>
+    <tr><th style="width:28%">Part</th><th>What you'll do</th><th style="width:22%">Time</th></tr>
+    <tr><td><strong>1. Install</strong></td><td>Rent a server, point an address at it, run one command.</td><td>20–30 minutes</td></tr>
+    <tr><td><strong>2. Get set up</strong></td><td>Your business details, Amazon SES (which delivers your email), your domain, and permission to send to anyone.</td><td>45 minutes, then up to a day waiting for Amazon</td></tr>
+    <tr><td><strong>3. Everyday use</strong></td><td>Bring in your subscribers, write an email, send it, see how it went.</td><td>Your first email: about 5 minutes</td></tr>
+    <tr><td><strong>4. Looking after it</strong></td><td>Updates, backups, and what to do when something goes wrong.</td><td>A few minutes a month</td></tr>
+  </table>
+
+  <h2>What the boxes mean</h2>
+  <div class="box need"><span class="box-title">You'll need</span><p>What to have ready before you start a chapter.</p></div>
+  <div class="box tip"><span class="box-title">Tip</span><p>Something that makes the job easier.</p></div>
+  <div class="box warn"><span class="box-title">Watch out</span><p>A common mistake, and how to avoid it.</p></div>
+  <div class="box stop"><span class="box-title">Don't skip this</span><p>Something that stops things working, or gets you into trouble, if it's missed.</p></div>
+
+  <h2>Typing commands</h2>
+  <p>A few steps in Part 1 ask you to type a command into your server. They look like this:</p>
+  <pre>mailstudio status</pre>
+  <p>Type (or paste) the whole line exactly as shown, then press <kbd>Enter</kbd>. Lines starting with <code>#</code> are notes, not commands. That's all the command line you'll need: everything else happens in your web browser.</p>
+</section>
+
+<!-- ====================================================================== -->
+<section class="part" data-toc-part="Part 1 · Install">
+  <div class="kicker">Part 1</div>
+  <h1>Install</h1>
+  <p>Rent a small server, give it an address like mail.yourbusiness.com, and run the installer. At the end you'll have Mail Studio running securely at that address.</p>
+</section>
+
+<section class="chapter" data-toc="Before you start">
+  <header>
+    <div class="kicker">Chapter 1</div>
+    <h1>Before you start</h1>
+    <p class="lead">Ten minutes gathering these now saves an hour of stopping and starting later.</p>
+  </header>
+
+  <div class="box need">
+    <span class="box-title">You'll need</span>
+    <ul class="checklist">
+      <li><strong>A domain name you control</strong>, such as <code>yourbusiness.com</code>, and the login for wherever its DNS is managed (usually where you bought it: GoDaddy, Crazy Domains, Cloudflare, VentraIP and so on).</li>
+      <li><strong>An email address at that domain</strong>, such as <code>news@yourbusiness.com</code>. Your campaigns will come from it. It can't be a Gmail, Outlook or Yahoo address.</li>
+      <li><strong>A credit card</strong> for the server (a few dollars a month) and for Amazon Web Services (about US$0.10 per thousand emails).</li>
+      <li><strong>About an hour</strong>, plus up to a day for Amazon to approve your account for sending.</li>
+      <li><strong>A list of people who agreed to hear from you</strong>, if you have one: a spreadsheet with an email column is fine.</li>
+    </ul>
+  </div>
+
+  <h2>How the pieces fit together</h2>
+  <p>Three things work together, and it helps to know which is which:</p>
+  <table>
+    <tr><th style="width:26%">Piece</th><th>What it does</th><th style="width:26%">Where it lives</th></tr>
+    <tr><td><strong>Mail Studio</strong></td><td>Where you keep your contacts, design emails and press Send. It runs on your server.</td><td>Your server, at e.g. <code>mail.yourbusiness.com</code></td></tr>
+    <tr><td><strong>Amazon SES</strong></td><td>Simple Email Service. It actually delivers the emails, reliably and cheaply. Mail Studio hands each email to it.</td><td>Your own AWS account</td></tr>
+    <tr><td><strong>Your domain's DNS</strong></td><td>The public address book for your domain. You add a few records so the world can find your server and trust your emails.</td><td>Where you manage your domain</td></tr>
+  </table>
+  <p>Your server never sends email directly, so it doesn't matter that many hosting companies block email ports. Everything goes through Amazon.</p>
+
+  <h2>Choose your Mail Studio address</h2>
+  <p>Mail Studio needs its own address. A subdomain of your website works best. For example, if your website is <code>yourbusiness.com</code>, use:</p>
+  <pre>mail.yourbusiness.com</pre>
+  <p>This is where you'll log in, where your signup page lives, and where unsubscribe links point. Your subscribers will see it in links, so keep it tidy. You'll use it in Chapter 3.</p>
+
+  <div class="box tip"><span class="box-title">Tip</span><p>Keep a note open while you work through Parts 1 and 2 and jot down your server's IP address, your Mail Studio address, your AWS region and your access key ID. You'll need them more than once.</p></div>
+</section>
+
+<section class="chapter" data-toc="Rent a server">
+  <header>
+    <div class="kicker">Chapter 2</div>
+    <h1>Rent a server</h1>
+    <p class="lead">A virtual private server (VPS) is a small computer in a data centre that you rent by the month. Mail Studio needs only the smallest kind.</p>
+  </header>
+
+  <h2>Pick a provider</h2>
+  <p>Any provider that offers Ubuntu servers will do. Choose a data centre near you and your subscribers. Well-known options with Australian locations include Vultr, DigitalOcean, Linode (Akamai) and BinaryLane. Elsewhere, Hetzner and OVH are popular.</p>
+
+  <h2>Create the server</h2>
+  <ol class="steps">
+    <li><strong>Choose the operating system.</strong> Pick <span class="ui">Ubuntu 24.04 LTS</span> (Debian 12 also works).</li>
+    <li><strong>Choose the size.</strong> 1 GB of memory and 25 GB of disk is plenty for tens of thousands of subscribers.</li>
+    <li><strong>Choose the location</strong> nearest you, for example Sydney or Melbourne.</li>
+    <li><strong>Turn on automatic backups or snapshots</strong> if the provider offers them. It's usually a dollar or two a month, and it's the simplest insurance you can buy.</li>
+    <li><strong>Set how you'll log in.</strong> An SSH key is more secure; a root password is fine to start with. If you choose a password, make it long and save it in your password manager.</li>
+    <li><strong>Create it</strong>, then copy the server's <strong>IPv4 address</strong> from the dashboard. It looks like <code>203.0.113.25</code>. Write it down.</li>
+  </ol>
+
+  <div class="box warn"><span class="box-title">Watch out</span><p>Some providers put a firewall in front of your server in their dashboard. If yours does, allow incoming <strong>ports 80 and 443</strong> (web traffic). Mail Studio's installer opens them on the server itself, but it can't change the provider's firewall.</p></div>
+
+  <h2>Connect to the server</h2>
+  <p>You'll type a few commands on the server. Most providers have a <span class="ui">Console</span> button in the dashboard that opens one in your browser. Or connect from your own computer:</p>
+  <div class="two">
+    <div>
+      <h3>On a Mac or Linux</h3>
+      <p>Open <span class="ui">Terminal</span> and type (with your server's IP):</p>
+      <pre>ssh root@203.0.113.25</pre>
+    </div>
+    <div>
+      <h3>On Windows</h3>
+      <p>Open <span class="ui">PowerShell</span> or <span class="ui">Windows Terminal</span> and type the same:</p>
+      <pre>ssh root@203.0.113.25</pre>
+    </div>
+  </div>
+  <p>The first time, it asks whether you trust the server: type <code>yes</code>. Then enter the password (nothing appears as you type; that's normal). You're in when you see a prompt ending in <code>#</code>.</p>
+</section>
+
+<section class="chapter" data-toc="Point your address at the server">
+  <header>
+    <div class="kicker">Chapter 3</div>
+    <h1>Point your address at the server</h1>
+    <p class="lead">Tell the world that mail.yourbusiness.com lives at your server's IP address. Do this before installing: the installer checks it, and the secure certificate depends on it.</p>
+  </header>
+
+  <ol class="steps">
+    <li><strong>Log in to where your domain's DNS is managed.</strong> Look for <span class="ui">DNS</span>, <span class="ui">DNS records</span>, <span class="ui">Zone editor</span> or <span class="ui">Manage DNS</span>.</li>
+    <li><strong>Add a new record</strong> with these values:
+      <table>
+        <tr><th style="width:24%">Field</th><th>Enter</th></tr>
+        <tr><td>Type</td><td><code>A</code></td></tr>
+        <tr><td>Name / Host</td><td><code>mail</code> (just the first part; some providers want the full <code>mail.yourbusiness.com</code>)</td></tr>
+        <tr><td>Value / Points to</td><td>Your server's IPv4 address, e.g. <code>203.0.113.25</code></td></tr>
+        <tr><td>TTL</td><td>Leave the default, or choose 5 minutes / 300</td></tr>
+      </table>
+    </li>
+    <li><strong>Save it.</strong> It usually starts working within a few minutes, though it can take up to an hour.</li>
+  </ol>
+
+  <div class="box warn"><span class="box-title">Using Cloudflare?</span><p>Set the record to <strong>DNS only</strong> (a grey cloud, not orange) while you install. Caddy, the part of Mail Studio that handles the secure certificate, needs to reach your server directly.</p></div>
+
+  <h2>Check it's working</h2>
+  <p>On your server, type:</p>
+  <pre>getent hosts mail.yourbusiness.com</pre>
+  <p>When it prints your server's IP address, you're ready. If it prints nothing, wait a few minutes and try again. (The installer does this check for you too, and waits if needed.)</p>
+</section>
+
+<section class="chapter" data-toc="Run the installer">
+  <header>
+    <div class="kicker">Chapter 4</div>
+    <h1>Run the installer</h1>
+    <p class="lead">One command does the rest: it installs Docker, sets up Mail Studio with a secure https:// address, adds a daily backup and a <code>mailstudio</code> command for looking after it.</p>
+  </header>
+
+  <div class="box stop"><span class="box-title">Before the official release</span><p>Until Mail Studio's ready-made image and <code>get.mailstudio.email</code> are published, use <strong>Appendix B</strong> instead: it builds Mail Studio on your server from your copy of the code, then runs the same installer.</p></div>
+
+  <ol class="steps">
+    <li><strong>On your server, run:</strong>
+      <pre>curl -fsSL https://get.mailstudio.email | sudo bash</pre>
+    </li>
+    <li><strong>Enter your Mail Studio address</strong> when asked, e.g. <code>mail.yourbusiness.com</code>.</li>
+    <li><strong>Enter your email address</strong> when asked (optional). Let's Encrypt, which issues the free security certificate, uses it only to warn you if something's wrong with it.</li>
+    <li><strong>Wait.</strong> Installing Docker takes a minute or two the first time, then the certificate usually takes under a minute.</li>
+  </ol>
+
+  <h2>What you'll see</h2>
+  <pre>Mail Studio installer
+
+==> Checking this server
+✓ Ubuntu 24.04 LTS, x86_64, 1963 MB memory
+
+==> Your Mail Studio address
+Address: mail.yourbusiness.com
+Your email, for certificate notices (optional): you@yourbusiness.com
+✓ https://mail.yourbusiness.com
+
+==> Docker
+✓ Docker installed
+
+==> Checking mail.yourbusiness.com points to this server
+✓ mail.yourbusiness.com → 203.0.113.25
+
+==> Writing the setup to /opt/mailstudio
+✓ compose.yml, Caddyfile and .env
+✓ Added the 'mailstudio' command and a daily backup
+
+==> Starting Mail Studio
+Waiting for the HTTPS certificate (usually under a minute)...
+✓ Running at https://mail.yourbusiness.com
+
+Mail Studio is installed.
+
+  Open https://mail.yourbusiness.com to create your account. Do it now:
+  the first person to open it becomes the owner.</pre>
+
+  <h2>If it stops with a message</h2>
+  <table>
+    <tr><th style="width:38%">Message</th><th>What to do</th></tr>
+    <tr><td>“… points to: nothing yet. It needs to point to this server”</td><td>Your A record isn't visible yet, or has the wrong IP. Check Chapter 3, wait a few minutes, then press <kbd>Enter</kbd> to check again.</td></tr>
+    <tr><td>“Something else is using port 80 or 443”</td><td>Another web server came with the server image. The message shows its name; stop it as suggested (e.g. <code>systemctl disable --now nginx</code>), then run the installer again.</td></tr>
+    <tr><td>“Mail Studio started, but https://… isn't answering yet”</td><td>Usually the provider's firewall is blocking ports 80 and 443 (see Chapter 2), or the A record is wrong. Fix it, then run <code>mailstudio logs caddy</code> to watch Caddy try again. It retries by itself.</td></tr>
+    <tr><td>“Run it as root”</td><td>Put <code>sudo</code> before <code>bash</code>, exactly as in step 1.</td></tr>
+  </table>
+
+  <div class="box tip"><span class="box-title">Tip</span><p>Running the installer again is always safe. It keeps your data and settings, and fixes up the setup files. It's the first thing to try if you change your address or something seems broken.</p></div>
+</section>
+
+<section class="chapter" data-toc="Create your account">
+  <header>
+    <div class="kicker">Chapter 5</div>
+    <h1>Create your account</h1>
+    <p class="lead">Open your Mail Studio address in a web browser straight away.</p>
+  </header>
+
+  <div class="box stop"><span class="box-title">Do this straight away</span><p>Until an account exists, the first person to open the address becomes the owner. Create yours as soon as the installer finishes.</p></div>
+
+  <ol class="steps">
+    <li><strong>Open</strong> <code>https://mail.yourbusiness.com</code>. You'll see <span class="ui">Welcome to Mail Studio</span>.</li>
+    <li><strong>Enter your name, email and a password</strong> of at least 10 characters. A few random words works well, or let your password manager make one.</li>
+    <li><strong>Choose</strong> <span class="ui">Create account</span>. You go straight to <span class="ui">Get set up</span>, the guide for Part 2.</li>
+  </ol>
+  <figure class="half"><img src="img/ui-1-setup.png"><figcaption>The first screen: creating the owner's account.</figcaption></figure>
+  <p>You can add other people later under <span class="ui">Users</span>. Everyone who can log in can do everything, so only add people you trust.</p>
+</section>
+
+<!-- ====================================================================== -->
+<section class="part" data-toc-part="Part 2 · Get set up">
+  <div class="kicker">Part 2</div>
+  <h1>Get set up</h1>
+  <p>Seven steps in the app's Get set up guide. Each one ticks itself off once it's really working, and the sidebar shows how many are left.</p>
+</section>
+
+<section class="chapter" data-toc="The setup guide, and your business details">
+  <header>
+    <div class="kicker">Chapter 6</div>
+    <h1>The setup guide, and your business details</h1>
+    <p class="lead">Steps 1 and 2 take two minutes: who you are, and who your emails come from.</p>
+  </header>
+  <figure><img src="img/setup-overview.png"><figcaption>Get set up: click a step to open it. Done steps get a green tick, and the sidebar counts them down.</figcaption></figure>
+
+  <h2>Step 1 · Your business details</h2>
+  <p>Enter your business name and <strong>postal address</strong>. Both appear at the bottom of every email. Anti-spam laws in Australia, the US, the EU and elsewhere require a real postal address in marketing email; a PO Box is fine.</p>
+  <figure class="half"><img src="img/business-card.png"><figcaption>Your business details, shown in every email's footer.</figcaption></figure>
+
+  <h2>Step 2 · Who emails come from</h2>
+  <ul>
+    <li><strong>From name:</strong> what people see in their inbox, usually your business name.</li>
+    <li><strong>From address:</strong> an address at your own domain, e.g. <code>news@yourbusiness.com</code>.</li>
+    <li><strong>Replies go to</strong> (optional): if replies should go somewhere else, like <code>hello@yourbusiness.com</code>.</li>
+    <li><strong>Emails per second:</strong> leave it at 10 for now. New Amazon accounts allow 14 per second.</li>
+  </ul>
+  <div class="box warn"><span class="box-title">Watch out</span><p>The from address must be at a domain you control: Amazon will only send from a domain you've proved is yours (Chapter 8). Gmail, Outlook and Yahoo addresses won't work. The address should be able to receive replies, so set up the mailbox (or a forwarder) with your email provider too.</p></div>
+</section>
+
+<section class="chapter" data-toc="Connect Amazon SES">
+  <header>
+    <div class="kicker">Chapter 7</div>
+    <h1>Connect Amazon SES</h1>
+    <p class="lead">Amazon Simple Email Service delivers your emails. You'll create a user in your AWS account that's allowed to send email and nothing else, and give Mail Studio its keys.</p>
+  </header>
+
+  <div class="box need"><span class="box-title">You'll need</span><p>An Amazon Web Services account. If you don't have one, create it at <code>aws.amazon.com</code> (it asks for a card and a phone number). Then sign in to the AWS console.</p></div>
+
+  <h2>Choose your region</h2>
+  <p>At the top right of the AWS console is a region menu. Pick the one nearest your subscribers, for example <span class="ui">Asia Pacific (Sydney) ap-southeast-2</span>, and stay in it for every step in this part. Amazon SES settings are separate in each region.</p>
+
+  <h2>Create a user for Mail Studio</h2>
+  <figure><img src="img/ses-guide.png"><figcaption>Step 3 in the app shows these instructions, with the permissions ready to copy.</figcaption></figure>
+  <ol class="steps">
+    <li><strong>Copy the permissions.</strong> In Mail Studio's step 3, choose <span class="ui">Copy policy</span>. (It's also printed in Appendix C.)</li>
+    <li><strong>Open IAM.</strong> In the AWS console, search for <span class="ui">IAM</span> and open it, then choose <span class="ui">Users → Create user</span>.</li>
+    <li><strong>Name it</strong> <code>mailstudio</code>. Leave <span class="ui">Provide user access to the AWS Management Console</span> unticked: this user is only for Mail Studio. Choose <span class="ui">Next</span>.</li>
+    <li><strong>Add the permissions.</strong> Choose <span class="ui">Attach policies directly</span>, then <span class="ui">Create policy</span>. A new tab opens. Choose <span class="ui">JSON</span>, delete what's there, paste the policy, choose <span class="ui">Next</span>, name it <code>MailStudio</code> and choose <span class="ui">Create policy</span>.</li>
+    <li><strong>Attach it.</strong> Back in the first tab, refresh the policy list, search for <code>MailStudio</code>, tick it, then <span class="ui">Next → Create user</span>.</li>
+    <li><strong>Create the keys.</strong> Open the new user, go to <span class="ui">Security credentials → Create access key</span>, choose <span class="ui">Application running outside AWS</span>, then <span class="ui">Next → Create access key</span>.</li>
+    <li><strong>Copy both keys</strong>: the <strong>Access key ID</strong> (starts with <code>AKIA</code>) and the <strong>Secret access key</strong>. The secret is shown only once; if you lose it, delete the key and make another.</li>
+  </ol>
+
+  <h2>Enter them in Mail Studio</h2>
+  <ol class="steps">
+    <li><strong>Choose the same region</strong> in the <span class="ui">Region</span> menu.</li>
+    <li><strong>Paste the Access key ID and Secret access key.</strong></li>
+    <li><strong>Choose</strong> <span class="ui">Save and check</span>. Mail Studio asks Amazon about your account and shows <span class="ui">Connected</span>, the account's limits, and any warnings.</li>
+  </ol>
+  <figure class="half"><img src="img/ses-card.png"><figcaption>The Amazon SES form. Once saved, the secret is never shown again; type in it only to replace it.</figcaption></figure>
+  <p>You'll almost certainly see “<em>Your SES account is in the sandbox</em>”. That's normal for every new account, and Chapter 10 deals with it.</p>
+
+  <div class="box stop"><span class="box-title">Keep the keys secret</span><p>Anyone with these keys can send email as you. Don't email them or put them in a shared document. If they leak, delete the access key in IAM straight away, create a new one, and paste it into Mail Studio.</p></div>
+</section>
+
+<section class="chapter" data-toc="Prove your emails are really from you">
+  <header>
+    <div class="kicker">Chapter 8</div>
+    <h1>Prove your emails are really from you</h1>
+    <p class="lead">Inboxes trust email that's cryptographically signed by the domain it claims to come from. You'll add four records to your domain's DNS, and Mail Studio checks each one for you.</p>
+  </header>
+
+  <ol class="steps">
+    <li><strong>Open step 4</strong> (or <span class="ui">Settings → Sending domain</span>). The domain from your from address is already filled in.</li>
+    <li><strong>Choose</strong> <span class="ui">Set up</span>. Mail Studio registers the domain with Amazon and lists the records to add.</li>
+    <li><strong>Add each record</strong> at your DNS provider, the same way you added the A record in Chapter 3. Each one has a <span class="ui">Copy</span> button for the name and the value.</li>
+    <li><strong>Choose</strong> <span class="ui">Check again</span> after a few minutes. Each record shows <span class="ui">✓ Found</span> when it's right. Amazon then verifies the domain, which can take up to an hour or so after the records appear.</li>
+  </ol>
+  <figure><img src="img/domain-card.png"><figcaption>The sending domain step. After Set up, a table of records appears here, each with Copy buttons and its status.</figcaption></figure>
+
+  <h2>The records you'll add</h2>
+  <table>
+    <tr><th style="width:12%">Type</th><th style="width:44%">Name (host)</th><th>Why</th></tr>
+    <tr><td>CNAME ×3</td><td><code>xxxx._domainkey.yourbusiness.com</code><br><span class="small">three different, long codes</span></td><td><strong>DKIM.</strong> Lets Amazon sign your emails on your domain's behalf. Each points to a value ending in <code>.dkim.amazonses.com</code>.</td></tr>
+    <tr><td>TXT</td><td><code>_dmarc.yourbusiness.com</code></td><td><strong>DMARC.</strong> Required by Gmail and Yahoo for bulk senders. Mail Studio suggests <code>v=DMARC1; p=none; rua=mailto:dmarc@yourbusiness.com</code>, which asks for reports without blocking anything.</td></tr>
+  </table>
+
+  <div class="box warn"><span class="box-title">The most common mistake</span><p>Many DNS providers add your domain to the end of the name automatically. If yours does, enter only the part before <code>.yourbusiness.com</code>, e.g. <code>abc123._domainkey</code>, otherwise you end up with <code>abc123._domainkey.yourbusiness.com.yourbusiness.com</code> and the check stays at “Missing”. If you're unsure, add it one way and press Check again.</p></div>
+
+  <div class="box tip"><span class="box-title">Already have a DMARC record?</span><p>If <code>_dmarc</code> already exists (perhaps your email provider set one up), keep it and don't add a second: a domain may only have one. Mail Studio shows it as found. SPF needs no change for Amazon SES; Mail Studio only warns if your domain has two SPF records, which breaks SPF for all your email.</p></div>
+</section>
+
+<section class="chapter" data-toc="Bounces and spam reports">
+  <header>
+    <div class="kicker">Chapter 9</div>
+    <h1>Bounces and spam reports</h1>
+    <p class="lead">When an address doesn't exist, or someone marks your email as spam, Amazon tells Mail Studio, and that address is never emailed again. One button sets this up.</p>
+  </header>
+
+  <ol class="steps">
+    <li><strong>Open step 5</strong> and choose <span class="ui">Set it up for me</span>.</li>
+    <li><strong>Wait a few seconds.</strong> Mail Studio creates a notification topic and a configuration set, both named <code>mailstudio</code>, in your AWS account, and connects them to your server. Amazon then sends a confirmation message, which Mail Studio accepts by itself.</li>
+    <li><strong>Check it says</strong> <span class="ui">Set up and working</span>. If it says it's waiting for Amazon, choose <span class="ui">Check again</span> in a minute.</li>
+  </ol>
+  <figure class="half"><img src="img/notifications-card.png"><figcaption>Bounces and spam reports. The button needs SES connected and Mail Studio on its https:// address.</figcaption></figure>
+
+  <h2>Why this matters</h2>
+  <p>Amazon watches your <strong>bounce rate</strong> (emails to addresses that don't exist) and <strong>complaint rate</strong> (people pressing “Report spam”). If they climb too high, around 5% bounces or 0.1% complaints, Amazon reviews and can pause your account. Stopping at once when an address bounces or complains keeps you well clear. Every campaign report shows both rates, in red if they're getting risky.</p>
+
+  <div class="box warn"><span class="box-title">If it says “Access denied”</span><p>The <code>mailstudio</code> user is missing a permission. Open the <code>MailStudio</code> policy in IAM, choose <span class="ui">Edit → JSON</span>, replace it with the current one from step 3, save, and try again.</p></div>
+</section>
+
+<section class="chapter" data-toc="Ask Amazon to let you send to anyone">
+  <header>
+    <div class="kicker">Chapter 10</div>
+    <h1>Ask Amazon to let you send to anyone</h1>
+    <p class="lead">Every new SES account starts in a “sandbox” where it can only send to addresses it has verified. A short form lifts that, usually within a day.</p>
+  </header>
+
+  <ol class="steps">
+    <li><strong>Open SES in the AWS console</strong>, in the same region, and go to <span class="ui">Account dashboard</span>. Choose <span class="ui">Request production access</span> (or <span class="ui">View Get set up page</span> first, on some accounts).</li>
+    <li><strong>Mail type:</strong> choose <span class="ui">Marketing</span>.</li>
+    <li><strong>Website URL:</strong> your business's website.</li>
+    <li><strong>Use case description:</strong> describe honestly how you collect addresses and send. For example:
+      <div class="box need"><p><em>“We are a bakery in Fremantle. We email a monthly newsletter to customers who signed up on our website or in our shop. Website signups confirm their address by email before they're added. Every email has a one-click unsubscribe link and our postal address. Bounces and complaints are handled automatically through SNS notifications, and those addresses are never emailed again. We expect to send about 2,000 emails a month.”</em></p></div>
+    </li>
+    <li><strong>Submit</strong> and wait. Amazon replies by email, usually within 24 hours. Step 6 in Mail Studio ticks itself once it's approved.</li>
+  </ol>
+
+  <div class="box tip"><span class="box-title">Testing while you wait</span><p>You can still send test emails while in the sandbox, to addresses Amazon has verified. Once your domain is verified (Chapter 8), any address at that domain counts, so send tests to yourself at <code>you@yourbusiness.com</code>. To test with another address, such as your Gmail, add it in SES under <span class="ui">Identities → Create identity → Email address</span> and click the link Amazon sends.</p></div>
+
+  <div class="box warn"><span class="box-title">If Amazon says no</span><p>They usually want more detail. Reply explaining how people sign up, how you handle unsubscribes, bounces and complaints, and roughly how much you'll send. Mention that you only email people who asked to hear from you.</p></div>
+</section>
+
+<!-- ====================================================================== -->
+<section class="part" data-toc-part="Part 3 · Everyday use">
+  <div class="kicker">Part 3</div>
+  <h1>Everyday use</h1>
+  <p>Bring in your subscribers, collect new ones, write an email and send it.</p>
+</section>
+
+<section class="chapter" data-toc="Contacts and lists">
+  <header>
+    <div class="kicker">Chapter 11</div>
+    <h1>Contacts and lists</h1>
+    <p class="lead">A contact is a person. A list is a group of people who agreed to get a particular kind of email from you. Most businesses need just one list, such as “Newsletter”.</p>
+  </header>
+
+  <div class="box stop"><span class="box-title">Only email people who asked</span><p>Never import a bought list, people from a business card pile, or customers who weren't told they'd get marketing email. It's against the law in most countries, Amazon will suspend your account for it, and it ruins how well your emails get delivered to everyone else. Mail Studio asks how each person agreed, and keeps the answer.</p></div>
+
+  <h2>Create a list</h2>
+  <p>Choose <span class="ui">Lists → New list</span>, give it a name (subscribers may see it, e.g. in confirmation emails) and, if you like, a description for yourself.</p>
+
+  <h2>Import a spreadsheet</h2>
+  <ol class="steps">
+    <li><strong>Save your spreadsheet as CSV.</strong> In Excel: <span class="ui">File → Save As → CSV UTF-8</span>. In Google Sheets: <span class="ui">File → Download → Comma-separated values</span>. It needs a column headed <code>email</code>; <code>first name</code> and <code>last name</code> are used too, and other columns are kept with each contact. (See Appendix D.)</li>
+    <li><strong>Choose</strong> <span class="ui">Contacts → Import from a spreadsheet</span>, then choose the file. The first few rows appear so you can check it's the right one.</li>
+    <li><strong>Pick the list</strong> to add them to, or <span class="ui">A new list…</span>.</li>
+    <li><strong>Say how they agreed</strong> to hear from you. This is saved with every person.</li>
+    <li><strong>Add tags</strong> if you like (e.g. <code>2026 customers</code>), then choose <span class="ui">Import</span>.</li>
+  </ol>
+  <figure><img src="img/sc-2-import.png"><figcaption>Importing: the file preview, the list, and how people agreed.</figcaption></figure>
+  <p>The summary shows how many contacts were new, updated or left off the list, and lists any rows with problems (usually a mistyped address). Importing the same file again doesn't create duplicates. People who previously unsubscribed are never added back by an import.</p>
+  <figure class="half"><img src="img/sc-3-import-done.png"><figcaption>After an import: what happened to every row.</figcaption></figure>
+
+  <h2>Find and change a contact</h2>
+  <p>Under <span class="ui">Contacts</span>, search by email or name, or filter by list. Choose an address to open it: you can change their details and tags, add them to a list, unsubscribe them, and see their <strong>history</strong>, the record of when and how they agreed and unsubscribed.</p>
+  <figure><img src="img/sc-5-contact.png"><figcaption>A contact: details, lists, and the consent history that shows they agreed.</figcaption></figure>
+
+  <h2>When someone asks</h2>
+  <table>
+    <tr><th style="width:36%">They ask you to…</th><th>Do this</th></tr>
+    <tr><td>Stop emailing them</td><td>Open their contact and choose <span class="ui">Unsubscribe</span> next to the list. (Most people use the link in the email, which does this for them.)</td></tr>
+    <tr><td>Never email them again, ever</td><td><span class="ui">Contacts → Addresses never emailed</span>, and block the address.</td></tr>
+    <tr><td>Delete their data</td><td>Open their contact and choose <span class="ui">Erase…</span> at the bottom. If they had unsubscribed or bounced, the address stays blocked so it's never emailed again.</td></tr>
+  </table>
+</section>
+
+<section class="chapter" data-toc="Signup forms">
+  <header>
+    <div class="kicker">Chapter 12</div>
+    <h1>Signup forms</h1>
+    <p class="lead">Let people join your list themselves, from a page Mail Studio hosts or a form on your own website.</p>
+  </header>
+
+  <ol class="steps">
+    <li><strong>Open your list</strong> under <span class="ui">Lists</span> and scroll to <span class="ui">Signup form</span>.</li>
+    <li><strong>Tick</strong> <span class="ui">Let people sign up with a form</span>.</li>
+    <li><strong>Leave</strong> <span class="ui">Ask new subscribers to confirm by email</span> ticked. New subscribers get an email with a button, and are only added once they click it. That keeps out typos, fake signups and bots, and proves they agreed.</li>
+    <li><strong>Write the heading, an introduction and the button text</strong>, choose whether to ask for names, and optionally a thank-you message or a page on your website to go to afterwards.</li>
+    <li><strong>Choose</strong> <span class="ui">Save</span>. Your signup page's address and the code for your website appear underneath.</li>
+  </ol>
+  <figure><img src="img/su-1-settings.png"><figcaption>A list's signup form settings, with the page address and the code for your website.</figcaption></figure>
+
+  <div class="two">
+    <figure><img src="img/su-2-page.png"><figcaption>The hosted signup page, in your brand colours.</figcaption></figure>
+    <figure><img src="img/su-7-email.png"><figcaption>The confirmation email new subscribers receive.</figcaption></figure>
+  </div>
+
+  <h2>Sharing it</h2>
+  <ul>
+    <li><strong>The signup page</strong> works anywhere: link it from your website, social media bio and email signature, or turn it into a QR code for the shop counter.</li>
+    <li><strong>The form for your website:</strong> choose <span class="ui">Copy HTML</span> and paste it into your website where the form should appear. On most website builders that's an “HTML”, “Embed” or “Custom code” block. It's plain HTML, so it can be styled to match your site. Keep the hidden <code>website</code> field: it catches spam bots.</li>
+  </ul>
+  <p>People waiting to confirm appear on the list's <span class="ui">Waiting for confirmation</span> tab. They aren't emailed until they confirm, and confirmation links expire after 14 days.</p>
+  <div class="box warn"><span class="box-title">Watch out</span><p>Confirmation emails are sent through Amazon SES. Until your account leaves the sandbox (Chapter 10), they only reach verified addresses, so test the form with your own address at your domain.</p></div>
+</section>
+
+<section class="chapter" data-toc="Write an email">
+  <header>
+    <div class="kicker">Chapter 13</div>
+    <h1>Write an email</h1>
+    <p class="lead">Emails are built from sections, like a header, a feature, some text and a button. Change the words and pictures, rearrange them, and see exactly what your readers will get.</p>
+  </header>
+
+  <ol class="steps">
+    <li><strong>Choose</strong> <span class="ui">Campaigns → New campaign</span>. A starter email opens in the editor, already in your brand.</li>
+    <li><strong>Choose “Email details”</strong> (top left) and write the <strong>subject line</strong> and <strong>preview text</strong>, the short line most inboxes show after the subject.</li>
+    <li><strong>Click any part of the email</strong> in the middle to select it. Its settings open on the right: change the words, links and pictures there.</li>
+    <li><strong>Add sections</strong> from <span class="ui">Add a section</span> at the bottom left. A new section goes below the selected one. Drag sections in the list to reorder them, or use <span class="ui">Up</span>, <span class="ui">Down</span>, <span class="ui">Duplicate</span> and <span class="ui">Delete</span>.</li>
+    <li><strong>Check it</strong> with <span class="ui">Mobile</span> and <span class="ui">Dark</span> at the top right. Most people read email on a phone.</li>
+  </ol>
+  <figure><img src="img/ed-4-reloaded.png"><figcaption>The editor: sections on the left, the email in the middle, settings on the right. Changes save by themselves.</figcaption></figure>
+
+  <h2>Words</h2>
+  <p>Text boxes understand a little formatting, written as plain characters:</p>
+  <table>
+    <tr><th style="width:42%">Type</th><th>To get</th></tr>
+    <tr><td><code>**fresh sourdough**</code></td><td><strong>bold</strong></td></tr>
+    <tr><td><code>*this week only*</code></td><td><em>italic</em></td></tr>
+    <tr><td><code>[our menu](https://yourbusiness.com/menu)</code></td><td>a link reading “our menu”</td></tr>
+    <tr><td>A blank line</td><td>a new paragraph</td></tr>
+    <tr><td>Lines starting with <code>- </code></td><td>a bulleted list</td></tr>
+  </table>
+  <p><strong>Personal details:</strong> the <span class="ui">Insert personal detail…</span> menu above a text box adds the reader's first name, last name or email. <code>{{first_name|there}}</code> means “their first name, or ‘there’ if we don't know it”, so “Hi {{first_name|there}}” becomes “Hi Ada” or “Hi there”.</p>
+
+  <h2>Pictures</h2>
+  <p>In an image setting, choose <span class="ui">Upload…</span> and pick a photo, or paste the address of an image already online. Uploads are resized and compressed for email automatically. Always fill in the <strong>description</strong>: it's shown when pictures are switched off, and read aloud to blind readers.</p>
+
+  <h2>Your brand</h2>
+  <p>Choose <span class="ui">Brand &amp; style</span> (top left) to set your logo, colours, fonts and spacing, or apply one of the three styles: <span class="ui">Modern</span>, <span class="ui">Editorial</span> or <span class="ui">Minimal</span>. <span class="ui">Dark mode</span> colours are used by mail apps like Apple Mail and Outlook when the reader has dark mode on. When it looks right, choose <span class="ui">Use as default brand</span> so every new campaign starts with it.</p>
+  <div class="two">
+    <figure><img src="img/ed-3-mobile.png"><figcaption>Mobile preview.</figcaption></figure>
+    <figure><img src="img/ed-2-dark.png"><figcaption>Dark mode preview and the Brand &amp; style panel.</figcaption></figure>
+  </div>
+  <p>Every email automatically gets your postal address and a working unsubscribe link at the bottom, even if you delete the footer section.</p>
+</section>
+
+<section class="chapter" data-toc="Send it, and see how it went">
+  <header>
+    <div class="kicker">Chapter 14</div>
+    <h1>Send it, and see how it went</h1>
+    <p class="lead">Choose Send… at the top right of the editor. One page covers who gets it, a test, a final check, and when.</p>
+  </header>
+  <figure><img src="img/sc-7-send.png"><figcaption>The send page. “Ready to send?” lists anything that still needs doing, with a link to fix it.</figcaption></figure>
+
+  <ol class="steps">
+    <li><strong>Who gets it:</strong> tick the lists. To send to only part of a list, enter tags (e.g. <code>fremantle</code>). The count underneath is exactly how many people will get it: anyone who unsubscribed, bounced or complained is always left out.</li>
+    <li><strong>Who it's from:</strong> already filled in from your settings; change it for this campaign if you need to.</li>
+    <li><strong>Send yourself a test.</strong> Look at it on your phone and your computer. Click the links. Read the subject line as a stranger would. Typos are much cheaper to fix now.</li>
+    <li><strong>Ready to send?</strong> Everything should have a green tick.</li>
+    <li><strong>When:</strong> <span class="ui">Now</span>, or <span class="ui">Later</span> with a date and time (your computer's time zone).</li>
+    <li><strong>Send</strong>, and confirm. Once it's going, it can't be edited.</li>
+  </ol>
+
+  <h2>The report</h2>
+  <p>After sending, the campaign opens its report. While it's going out it updates by itself, and you can <span class="ui">Pause</span>, <span class="ui">Resume</span> or <span class="ui">Stop</span>. A scheduled campaign can be <span class="ui">Cancel and edit</span>-ed right up until it starts.</p>
+  <figure><img src="img/sc-8-report.png"><figcaption>A campaign report: sent, bounces, spam reports and unsubscribes, and the email itself.</figcaption></figure>
+  <table>
+    <tr><th style="width:26%">Number</th><th>What it means</th></tr>
+    <tr><td>Sent</td><td>Handed to Amazon for delivery.</td></tr>
+    <tr><td>Delivered</td><td>Accepted by the reader's mail server (needs Chapter 9 set up).</td></tr>
+    <tr><td>Bounced</td><td>The address doesn't exist or refused it permanently. It won't be emailed again. Keep this under 2%.</td></tr>
+    <tr><td>Spam reports</td><td>People pressed “Report spam”. They won't be emailed again. Keep this under 0.1% (one in a thousand).</td></tr>
+    <tr><td>Unsubscribed</td><td>People who used the unsubscribe link in this campaign.</td></tr>
+  </table>
+  <p>Mail Studio doesn't track who opens your emails or clicks links. That keeps your subscribers' privacy, and avoids the tracking that makes opens unreliable anyway.</p>
+
+  <div class="box tip"><span class="box-title">Next time</span><p>On the report, choose <span class="ui">Copy to a new draft</span> to start the next campaign from this one: same design, same lists, ready for new words.</p></div>
+</section>
+
+<!-- ====================================================================== -->
+<section class="part" data-toc-part="Part 4 · Looking after it">
+  <div class="kicker">Part 4</div>
+  <h1>Looking after it</h1>
+  <p>Updates, backups and fixing things. A few minutes a month.</p>
+</section>
+
+<section class="chapter" data-toc="Updates, backups and moving">
+  <header>
+    <div class="kicker">Chapter 15</div>
+    <h1>Updates, backups and moving</h1>
+    <p class="lead">The installer added a <code>mailstudio</code> command to your server. Connect to the server (Chapter 2) to use it.</p>
+  </header>
+
+  <h2>Updating</h2>
+  <pre>mailstudio update</pre>
+  <p>It backs everything up, downloads the latest version and restarts. Any changes to the database happen automatically on start, with a copy kept first. Update every month or two, or when a release note mentions a fix you need. Choose a time when no campaign is going out: an email that's halfway to Amazon at the moment of the restart is marked as not sent rather than risk sending it twice.</p>
+  <p>It's also worth updating the server itself now and then:</p>
+  <pre>apt update &amp;&amp; apt upgrade -y</pre>
+
+  <h2>Backups</h2>
+  <p>Mail Studio backs up its database and uploaded images <strong>every day</strong> to <code>/opt/mailstudio/backups</code>, keeping two weeks. To make one now, for example before a big change:</p>
+  <pre>mailstudio backup</pre>
+  <div class="box stop"><span class="box-title">Keep a copy somewhere else</span><p>A backup on the same server doesn't help if the server is lost. Turn on your hosting provider's automatic backups or snapshots (Chapter 2), and every month or so copy the latest file off the server, e.g. from your own computer:</p>
+<pre>scp root@203.0.113.25:/opt/mailstudio/backups/*.tar.gz .</pre></div>
+
+  <h2>Restoring a backup</h2>
+  <pre>mailstudio restore /opt/mailstudio/backups/mailstudio-2026-11-13-030000.tar.gz</pre>
+  <p>It asks you to type <code>restore</code> to confirm, backs up the current data first (so a restore can be undone), then puts the backup back and restarts.</p>
+
+  <h2>Moving to a new server</h2>
+  <ol class="steps">
+    <li><strong>On the old server,</strong> run <code>mailstudio backup</code> and copy the new file to your computer.</li>
+    <li><strong>Rent the new server</strong> and change your A record to its IP address (Chapter 3).</li>
+    <li><strong>Run the installer</strong> on the new server (Chapter 4), but don't create an account.</li>
+    <li><strong>Copy the backup</strong> to the new server (e.g. <code>scp mailstudio-….tar.gz root@NEW-IP:/root/</code>) and run <code>mailstudio restore /root/mailstudio-….tar.gz</code>.</li>
+    <li><strong>Log in</strong> as before. Once everything works, delete the old server.</li>
+  </ol>
+
+  <h2>Other commands</h2>
+  <table>
+    <tr><th style="width:42%">Command</th><th>What it does</th></tr>
+    <tr><td><code>mailstudio status</code></td><td>Is it running, and is the address answering?</td></tr>
+    <tr><td><code>mailstudio logs</code></td><td>Watch what it's doing (<kbd>Ctrl</kbd>+<kbd>C</kbd> to stop). <code>mailstudio logs caddy</code> for certificate problems.</td></tr>
+    <tr><td><code>mailstudio restart</code></td><td>Restart it.</td></tr>
+    <tr><td><code>mailstudio reset-password you@…</code></td><td>Prints a new password for someone who's locked out.</td></tr>
+    <tr><td><code>mailstudio create-api-key NAME</code></td><td>A key for connecting other software through the API.</td></tr>
+  </table>
+</section>
+
+<section class="chapter" data-toc="When something goes wrong">
+  <header>
+    <div class="kicker">Chapter 16</div>
+    <h1>When something goes wrong</h1>
+    <p class="lead">Find what you're seeing in the left column.</p>
+  </header>
+  <table>
+    <tr><th style="width:36%">What you see</th><th>Likely cause, and the fix</th></tr>
+    <tr><td>The address doesn't open, or the browser warns it isn't secure</td><td>The certificate couldn't be issued. Check the A record points to the server (Chapter 3), the provider's firewall allows ports 80 and 443, and Cloudflare is set to “DNS only”. Then <code>mailstudio logs caddy</code>; it retries by itself.</td></tr>
+    <tr><td>Forgot your password</td><td>On the server, run <code>mailstudio reset-password you@yourbusiness.com</code>. It prints a new password; change it under your name in the sidebar once you're in.</td></tr>
+    <tr><td>“Not connected yet” for Amazon SES</td><td>Check the region matches the one you used in AWS, and re-paste both keys. A secret pasted with a space at the end is a common culprit.</td></tr>
+    <tr><td>Test email never arrives</td><td>In the sandbox, tests only reach verified addresses (Chapter 10). Check spam. In <span class="ui">Settings</span>, Amazon SES shows any warnings.</td></tr>
+    <tr><td>Domain records stay “Missing”</td><td>The DNS provider may have added your domain twice (Chapter 8's “most common mistake”). Or wait: some providers take an hour.</td></tr>
+    <tr><td>“Set it up for me” says it needs https://</td><td>Mail Studio isn't on its secure address. Re-run the installer (Chapter 4).</td></tr>
+    <tr><td>A campaign paused by itself</td><td>The report says why, usually a problem with Amazon (sending paused, account suspended, or domain not verified). Fix it in Settings or the AWS console, then choose <span class="ui">Resume</span>. Nobody gets the email twice.</td></tr>
+    <tr><td>“Nobody on those lists can be emailed right now”</td><td>Everyone on the chosen lists has unsubscribed, bounced or is blocked, or the tag filter matches nobody.</td></tr>
+    <tr><td>Signup form says “Too many signups from here”</td><td>More than 20 signups from one internet address in an hour, usually a bot. Real people can try again in an hour.</td></tr>
+    <tr><td>High bounce rate on the first send</td><td>The list has old or mistyped addresses. They're now blocked automatically; the next send will be cleaner. Don't import that list again without cleaning it.</td></tr>
+  </table>
+  <p>If none of these help, run <code>mailstudio logs</code>, reproduce the problem, and include the last 50 lines when you ask for help.</p>
+</section>
+
+<!-- ====================================================================== -->
+<section class="chapter" data-toc="A · Command reference" data-appendix>
+  <header>
+    <div class="kicker">Appendix A</div>
+    <h1>Command reference</h1>
+  </header>
+  <h2>The installer</h2>
+  <pre>curl -fsSL https://get.mailstudio.email | sudo bash -s -- [options]</pre>
+  <table>
+    <tr><th style="width:36%">Option</th><th>Meaning</th></tr>
+    <tr><td><code>--domain mail.example.com</code></td><td>The address, so it isn't asked.</td></tr>
+    <tr><td><code>--email you@example.com</code></td><td>For certificate notices.</td></tr>
+    <tr><td><code>--dir /opt/mailstudio</code></td><td>Where to install (the default is shown).</td></tr>
+    <tr><td><code>--image NAME</code></td><td>Which Mail Studio image to run (Appendix B).</td></tr>
+    <tr><td><code>--yes</code></td><td>Ask nothing; needs <code>--domain</code>.</td></tr>
+    <tr><td><code>--skip-dns-check</code></td><td>Don't check the address points here.</td></tr>
+    <tr><td><code>--dry-run</code></td><td>Write the setup files only; install and start nothing.</td></tr>
+  </table>
+  <h2>On the server</h2>
+  <table>
+    <tr><th style="width:42%">Command</th><th>What it does</th></tr>
+    <tr><td><code>mailstudio status</code></td><td>Running? Answering?</td></tr>
+    <tr><td><code>mailstudio logs [app|caddy]</code></td><td>Follow the logs</td></tr>
+    <tr><td><code>mailstudio update</code></td><td>Back up, update, restart</td></tr>
+    <tr><td><code>mailstudio backup [--keep N]</code></td><td>Back up now (keep the newest N)</td></tr>
+    <tr><td><code>mailstudio restore FILE</code></td><td>Put a backup back</td></tr>
+    <tr><td><code>mailstudio restart | stop | start</code></td><td></td></tr>
+    <tr><td><code>mailstudio reset-password EMAIL</code></td><td>New password for a locked-out user</td></tr>
+    <tr><td><code>mailstudio create-api-key NAME</code></td><td>Create an API key</td></tr>
+    <tr><td><code>mailstudio version</code></td><td>Which version is running</td></tr>
+  </table>
+  <h2>What's where</h2>
+  <pre>/opt/mailstudio/
+  .env          your address and the image version (edit, then: mailstudio restart)
+  compose.yml   Mail Studio and Caddy (rewritten by the installer)
+  Caddyfile     HTTPS settings (rewritten by the installer)
+  data/         the database and uploaded images
+  backups/      daily backups</pre>
+</section>
+
+<section class="chapter" data-toc="B · Installing from your own copy of the code" data-appendix>
+  <header>
+    <div class="kicker">Appendix B</div>
+    <h1>Installing from your own copy of the code</h1>
+    <p class="lead">For installs before the ready-made image and get.mailstudio.email are published, or to run your own changes. The server builds Mail Studio itself, then the normal installer takes over.</p>
+  </header>
+  <div class="box need"><span class="box-title">You'll need</span><p>Chapters 1–3 done (a server, and your address pointing at it), and the address of your Mail Studio Git repository with a way to log in to it if it's private.</p></div>
+  <ol class="steps">
+    <li><strong>Install Git and Docker:</strong>
+<pre>apt update &amp;&amp; apt install -y git
+curl -fsSL https://get.docker.com | sh</pre></li>
+    <li><strong>Get the code</strong> (use your repository's address):
+<pre>git clone https://your-git-server/you/mailstudio.git /opt/mailstudio-src
+cd /opt/mailstudio-src</pre></li>
+    <li><strong>Build the image</strong> (a few minutes the first time):
+<pre>docker build -t mailstudio:local -f server/Dockerfile .</pre></li>
+    <li><strong>Run the installer from the code, using that image:</strong>
+<pre>bash install/install.sh --image mailstudio:local</pre>
+      Then carry on from “What you'll see” in Chapter 4.</li>
+  </ol>
+  <h2>Updating an install built this way</h2>
+<pre>cd /opt/mailstudio-src
+git pull
+docker build -t mailstudio:local -f server/Dockerfile .
+mailstudio update</pre>
+  <p><code>mailstudio update</code> backs up and restarts with the newly built image; there's nothing to download for an image built on the server.</p>
+  <h2>Switching to the official image later</h2>
+  <p>Edit <code>/opt/mailstudio/.env</code>, change the <code>MAILSTUDIO_IMAGE=</code> line to the published image (e.g. <code>ghcr.io/mailstudio/mailstudio:1</code>), and run <code>mailstudio update</code>. Your data stays as it is.</p>
+</section>
+
+<section class="chapter" data-toc="C · The Amazon permissions" data-appendix>
+  <header>
+    <div class="kicker">Appendix C</div>
+    <h1>The Amazon permissions</h1>
+    <p class="lead">The policy for the mailstudio user (Chapter 7). Copy it from step 3 in the app if you can, as it's always current.</p>
+  </header>
+<pre>{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "MailStudio",
+      "Effect": "Allow",
+      "Action": [
+        "ses:SendEmail",
+        "ses:SendRawEmail",
+        "ses:GetAccount",
+        "ses:CreateEmailIdentity",
+        "ses:GetEmailIdentity",
+        "ses:CreateConfigurationSet",
+        "ses:CreateConfigurationSetEventDestination",
+        "ses:UpdateConfigurationSetEventDestination",
+        "sns:CreateTopic",
+        "sns:SetTopicAttributes",
+        "sns:Subscribe",
+        "sns:ListSubscriptionsByTopic"
+      ],
+      "Resource": "*"
+    }
+  ]
+}</pre>
+  <table>
+    <tr><th style="width:44%">Permissions</th><th>Used for</th></tr>
+    <tr><td><code>ses:SendEmail</code>, <code>ses:SendRawEmail</code></td><td>Sending campaigns, tests and confirmation emails</td></tr>
+    <tr><td><code>ses:GetAccount</code></td><td>Showing your sending limits and sandbox status</td></tr>
+    <tr><td><code>ses:CreateEmailIdentity</code>, <code>ses:GetEmailIdentity</code></td><td>Setting up and checking your sending domain</td></tr>
+    <tr><td><code>ses:…ConfigurationSet…</code>, <code>sns:…</code></td><td>Setting up bounce and spam-report notifications (Chapter 9)</td></tr>
+  </table>
+</section>
+
+<section class="chapter" data-toc="D · Spreadsheet format for importing" data-appendix>
+  <header>
+    <div class="kicker">Appendix D</div>
+    <h1>Spreadsheet format for importing</h1>
+  </header>
+  <p>Save as CSV (comma-separated values). The first row holds the column headings:</p>
+<pre>email,first name,last name,suburb
+ada@example.com,Ada,Lovelace,Fremantle
+grace@example.com,Grace,Hopper,Perth</pre>
+  <ul>
+    <li><strong>email</strong> is required. <code>E-mail</code> and <code>Email address</code> also work.</li>
+    <li><strong>first name</strong> and <strong>last name</strong> are optional (<code>firstname</code> and <code>first_name</code> work too).</li>
+    <li><strong>Any other column</strong> is kept with each contact and shown on their page.</li>
+    <li>Headings can be in any case. Commas, semicolons or tabs between columns all work.</li>
+    <li>Up to 10 MB per file (roughly 100,000 people). Split bigger lists into several files.</li>
+    <li>People already in Mail Studio are updated, never duplicated. People who unsubscribed from the list, or whose addresses bounced or were blocked, are left off it.</li>
+  </ul>
+</section>
+
+<section class="chapter" data-toc="E · Words you'll come across" data-appendix>
+  <header>
+    <div class="kicker">Appendix E</div>
+    <h1>Words you'll come across</h1>
+  </header>
+  <table>
+    <tr><th style="width:28%">Word</th><th>Meaning</th></tr>
+    <tr><td>A record</td><td>A DNS record that says which IP address a name (like mail.yourbusiness.com) lives at.</td></tr>
+    <tr><td>Amazon SES</td><td>Amazon Simple Email Service: the service that delivers your emails.</td></tr>
+    <tr><td>AWS</td><td>Amazon Web Services, Amazon's cloud services. SES is one of them.</td></tr>
+    <tr><td>Bounce</td><td>An email that couldn't be delivered, usually because the address doesn't exist.</td></tr>
+    <tr><td>Caddy</td><td>The part of a Mail Studio install that handles the secure https:// connection and its certificate.</td></tr>
+    <tr><td>CNAME record</td><td>A DNS record that says one name is an alias of another.</td></tr>
+    <tr><td>Complaint</td><td>A reader pressed “Report spam” on your email.</td></tr>
+    <tr><td>Consent</td><td>A person's agreement to receive your emails. Mail Studio records how and when it was given.</td></tr>
+    <tr><td>CSV</td><td>A plain spreadsheet file that any spreadsheet program can save and open.</td></tr>
+    <tr><td>DKIM</td><td>A signature on each email proving it came from your domain.</td></tr>
+    <tr><td>DMARC</td><td>A DNS record that tells inboxes what to do with email claiming to be from your domain that isn't signed.</td></tr>
+    <tr><td>DNS</td><td>The internet's address book: it turns names into server addresses and holds records about your domain.</td></tr>
+    <tr><td>Docker</td><td>Software that runs Mail Studio in a self-contained package on your server.</td></tr>
+    <tr><td>Double opt-in</td><td>New subscribers confirm their address by clicking a link before they're added.</td></tr>
+    <tr><td>IAM</td><td>Identity and Access Management: where you create AWS users and set what they may do.</td></tr>
+    <tr><td>Production access</td><td>Amazon's permission to send to anyone, not just verified addresses.</td></tr>
+    <tr><td>Sandbox</td><td>A new SES account's starting state: it can only send to verified addresses.</td></tr>
+    <tr><td>SSH</td><td>A secure way to type commands on your server from your own computer.</td></tr>
+    <tr><td>Suppressed / never emailed</td><td>An address Mail Studio will never send to: it bounced, complained, or you blocked it.</td></tr>
+    <tr><td>VPS</td><td>Virtual private server: the small computer you rent to run Mail Studio.</td></tr>
+  </table>
+</section>
+
+</body>
+</html>

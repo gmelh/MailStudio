@@ -1,0 +1,8 @@
+<mj-section css-class="ms-s-{{section_id}}">
+  <mj-column width="50%">
+    <mj-text css-class="ms-text" padding="0 30px 16px 0"><h3 class="ms-heading" style="{{brand.h3}}">{{s.leftTitle}}</h3>{{{s.leftBody_html}}}</mj-text>
+  </mj-column>
+  <mj-column width="50%">
+    <mj-text css-class="ms-text"><h3 class="ms-heading" style="{{brand.h3}}">{{s.rightTitle}}</h3>{{{s.rightBody_html}}}</mj-text>
+  </mj-column>
+</mj-section>

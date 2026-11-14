@@ -1,0 +1,21 @@
+<mjml>
+  <mj-head>
+    <mj-title>{{subject}}</mj-title>
+    <mj-preview>{{preheader}}</mj-preview>
+    <mj-attributes>
+      <mj-all font-family="{{brand.fonts.body}}" />
+      <mj-section padding="24px {{brand.padding}}px" />
+      <mj-column padding="0" />
+      <mj-text color="{{brand.text}}" font-size="{{brand.fontSize}}px" line-height="1.7" padding="0" />
+      <mj-image padding="0" />
+      <mj-button background-color="{{brand.accent}}" color="{{brand.buttonText}}" font-weight="{{brand.buttonWeight}}" font-style="{{brand.buttonStyle}}" font-size="15px" border-radius="{{brand.buttonRadius}}px" inner-padding="13px 26px" padding="0" />
+    </mj-attributes>
+    {{#dark_css}}<mj-style>{{{dark_css}}}</mj-style>{{/dark_css}}
+  </mj-head>
+  <mj-body css-class="ms-outer" width="{{brand.width}}px" background-color="{{brand.outer}}">
+    <mj-wrapper css-class="ms-body" background-color="{{brand.background}}" border-radius="{{brand.radius}}px" padding="0">
+{{{sections}}}
+{{{compliance}}}
+    </mj-wrapper>
+  </mj-body>
+</mjml>

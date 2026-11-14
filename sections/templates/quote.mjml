@@ -1,0 +1,7 @@
+<mj-section css-class="ms-s-{{section_id}}">
+  <mj-column>
+    <mj-text css-class="ms-accent" align="center" font-family="Georgia, serif" font-size="52px" line-height="1" color="{{brand.accent}}">&#8220;</mj-text>
+    <mj-text css-class="ms-title" align="center" font-family="Georgia, serif" font-size="22px" line-height="1.5" color="{{brand.heading}}" padding="6px 0 12px"><em>{{{s.text_html}}}</em></mj-text>
+    <mj-text css-class="ms-muted" align="center" font-family="{{brand.fonts.small}}" font-size="13px" color="{{brand.muted}}">{{s.author}}</mj-text>
+  </mj-column>
+</mj-section>

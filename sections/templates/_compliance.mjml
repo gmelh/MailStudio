@@ -1,0 +1,5 @@
+<mj-section css-class="ms-compliance" padding="22px {{brand.padding}}px">
+  <mj-column>
+    <mj-text css-class="ms-muted" align="center" font-family="{{brand.fonts.small}}" font-size="12px" line-height="1.8" color="{{brand.muted}}">{{business.name}}{{#business.address}}<br>{{business.address}}{{/business.address}}<br><a class="ms-link" href="{{merge.unsubscribe_url}}" style="color:{{brand.link}}">Unsubscribe</a></mj-text>
+  </mj-column>
+</mj-section>

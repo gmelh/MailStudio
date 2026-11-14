@@ -1,0 +1,397 @@
+{
+  "$comment": "Section types shared by the server renderer and the editor. Each type has templates/<type>.mjml (MJML with Mustache placeholders). Field kinds: text, textarea, url, image, number, select.",
+  "version": 1,
+  "sections": {
+    "header": {
+      "label": "Header",
+      "icon": "▤",
+      "fields": [
+        {
+          "key": "brand",
+          "label": "Brand name",
+          "kind": "text"
+        },
+        {
+          "key": "tagline",
+          "label": "Tagline",
+          "kind": "text"
+        },
+        {
+          "key": "imageUrl",
+          "label": "Logo image",
+          "kind": "image",
+          "fallback": "brand.logo"
+        },
+        {
+          "key": "imageAlt",
+          "label": "Image description",
+          "kind": "text"
+        },
+        {
+          "key": "imageWidth",
+          "label": "Image width (px)",
+          "kind": "number",
+          "min": 40,
+          "max": 600
+        },
+        {
+          "key": "imagePosition",
+          "label": "Image placement",
+          "kind": "select",
+          "options": [
+            [
+              "above",
+              "Above the name"
+            ],
+            [
+              "beside",
+              "Beside the name"
+            ],
+            [
+              "below",
+              "Below the name"
+            ]
+          ]
+        }
+      ],
+      "defaults": {
+        "brand": "YOUR COMPANY",
+        "tagline": "",
+        "imageUrl": "",
+        "imageAlt": "Company logo",
+        "imageWidth": "240",
+        "imagePosition": "above"
+      }
+    },
+    "hero": {
+      "label": "Feature",
+      "icon": "▣",
+      "fields": [
+        {
+          "key": "eyebrow",
+          "label": "Small heading",
+          "kind": "text"
+        },
+        {
+          "key": "title",
+          "label": "Headline",
+          "kind": "text"
+        },
+        {
+          "key": "description",
+          "label": "Description",
+          "kind": "textarea"
+        }
+      ],
+      "defaults": {
+        "eyebrow": "A FRESH UPDATE",
+        "title": "Something new is here.",
+        "description": "Beautiful emails, without the complicated tools."
+      }
+    },
+    "text": {
+      "label": "Text",
+      "icon": "☰",
+      "fields": [
+        {
+          "key": "heading",
+          "label": "Heading",
+          "kind": "text"
+        },
+        {
+          "key": "body",
+          "label": "Body text",
+          "kind": "textarea"
+        }
+      ],
+      "defaults": {
+        "heading": "A little introduction",
+        "body": "Welcome to our latest newsletter! We have some exciting updates to share with you.\n\nSelect this section to edit the content."
+      }
+    },
+    "image": {
+      "label": "Image",
+      "icon": "▧",
+      "fields": [
+        {
+          "key": "url",
+          "label": "Image URL",
+          "kind": "image"
+        },
+        {
+          "key": "alt",
+          "label": "Alternative text",
+          "kind": "text"
+        }
+      ],
+      "defaults": {
+        "url": "",
+        "alt": "Featured image"
+      }
+    },
+    "button": {
+      "label": "Button",
+      "icon": "▭",
+      "fields": [
+        {
+          "key": "text",
+          "label": "Button label",
+          "kind": "text"
+        },
+        {
+          "key": "url",
+          "label": "Destination URL",
+          "kind": "url"
+        }
+      ],
+      "defaults": {
+        "text": "Discover more",
+        "url": "https://example.com"
+      }
+    },
+    "divider": {
+      "label": "Divider",
+      "icon": "─",
+      "fields": [],
+      "defaults": {}
+    },
+    "contents": {
+      "label": "Contents",
+      "icon": "☷",
+      "fields": [
+        {
+          "key": "title",
+          "label": "Section heading",
+          "kind": "text"
+        },
+        {
+          "key": "items",
+          "label": "Contents (one per line)",
+          "kind": "textarea"
+        }
+      ],
+      "defaults": {
+        "title": "In this issue",
+        "items": "Latest news\nFeatured story\nUpcoming events"
+      }
+    },
+    "imageText": {
+      "label": "Image + Text",
+      "icon": "▥",
+      "fields": [
+        {
+          "key": "title",
+          "label": "Heading",
+          "kind": "text"
+        },
+        {
+          "key": "body",
+          "label": "Body text",
+          "kind": "textarea"
+        },
+        {
+          "key": "url",
+          "label": "Image URL",
+          "kind": "image"
+        },
+        {
+          "key": "alt",
+          "label": "Alternative text",
+          "kind": "text"
+        },
+        {
+          "key": "position",
+          "label": "Image position",
+          "kind": "select",
+          "options": [
+            [
+              "left",
+              "Left"
+            ],
+            [
+              "right",
+              "Right"
+            ]
+          ]
+        }
+      ],
+      "defaults": {
+        "title": "A story worth sharing",
+        "body": "Add your story here.",
+        "url": "",
+        "alt": "Story image",
+        "position": "left"
+      }
+    },
+    "columns": {
+      "label": "Two Columns",
+      "icon": "▦",
+      "fields": [
+        {
+          "key": "leftTitle",
+          "label": "Left heading",
+          "kind": "text"
+        },
+        {
+          "key": "leftBody",
+          "label": "Left text",
+          "kind": "textarea"
+        },
+        {
+          "key": "rightTitle",
+          "label": "Right heading",
+          "kind": "text"
+        },
+        {
+          "key": "rightBody",
+          "label": "Right text",
+          "kind": "textarea"
+        }
+      ],
+      "defaults": {
+        "leftTitle": "First story",
+        "leftBody": "A short update.",
+        "rightTitle": "Second story",
+        "rightBody": "Another useful update."
+      }
+    },
+    "quote": {
+      "label": "Quote",
+      "icon": "❝",
+      "fields": [
+        {
+          "key": "text",
+          "label": "Quotation",
+          "kind": "textarea"
+        },
+        {
+          "key": "author",
+          "label": "Attribution",
+          "kind": "text"
+        }
+      ],
+      "defaults": {
+        "text": "A thoughtful message from a happy customer.",
+        "author": "— Customer name"
+      }
+    },
+    "offer": {
+      "label": "Offer",
+      "icon": "%",
+      "fields": [
+        {
+          "key": "eyebrow",
+          "label": "Small heading",
+          "kind": "text"
+        },
+        {
+          "key": "title",
+          "label": "Offer heading",
+          "kind": "text"
+        },
+        {
+          "key": "body",
+          "label": "Description",
+          "kind": "textarea"
+        },
+        {
+          "key": "button",
+          "label": "Button label",
+          "kind": "text"
+        },
+        {
+          "key": "url",
+          "label": "Destination URL",
+          "kind": "url"
+        }
+      ],
+      "defaults": {
+        "eyebrow": "SPECIAL OFFER",
+        "title": "Something worth celebrating",
+        "body": "Tell your readers what makes this special.",
+        "button": "See the offer",
+        "url": "https://example.com"
+      }
+    },
+    "social": {
+      "label": "Social Links",
+      "icon": "◎",
+      "fields": [
+        {
+          "key": "title",
+          "label": "Heading",
+          "kind": "text"
+        },
+        {
+          "key": "website",
+          "label": "Website URL",
+          "kind": "url"
+        },
+        {
+          "key": "instagram",
+          "label": "Instagram URL",
+          "kind": "url"
+        },
+        {
+          "key": "facebook",
+          "label": "Facebook URL",
+          "kind": "url"
+        },
+        {
+          "key": "linkedin",
+          "label": "LinkedIn URL",
+          "kind": "url"
+        }
+      ],
+      "defaults": {
+        "title": "Follow along",
+        "website": "",
+        "instagram": "",
+        "facebook": "",
+        "linkedin": ""
+      }
+    },
+    "unsubscribe": {
+      "label": "Unsubscribe",
+      "icon": "↗",
+      "providesUnsubscribe": true,
+      "fields": [
+        {
+          "key": "message",
+          "label": "Subscription message",
+          "kind": "textarea"
+        }
+      ],
+      "defaults": {
+        "message": "You are receiving this because you subscribed."
+      }
+    },
+    "footer": {
+      "label": "Footer",
+      "icon": "≡",
+      "providesUnsubscribe": true,
+      "fields": [
+        {
+          "key": "company",
+          "label": "Company name",
+          "kind": "text"
+        },
+        {
+          "key": "address",
+          "label": "Business address",
+          "kind": "text"
+        },
+        {
+          "key": "note",
+          "label": "Footer message",
+          "kind": "textarea"
+        }
+      ],
+      "defaults": {
+        "company": "Your Company",
+        "address": "Your business address",
+        "note": "You are receiving this email because you subscribed."
+      }
+    }
+  }
+}

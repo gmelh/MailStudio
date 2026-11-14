@@ -1,0 +1,5 @@
+<mj-section css-class="ms-s-{{section_id}}" padding="22px {{brand.padding}}px">
+  <mj-column>
+    <mj-text css-class="ms-text" align="center" font-family="{{brand.fonts.small}}" font-size="13px" line-height="2"><strong>{{s.title}}</strong><br>{{#s.website_ok}}<a class="ms-link" href="{{s.website}}" style="color:{{brand.link}}">Website</a> &nbsp; {{/s.website_ok}}{{#s.instagram_ok}}<a class="ms-link" href="{{s.instagram}}" style="color:{{brand.link}}">Instagram</a> &nbsp; {{/s.instagram_ok}}{{#s.facebook_ok}}<a class="ms-link" href="{{s.facebook}}" style="color:{{brand.link}}">Facebook</a> &nbsp; {{/s.facebook_ok}}{{#s.linkedin_ok}}<a class="ms-link" href="{{s.linkedin}}" style="color:{{brand.link}}">LinkedIn</a>{{/s.linkedin_ok}}</mj-text>
+  </mj-column>
+</mj-section>

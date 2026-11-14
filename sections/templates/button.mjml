@@ -1,0 +1,7 @@
+{{#s.url_ok}}
+<mj-section css-class="ms-s-{{section_id}}" padding="12px {{brand.padding}}px 28px">
+  <mj-column>
+    <mj-button css-class="ms-button" href="{{s.url}}">{{s.text}}</mj-button>
+  </mj-column>
+</mj-section>
+{{/s.url_ok}}

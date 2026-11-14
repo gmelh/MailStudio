@@ -1,0 +1,21 @@
+{{#s.imagePosition_is_beside}}
+<mj-section css-class="ms-s-{{section_id}}" padding="25px {{brand.padding}}px">
+  {{#s.imageUrl_ok}}
+  <mj-column width="45%" vertical-align="middle">
+    <mj-image src="{{s.imageUrl}}" alt="{{s.imageAlt}}" width="{{s.imageWidth}}px" />
+  </mj-column>
+  {{/s.imageUrl_ok}}
+  <mj-column vertical-align="middle">
+    <mj-text css-class="ms-title" align="center" font-family="{{brand.fonts.heading}}" font-size="20px" font-weight="800" letter-spacing="1px" color="{{brand.heading}}">{{s.brand}}{{#s.tagline}}<br><span style="{{brand.small}}">{{s.tagline}}</span>{{/s.tagline}}</mj-text>
+  </mj-column>
+</mj-section>
+{{/s.imagePosition_is_beside}}
+{{^s.imagePosition_is_beside}}
+<mj-section css-class="ms-s-{{section_id}}" padding="25px {{brand.padding}}px">
+  <mj-column>
+    {{#s.imagePosition_is_above}}{{#s.imageUrl_ok}}<mj-image src="{{s.imageUrl}}" alt="{{s.imageAlt}}" width="{{s.imageWidth}}px" padding-bottom="12px" />{{/s.imageUrl_ok}}{{/s.imagePosition_is_above}}
+    <mj-text css-class="ms-title" align="center" font-family="{{brand.fonts.heading}}" font-size="20px" font-weight="800" letter-spacing="1px" color="{{brand.heading}}">{{s.brand}}{{#s.tagline}}<br><span style="{{brand.small}}">{{s.tagline}}</span>{{/s.tagline}}</mj-text>
+    {{#s.imagePosition_is_below}}{{#s.imageUrl_ok}}<mj-image src="{{s.imageUrl}}" alt="{{s.imageAlt}}" width="{{s.imageWidth}}px" padding-top="12px" />{{/s.imageUrl_ok}}{{/s.imagePosition_is_below}}
+  </mj-column>
+</mj-section>
+{{/s.imagePosition_is_beside}}

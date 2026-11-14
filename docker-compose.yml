@@ -1,0 +1,27 @@
+# Development stack. Owners will install with the one-line installer instead.
+#   docker compose up --build
+#   docker compose exec app mailstudio create-api-key --name dev --scopes "read write send"
+services:
+  app:
+    build:
+      context: .
+      dockerfile: server/Dockerfile
+    ports:
+      - "8080:8080"
+    environment:
+      MAILSTUDIO_BASE_URL: http://localhost:8080
+      # Development only: send campaigns over SMTP to Mailpit. In Settings, set
+      # smtp to {"host": "mailpit", "port": 1025, "security": "none"}.
+      MAILSTUDIO_ALLOW_SMTP_SENDING: "1"
+    volumes:
+      - data:/data
+
+  # Catches every email the app sends, for testing without a real provider.
+  # Web UI: http://localhost:8025   SMTP: mailpit:1025
+  mailpit:
+    image: axllent/mailpit:latest
+    ports:
+      - "8025:8025"
+
+volumes:
+  data:

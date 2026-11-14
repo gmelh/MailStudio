@@ -1,0 +1,5 @@
+<mj-section css-class="ms-s-{{section_id}}" padding="10px {{brand.padding}}px">
+  <mj-column>
+    <mj-divider css-class="ms-divider" border-width="1px" border-color="{{brand.divider}}" padding="0" />
+  </mj-column>
+</mj-section>
