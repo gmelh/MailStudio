@@ -10,10 +10,34 @@ const listeners = new Set<() => void>();
 const notify = () => listeners.forEach((listener) => listener());
 window.addEventListener('popstate', notify);
 
+type LeaveGuard = () => Promise<unknown> | void;
+let leaveGuard: LeaveGuard | null = null;
+
+/**
+ * Lets a screen finish something (like saving) before the app moves to another screen.
+ * Returns a function that removes the guard. One at a time: the newest replaces any other.
+ */
+export function onLeave(guard: LeaveGuard): () => void {
+  leaveGuard = guard;
+  return () => {
+    if (leaveGuard === guard) leaveGuard = null;
+  };
+}
+
+/** Go to `to` within the app, once any `onLeave` guard has finished. */
 export function navigate(to: string, { replace = false } = {}): void {
   if (to === location.pathname + location.search) return;
-  history[replace ? 'replaceState' : 'pushState'](null, '', to);
-  notify();
+  const go = () => {
+    history[replace ? 'replaceState' : 'pushState'](null, '', to);
+    notify();
+  };
+  const guard = leaveGuard;
+  if (!guard) return go();
+  leaveGuard = null;
+  Promise.resolve()
+    .then(guard)
+    .catch(() => undefined) // a failed save still lets you leave; the editor showed the error
+    .finally(go);
 }
 
 export function usePath(): string {
@@ -46,6 +70,7 @@ interface LinkProps {
   children: ComponentChildren;
   class?: string;
   'aria-current'?: 'page';
+  'aria-label'?: string;
 }
 
 /** An ordinary link that navigates in-app on a plain left click. */

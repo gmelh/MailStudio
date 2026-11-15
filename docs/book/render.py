@@ -11,7 +11,7 @@ HERE = Path(__file__).parent
 SOURCE = (HERE / "book.html").read_text()
 
 FOOTER = """<div style="width:100%;font:8pt Inter,sans-serif;color:#8792a6;padding:0 20mm;display:flex;justify-content:space-between">
-<span>The Mail Studio Book</span><span class="pageNumber"></span></div>"""
+<span>The MailStudio Book</span><span class="pageNumber"></span></div>"""
 
 
 def entries(html: str) -> list[tuple[str, str, str]]:
@@ -95,8 +95,8 @@ def main() -> None:
     writer.add_page(PdfReader(cover).pages[0])
     for page in PdfReader(body).pages[1:]:
         writer.add_page(page)
-    writer.add_metadata({"/Title": "The Mail Studio Book", "/Author": "Mail Studio"})
-    out = HERE / "The-Mail-Studio-Book.pdf"
+    writer.add_metadata({"/Title": "The MailStudio Book", "/Author": "MailStudio"})
+    out = HERE / "The-MailStudio-Book.pdf"
     with out.open("wb") as f:
         writer.write(f)
     print(out, len(writer.pages), "pages", pages)

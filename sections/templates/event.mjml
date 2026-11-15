@@ -1,0 +1,10 @@
+<mj-section css-class="ms-s-{{section_id}}{{#s.featured_on}} ms-featured{{/s.featured_on}}"{{#s.featured_on}} background-color="{{brand.featured}}"{{/s.featured_on}} padding="44px {{brand.padding}}px">
+  <mj-column>
+    {{#s.eyebrow}}<mj-text css-class="ms-text" align="center" font-family="{{brand.fonts.small}}" font-size="11px" font-weight="800" letter-spacing="2px"><span style="text-transform:uppercase">{{s.eyebrow}}</span></mj-text>{{/s.eyebrow}}
+    <mj-text css-class="ms-text" align="center" padding="12px 0 16px"><h2 class="ms-heading" style="{{brand.h2}}">{{s.title}}</h2></mj-text>
+    <mj-text css-class="ms-text" align="center" padding="0 0 4px"><p style="margin:0"><strong>{{s.date}}</strong>{{#s.time}} &middot; {{s.time}}{{/s.time}}</p></mj-text>
+    {{#s.place}}<mj-text css-class="ms-text" align="center" padding="0 0 16px"><p style="margin:0">{{#s.placeLink_ok}}<a class="ms-link" href="{{s.placeLink}}" style="color:{{brand.link}}">{{s.place}}</a>{{/s.placeLink_ok}}{{^s.placeLink_ok}}{{s.place}}{{/s.placeLink_ok}}</p></mj-text>{{/s.place}}
+    <mj-text css-class="ms-text" align="center" padding="4px 0 20px">{{{s.description_html}}}</mj-text>
+    {{#s.url_ok}}<mj-button css-class="ms-button" href="{{s.url}}">{{s.button}}</mj-button>{{/s.url_ok}}
+  </mj-column>
+</mj-section>

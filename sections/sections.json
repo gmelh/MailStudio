@@ -1,5 +1,5 @@
 {
-  "$comment": "Section types shared by the server renderer and the editor. Each type has templates/<type>.mjml (MJML with Mustache placeholders). Field kinds: text, textarea, url, image, number, select.",
+  "$comment": "Section types shared by the server renderer and the editor. Each type has templates/<type>.mjml (MJML with Mustache placeholders). Field kinds: text, textarea, url, image, number, select, toggle (\"on\" or \"off\").",
   "version": 1,
   "sections": {
     "header": {
@@ -25,14 +25,24 @@
         {
           "key": "imageAlt",
           "label": "Image description",
-          "kind": "text"
+          "kind": "text",
+          "hint": "Leave empty to use the brand name. It's shown when images are blocked and read out by screen readers."
+        },
+        {
+          "key": "imageLink",
+          "label": "Image link (optional)",
+          "kind": "url",
+          "hint": "Where the logo goes when clicked, usually your website. Leave empty for no link."
         },
         {
           "key": "imageWidth",
           "label": "Image width (px)",
           "kind": "number",
           "min": 40,
-          "max": 600
+          "max": 600,
+          "hideWhen": {
+            "imageStretch": "on"
+          }
         },
         {
           "key": "imagePosition",
@@ -51,16 +61,34 @@
               "below",
               "Below the name"
             ]
-          ]
+          ],
+          "hideWhen": {
+            "imageStretch": "on"
+          }
+        },
+        {
+          "key": "imageStretch",
+          "label": "Stretch to edges",
+          "kind": "toggle",
+          "needs": "imageUrl",
+          "hint": "The image fills the whole header, edge to edge, with no space around it. The brand name and tagline show only when there's no image."
+        },
+        {
+          "key": "featured",
+          "label": "Feature background",
+          "kind": "toggle"
         }
       ],
       "defaults": {
         "brand": "YOUR COMPANY",
         "tagline": "",
         "imageUrl": "",
-        "imageAlt": "Company logo",
+        "imageAlt": "",
         "imageWidth": "240",
-        "imagePosition": "above"
+        "imagePosition": "above",
+        "imageStretch": "off",
+        "featured": "off",
+        "imageLink": ""
       }
     },
     "hero": {
@@ -81,12 +109,123 @@
           "key": "description",
           "label": "Description",
           "kind": "textarea"
+        },
+        {
+          "key": "featured",
+          "label": "Feature background",
+          "kind": "toggle"
         }
       ],
       "defaults": {
         "eyebrow": "A FRESH UPDATE",
         "title": "Something new is here.",
-        "description": "Beautiful emails, without the complicated tools."
+        "description": "Beautiful emails, without the complicated tools.",
+        "featured": "on"
+      }
+    },
+    "heroImage": {
+      "label": "Hero image",
+      "icon": "▨",
+      "fields": [
+        {
+          "key": "url",
+          "label": "Background image",
+          "kind": "image",
+          "hint": "A wide photo works best (at least 1200px wide). Keep the important part in the middle: the edges may be cropped on phones."
+        },
+        {
+          "key": "title",
+          "label": "Headline",
+          "kind": "text"
+        },
+        {
+          "key": "text",
+          "label": "Text",
+          "kind": "textarea"
+        },
+        {
+          "key": "buttonText",
+          "label": "Button label",
+          "kind": "text"
+        },
+        {
+          "key": "buttonUrl",
+          "label": "Button link",
+          "kind": "url",
+          "hint": "Leave empty for no button."
+        },
+        {
+          "key": "tone",
+          "label": "Text colour",
+          "kind": "select",
+          "options": [
+            [
+              "light",
+              "White text (for darker photos)"
+            ],
+            [
+              "dark",
+              "Dark text (for lighter photos)"
+            ]
+          ]
+        },
+        {
+          "key": "align",
+          "label": "Text alignment",
+          "kind": "select",
+          "options": [
+            [
+              "center",
+              "Centred"
+            ],
+            [
+              "left",
+              "Left"
+            ]
+          ]
+        },
+        {
+          "key": "height",
+          "label": "Height",
+          "kind": "select",
+          "options": [
+            [
+              "short",
+              "Short"
+            ],
+            [
+              "medium",
+              "Medium"
+            ],
+            [
+              "tall",
+              "Tall"
+            ]
+          ]
+        },
+        {
+          "key": "edge",
+          "label": "Image to the edges",
+          "kind": "toggle",
+          "hint": "Fills the full width of the email, with no space or rounded corners around it."
+        },
+        {
+          "key": "featured",
+          "label": "Feature background",
+          "kind": "toggle"
+        }
+      ],
+      "defaults": {
+        "url": "",
+        "title": "Made fresh, every morning",
+        "text": "Come and see what's new this week.",
+        "buttonText": "See what's new",
+        "buttonUrl": "https://example.com",
+        "tone": "light",
+        "align": "center",
+        "height": "medium",
+        "edge": "on",
+        "featured": "off"
       }
     },
     "text": {
@@ -102,11 +241,17 @@
           "key": "body",
           "label": "Body text",
           "kind": "textarea"
+        },
+        {
+          "key": "featured",
+          "label": "Feature background",
+          "kind": "toggle"
         }
       ],
       "defaults": {
         "heading": "A little introduction",
-        "body": "Welcome to our latest newsletter! We have some exciting updates to share with you.\n\nSelect this section to edit the content."
+        "body": "Welcome to our latest newsletter! We have some exciting updates to share with you.\n\nSelect this section to edit the content.",
+        "featured": "off"
       }
     },
     "image": {
@@ -120,13 +265,35 @@
         },
         {
           "key": "alt",
-          "label": "Alternative text",
-          "kind": "text"
+          "label": "Image description",
+          "kind": "text",
+          "hint": "Say what the image shows, in a few words. It's shown when images are blocked and read out by screen readers."
+        },
+        {
+          "key": "link",
+          "label": "Image link (optional)",
+          "kind": "url",
+          "hint": "Where the image goes when clicked. Leave empty for no link."
+        },
+        {
+          "key": "edge",
+          "label": "Image to the edges",
+          "kind": "toggle",
+          "needs": "url",
+          "hint": "Pushes the image to the email's edges, with no space around it. It keeps its shape and isn't stretched."
+        },
+        {
+          "key": "featured",
+          "label": "Feature background",
+          "kind": "toggle"
         }
       ],
       "defaults": {
         "url": "",
-        "alt": "Featured image"
+        "alt": "",
+        "featured": "off",
+        "link": "",
+        "edge": "off"
       }
     },
     "button": {
@@ -142,18 +309,54 @@
           "key": "url",
           "label": "Destination URL",
           "kind": "url"
+        },
+        {
+          "key": "featured",
+          "label": "Feature background",
+          "kind": "toggle"
         }
       ],
       "defaults": {
         "text": "Discover more",
-        "url": "https://example.com"
+        "url": "https://example.com",
+        "featured": "off"
       }
     },
     "divider": {
       "label": "Divider",
       "icon": "─",
-      "fields": [],
-      "defaults": {}
+      "fields": [
+        {
+          "key": "featured",
+          "label": "Feature background",
+          "kind": "toggle"
+        }
+      ],
+      "defaults": {
+        "featured": "off"
+      }
+    },
+    "spacer": {
+      "label": "Spacer",
+      "icon": "↕",
+      "fields": [
+        {
+          "key": "height",
+          "label": "Height (px)",
+          "kind": "number",
+          "min": 4,
+          "max": 160
+        },
+        {
+          "key": "featured",
+          "label": "Feature background",
+          "kind": "toggle"
+        }
+      ],
+      "defaults": {
+        "height": "32",
+        "featured": "off"
+      }
     },
     "contents": {
       "label": "Contents",
@@ -168,11 +371,17 @@
           "key": "items",
           "label": "Contents (one per line)",
           "kind": "textarea"
+        },
+        {
+          "key": "featured",
+          "label": "Feature background",
+          "kind": "toggle"
         }
       ],
       "defaults": {
         "title": "In this issue",
-        "items": "Latest news\nFeatured story\nUpcoming events"
+        "items": "Latest news\nFeatured story\nUpcoming events",
+        "featured": "off"
       }
     },
     "imageText": {
@@ -196,8 +405,15 @@
         },
         {
           "key": "alt",
-          "label": "Alternative text",
-          "kind": "text"
+          "label": "Image description",
+          "kind": "text",
+          "hint": "Say what the image shows, in a few words. It's shown when images are blocked and read out by screen readers."
+        },
+        {
+          "key": "link",
+          "label": "Image link (optional)",
+          "kind": "url",
+          "hint": "Where the image goes when clicked. Leave empty for no link."
         },
         {
           "key": "position",
@@ -213,14 +429,242 @@
               "Right"
             ]
           ]
+        },
+        {
+          "key": "edge",
+          "label": "Image to the edges",
+          "kind": "toggle",
+          "needs": "url",
+          "hint": "Pushes the image to its side of the email and to the top and bottom, with no space around it. It keeps its shape and isn't stretched; the text keeps its spacing."
+        },
+        {
+          "key": "featured",
+          "label": "Feature background",
+          "kind": "toggle"
         }
       ],
       "defaults": {
         "title": "A story worth sharing",
         "body": "Add your story here.",
         "url": "",
-        "alt": "Story image",
-        "position": "left"
+        "alt": "",
+        "position": "left",
+        "featured": "on",
+        "link": "",
+        "edge": "off"
+      }
+    },
+    "products": {
+      "label": "Product cards",
+      "icon": "▦",
+      "fields": [
+        {
+          "key": "count",
+          "label": "Number of cards",
+          "kind": "select",
+          "options": [
+            [
+              "2",
+              "Two"
+            ],
+            [
+              "3",
+              "Three"
+            ]
+          ]
+        },
+        {
+          "key": "buttonText",
+          "label": "Button label (all cards)",
+          "kind": "text",
+          "hint": "A card shows its button only when it has a link."
+        },
+        {
+          "key": "image1",
+          "label": "Card 1: image",
+          "kind": "image",
+          "hint": "Square or 4:3 photos line up best. Use the same shape for every card."
+        },
+        {
+          "key": "alt1",
+          "label": "Card 1: image description",
+          "kind": "text"
+        },
+        {
+          "key": "name1",
+          "label": "Card 1: name",
+          "kind": "text"
+        },
+        {
+          "key": "text1",
+          "label": "Card 1: description",
+          "kind": "text"
+        },
+        {
+          "key": "price1",
+          "label": "Card 1: price",
+          "kind": "text",
+          "hint": "Leave empty for no price."
+        },
+        {
+          "key": "link1",
+          "label": "Card 1: link",
+          "kind": "url"
+        },
+        {
+          "key": "image2",
+          "label": "Card 2: image",
+          "kind": "image"
+        },
+        {
+          "key": "alt2",
+          "label": "Card 2: image description",
+          "kind": "text"
+        },
+        {
+          "key": "name2",
+          "label": "Card 2: name",
+          "kind": "text"
+        },
+        {
+          "key": "text2",
+          "label": "Card 2: description",
+          "kind": "text"
+        },
+        {
+          "key": "price2",
+          "label": "Card 2: price",
+          "kind": "text"
+        },
+        {
+          "key": "link2",
+          "label": "Card 2: link",
+          "kind": "url"
+        },
+        {
+          "key": "image3",
+          "label": "Card 3: image",
+          "kind": "image",
+          "hideWhen": {
+            "count": "2"
+          }
+        },
+        {
+          "key": "alt3",
+          "label": "Card 3: image description",
+          "kind": "text",
+          "hideWhen": {
+            "count": "2"
+          }
+        },
+        {
+          "key": "name3",
+          "label": "Card 3: name",
+          "kind": "text",
+          "hideWhen": {
+            "count": "2"
+          }
+        },
+        {
+          "key": "text3",
+          "label": "Card 3: description",
+          "kind": "text",
+          "hideWhen": {
+            "count": "2"
+          }
+        },
+        {
+          "key": "price3",
+          "label": "Card 3: price",
+          "kind": "text",
+          "hideWhen": {
+            "count": "2"
+          }
+        },
+        {
+          "key": "link3",
+          "label": "Card 3: link",
+          "kind": "url",
+          "hideWhen": {
+            "count": "2"
+          }
+        },
+        {
+          "key": "featured",
+          "label": "Feature background",
+          "kind": "toggle"
+        }
+      ],
+      "defaults": {
+        "count": "3",
+        "buttonText": "Order now",
+        "image1": "",
+        "alt1": "",
+        "name1": "Seeded rye",
+        "text1": "Baked fresh every morning.",
+        "price1": "$9.50",
+        "link1": "https://example.com",
+        "image2": "",
+        "alt2": "",
+        "name2": "Spelt sourdough",
+        "text2": "Baked fresh every morning.",
+        "price2": "$11.00",
+        "link2": "https://example.com",
+        "image3": "",
+        "alt3": "",
+        "name3": "Fruit loaf",
+        "text3": "Baked fresh every morning.",
+        "price3": "$8.50",
+        "link3": "https://example.com",
+        "featured": "off"
+      }
+    },
+    "video": {
+      "label": "Video",
+      "icon": "▶",
+      "fields": [
+        {
+          "key": "url",
+          "label": "Video link",
+          "kind": "url",
+          "hint": "A YouTube or Vimeo address. Email can't play video, so this opens it in the browser."
+        },
+        {
+          "key": "thumbnail",
+          "label": "Thumbnail",
+          "kind": "image",
+          "fallback": "youtube:url",
+          "hint": "Leave empty to use YouTube's own thumbnail. For Vimeo and others, upload one (16:9 works best)."
+        },
+        {
+          "key": "buttonText",
+          "label": "Button label",
+          "kind": "text"
+        },
+        {
+          "key": "caption",
+          "label": "Caption (optional)",
+          "kind": "textarea"
+        },
+        {
+          "key": "edge",
+          "label": "Video to the edges",
+          "kind": "toggle",
+          "hint": "Fills the full width of the email, with no space or rounded corners around it."
+        },
+        {
+          "key": "featured",
+          "label": "Feature background",
+          "kind": "toggle"
+        }
+      ],
+      "defaults": {
+        "url": "",
+        "thumbnail": "",
+        "buttonText": "Watch the video",
+        "caption": "",
+        "edge": "off",
+        "featured": "off"
       }
     },
     "columns": {
@@ -246,13 +690,19 @@
           "key": "rightBody",
           "label": "Right text",
           "kind": "textarea"
+        },
+        {
+          "key": "featured",
+          "label": "Feature background",
+          "kind": "toggle"
         }
       ],
       "defaults": {
         "leftTitle": "First story",
         "leftBody": "A short update.",
         "rightTitle": "Second story",
-        "rightBody": "Another useful update."
+        "rightBody": "Another useful update.",
+        "featured": "off"
       }
     },
     "quote": {
@@ -268,11 +718,17 @@
           "key": "author",
           "label": "Attribution",
           "kind": "text"
+        },
+        {
+          "key": "featured",
+          "label": "Feature background",
+          "kind": "toggle"
         }
       ],
       "defaults": {
         "text": "A thoughtful message from a happy customer.",
-        "author": "— Customer name"
+        "author": "— Customer name",
+        "featured": "off"
       }
     },
     "offer": {
@@ -295,6 +751,12 @@
           "kind": "textarea"
         },
         {
+          "key": "code",
+          "label": "Coupon code (optional)",
+          "kind": "text",
+          "hint": "Shown large in a dashed box, like SPRING20. Leave empty for none."
+        },
+        {
           "key": "button",
           "label": "Button label",
           "kind": "text"
@@ -303,6 +765,11 @@
           "key": "url",
           "label": "Destination URL",
           "kind": "url"
+        },
+        {
+          "key": "featured",
+          "label": "Feature background",
+          "kind": "toggle"
         }
       ],
       "defaults": {
@@ -310,7 +777,80 @@
         "title": "Something worth celebrating",
         "body": "Tell your readers what makes this special.",
         "button": "See the offer",
-        "url": "https://example.com"
+        "url": "https://example.com",
+        "featured": "on",
+        "code": ""
+      }
+    },
+    "event": {
+      "label": "Event",
+      "icon": "◷",
+      "fields": [
+        {
+          "key": "eyebrow",
+          "label": "Small heading",
+          "kind": "text"
+        },
+        {
+          "key": "title",
+          "label": "Event name",
+          "kind": "text"
+        },
+        {
+          "key": "date",
+          "label": "Date",
+          "kind": "text",
+          "hint": "Written out, like “Saturday 22 November”."
+        },
+        {
+          "key": "time",
+          "label": "Time (optional)",
+          "kind": "text"
+        },
+        {
+          "key": "place",
+          "label": "Place (optional)",
+          "kind": "text"
+        },
+        {
+          "key": "placeLink",
+          "label": "Map link (optional)",
+          "kind": "url",
+          "hint": "A Google or Apple Maps link, so the place can be tapped."
+        },
+        {
+          "key": "description",
+          "label": "Description",
+          "kind": "textarea"
+        },
+        {
+          "key": "button",
+          "label": "Button label",
+          "kind": "text"
+        },
+        {
+          "key": "url",
+          "label": "Booking link",
+          "kind": "url",
+          "hint": "Leave empty for no button."
+        },
+        {
+          "key": "featured",
+          "label": "Feature background",
+          "kind": "toggle"
+        }
+      ],
+      "defaults": {
+        "eyebrow": "EVENT",
+        "title": "Sourdough workshop",
+        "date": "Saturday 22 November",
+        "time": "10am – 1pm",
+        "place": "Our bakery, 12 Main Street",
+        "placeLink": "",
+        "description": "Learn to make your own starter and bake a loaf to take home.",
+        "button": "Book a place",
+        "url": "https://example.com",
+        "featured": "on"
       }
     },
     "social": {
@@ -319,28 +859,144 @@
       "fields": [
         {
           "key": "title",
-          "label": "Heading",
+          "label": "Heading (optional)",
           "kind": "text"
         },
         {
           "key": "website",
-          "label": "Website URL",
-          "kind": "url"
+          "label": "Website link",
+          "kind": "url",
+          "hint": "Fill in the ones you use: only those show, as icons."
         },
         {
           "key": "instagram",
-          "label": "Instagram URL",
+          "label": "Instagram link",
           "kind": "url"
         },
         {
           "key": "facebook",
-          "label": "Facebook URL",
+          "label": "Facebook link",
           "kind": "url"
         },
         {
           "key": "linkedin",
-          "label": "LinkedIn URL",
+          "label": "LinkedIn link",
           "kind": "url"
+        },
+        {
+          "key": "x",
+          "label": "X link",
+          "kind": "url"
+        },
+        {
+          "key": "youtube",
+          "label": "YouTube link",
+          "kind": "url"
+        },
+        {
+          "key": "tiktok",
+          "label": "TikTok link",
+          "kind": "url"
+        },
+        {
+          "key": "pinterest",
+          "label": "Pinterest link",
+          "kind": "url"
+        },
+        {
+          "key": "threads",
+          "label": "Threads link",
+          "kind": "url"
+        },
+        {
+          "key": "bluesky",
+          "label": "Bluesky link",
+          "kind": "url"
+        },
+        {
+          "key": "whatsapp",
+          "label": "WhatsApp link",
+          "kind": "url",
+          "hint": "Like https://wa.me/61400000000 (your number in international form)."
+        },
+        {
+          "key": "mastodon",
+          "label": "Mastodon link",
+          "kind": "url"
+        },
+        {
+          "key": "style",
+          "label": "Icon style",
+          "kind": "select",
+          "options": [
+            [
+              "circle",
+              "Logo on a circle"
+            ],
+            [
+              "plain",
+              "Logo only"
+            ]
+          ]
+        },
+        {
+          "key": "colour",
+          "label": "Icon colour",
+          "kind": "select",
+          "options": [
+            [
+              "network",
+              "Each network's own colour"
+            ],
+            [
+              "accent",
+              "Your accent colour"
+            ],
+            [
+              "heading",
+              "Your heading colour"
+            ],
+            [
+              "custom",
+              "A colour of your own"
+            ]
+          ]
+        },
+        {
+          "key": "customColour",
+          "label": "Your colour",
+          "kind": "colour",
+          "hideWhen": {
+            "colour": [
+              "network",
+              "accent",
+              "heading"
+            ]
+          }
+        },
+        {
+          "key": "size",
+          "label": "Icon size",
+          "kind": "select",
+          "options": [
+            [
+              "24",
+              "Small"
+            ],
+            [
+              "32",
+              "Medium"
+            ],
+            [
+              "40",
+              "Large"
+            ]
+          ]
+        },
+        {
+          "key": "featured",
+          "label": "Feature background",
+          "kind": "toggle"
         }
       ],
       "defaults": {
@@ -348,7 +1004,20 @@
         "website": "",
         "instagram": "",
         "facebook": "",
-        "linkedin": ""
+        "linkedin": "",
+        "x": "",
+        "youtube": "",
+        "tiktok": "",
+        "pinterest": "",
+        "threads": "",
+        "bluesky": "",
+        "whatsapp": "",
+        "mastodon": "",
+        "style": "circle",
+        "colour": "accent",
+        "customColour": "#273449",
+        "size": "32",
+        "featured": "off"
       }
     },
     "unsubscribe": {
@@ -360,10 +1029,16 @@
           "key": "message",
           "label": "Subscription message",
           "kind": "textarea"
+        },
+        {
+          "key": "featured",
+          "label": "Feature background",
+          "kind": "toggle"
         }
       ],
       "defaults": {
-        "message": "You are receiving this because you subscribed."
+        "message": "You are receiving this because you subscribed.",
+        "featured": "off"
       }
     },
     "footer": {
@@ -385,12 +1060,18 @@
           "key": "note",
           "label": "Footer message",
           "kind": "textarea"
+        },
+        {
+          "key": "featured",
+          "label": "Feature background",
+          "kind": "toggle"
         }
       ],
       "defaults": {
         "company": "Your Company",
         "address": "Your business address",
-        "note": "You are receiving this email because you subscribed."
+        "note": "You are receiving this email because you subscribed.",
+        "featured": "on"
       }
     }
   }

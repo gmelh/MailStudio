@@ -21,11 +21,12 @@ from urllib.parse import urlsplit
 import chevron
 import mrml
 
+from . import images, social
 from .document import Brand, Document
-from .sections import FieldDef, Library
+from .sections import HEX_COLOUR, FieldDef, Library
 
 MERGE_TAG = re.compile(r"\{\{\s*([a-z][a-z0-9_]{0,39})\s*(?:\|([^{}]{0,200}))?\}\}")
-_MERGE_LITERALS = {"unsubscribe_url": "{{unsubscribe_url}}"}
+_MERGE_LITERALS = {"unsubscribe_url": "{{unsubscribe_url}}", "web_url": "{{web_url}}"}
 _COLOR_SCHEME_META = (
     '<meta name="color-scheme" content="light dark">'
     '<meta name="supported-color-schemes" content="light dark">'
@@ -117,6 +118,17 @@ def _number(value: str, field: FieldDef, fallback: str) -> str:
     return str(n)
 
 
+_YOUTUBE = re.compile(
+    r"^https?://(?:www\.|m\.)?(?:youtube\.com/(?:watch\?(?:.*&)?v=|shorts/|embed/|live/)|youtu\.be/)([A-Za-z0-9_-]{11})"
+)
+
+
+def youtube_id(url: str) -> str | None:
+    """The video's ID from any usual YouTube address, for its thumbnail."""
+    match = _YOUTUBE.match(url.strip())
+    return match.group(1) if match else None
+
+
 def prepare_settings(
     fields: tuple[FieldDef, ...], defaults: dict[str, str], settings: dict[str, str], brand: dict[str, Any]
 ) -> dict[str, Any]:
@@ -127,6 +139,9 @@ def prepare_settings(
         if f.kind in ("url", "image"):
             if not value and f.fallback == "brand.logo":
                 value = brand["logo"]
+            elif not value and f.fallback and f.fallback.startswith("youtube:"):
+                video = youtube_id(str(out.get(f.fallback.removeprefix("youtube:"), "")))
+                value = f"https://i.ytimg.com/vi/{video}/hqdefault.jpg" if video else ""
             value = safe_url(value)
             out[f"{f.key}_ok"] = bool(value)
         elif f.kind == "number":
@@ -136,6 +151,15 @@ def prepare_settings(
                 value = defaults[f.key]
             for option in f.options:
                 out[f"{f.key}_is_{option}"] = value == option
+        elif f.kind == "colour":
+            if not HEX_COLOUR.match(value):
+                value = defaults[f.key]
+            value = value.lower()
+        elif f.kind == "toggle":
+            if value not in ("on", "off"):
+                value = defaults[f.key]
+            needed = f.needs is None or bool(out.get(f"{f.needs}_ok", out.get(f.needs)))
+            out[f"{f.key}_on"] = value == "on" and needed
         elif f.kind == "textarea":
             out[f"{f.key}_html"] = paragraphs_html(value, brand["link"])
             out[f"{f.key}_lines"] = [line.strip() for line in value.split("\n") if line.strip()]
@@ -162,6 +186,7 @@ def brand_values(brand: Brand, scheme: str = "light") -> dict[str, Any]:
     heading = f"margin:0 0 12px;font-family:{fonts['heading']};color:{p.heading}"
     return {
         **p.model_dump(),
+        "featured": p.background if brand.flatFeatured else p.featured,
         "width": brand.width,
         "padding": brand.padding,
         "radius": brand.radius,
@@ -171,6 +196,7 @@ def brand_values(brand: Brand, scheme: str = "light") -> dict[str, Any]:
         "buttonWeight": "700" if brand.button.bold else "400",
         "buttonStyle": "italic" if brand.button.italic else "normal",
         "logo": brand.logo,
+        "webLink": brand.webLink,
         "muted": _blend(p.text, p.background, 0.8),
         "divider": _blend(p.text, p.background, 0.2),
         "h2": f"{heading};font-size:30px;line-height:1.16;letter-spacing:-0.5px",
@@ -186,6 +212,7 @@ def dark_css(brand: Brand) -> str:
     plus the attribute selectors Outlook.com and the Outlook apps add in dark mode.
     Gmail ignores both and darkens emails its own way."""
     d = brand.dark
+    featured = d.background if brand.flatFeatured else d.featured
     muted = _blend(d.text, d.background, 0.8)
     divider = _blend(d.text, d.background, 0.2)
     rules = [
@@ -196,7 +223,7 @@ def dark_css(brand: Brand) -> str:
         ),
         (
             ".ms-featured, .ms-featured > table",
-            f"background:{d.featured} !important;background-color:{d.featured} !important",
+            f"background:{featured} !important;background-color:{featured} !important",
         ),
         (".ms-text div, .ms-text p, .ms-text li", f"color:{d.text} !important"),
         (".ms-title div, .ms-heading", f"color:{d.heading} !important"),
@@ -235,8 +262,13 @@ def to_mjml(
     preheader: str,
     business: Business,
     scheme: str = "light",
+    site: str = "",
 ) -> str:
+    """`site`: the install's public address, for images it serves itself (social icons)."""
     brand = brand_values(document.brand, scheme)
+    social_colours = {
+        network: (colour or brand["accent"]).lower() for network, (_, colour) in social.NETWORKS.items()
+    }
     parts = []
     for section in document.sections:
         definition = library.sections[section.type]
@@ -245,6 +277,9 @@ def to_mjml(
             "s": prepare_settings(definition.fields, definition.defaults, section.settings, brand),
             "brand": brand,
             "merge": _MERGE_LITERALS,
+            "site": site.rstrip("/"),
+            "social": social_colours,
+            "nohash": lambda text, render: render(text).strip().lstrip("#"),
         }
         parts.append(chevron.render(definition.template, context))
 
@@ -265,6 +300,7 @@ def to_mjml(
             "sections": "\n".join(parts),
             "compliance": compliance,
             "dark_css": dark_css(document.brand) if scheme == "light" else "",
+            "merge": _MERGE_LITERALS,
         },
     )
     return page
@@ -278,9 +314,22 @@ def render(
     preheader: str,
     business: Business,
     scheme: str = "light",
+    asset_base: str | None = None,
 ) -> Rendered:
-    mjml = to_mjml(document, library, subject=subject, preheader=preheader, business=business, scheme=scheme)
+    """`asset_base`: the install's public address; MailStudio's own images are pointed
+    at it, so they keep working after the address changes."""
+    mjml = to_mjml(
+        document,
+        library,
+        subject=subject,
+        preheader=preheader,
+        business=business,
+        scheme=scheme,
+        site=asset_base or "",
+    )
     content: str = mrml.to_html(mjml).content
+    if asset_base:
+        content = images.absolute_assets(content, asset_base)
     if scheme == "light":
         # Tells Apple Mail and others the email has its own dark styles. mrml drops raw
         # tags in <mj-head>, so these go in after rendering.
@@ -371,12 +420,13 @@ def personalise(content: str, values: dict[str, str], *, escape: bool) -> str:
     return MERGE_TAG.sub(replace, content)
 
 
-def merge_values(contact: dict[str, Any], unsubscribe_url: str) -> dict[str, str]:
+def merge_values(contact: dict[str, Any], unsubscribe_url: str, web_url: str = "") -> dict[str, str]:
     values = {k: str(v) for k, v in contact.get("fields", {}).items()}
     values.update(
         email=contact["email"],
         first_name=contact.get("first_name", ""),
         last_name=contact.get("last_name", ""),
         unsubscribe_url=unsubscribe_url,
+        web_url=web_url,
     )
     return values

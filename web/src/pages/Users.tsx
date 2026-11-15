@@ -26,7 +26,7 @@ export function Users() {
     <>
       <PageHeader
         title="Users"
-        intro="People who can log in to Mail Studio. Everyone can do everything."
+        intro="People who can log in to MailStudio. Everyone can do everything."
         actions={!adding && <Button variant="primary" onClick={() => setAdding(true)}>Add a person</Button>}
       />
       {adding && <AddUser onDone={() => { setAdding(false); reload(); }} onCancel={() => setAdding(false)} />}

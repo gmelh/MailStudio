@@ -42,9 +42,9 @@ export function SignupFormCard({ list, onSaved }: { list: MailingList; onSaved: 
   const code = embedCode(pageUrl, list.signup);
 
   return (
-    <form class="card form-card form-card--wide signup-card" onSubmit={onSubmit} id="signup">
+    <form class="card form-card signup-card" onSubmit={onSubmit} id="signup">
       <h2>Signup form</h2>
-      <p class="muted">Let people join this list themselves, from a page Mail Studio hosts or a form on your own website.</p>
+      <p class="muted">Let people join this list themselves, from a page MailStudio hosts or a form on your own website.</p>
       {error && <Notice tone="error">{error}</Notice>}
       {saved && <Notice tone="success">Saved.</Notice>}
 

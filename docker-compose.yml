@@ -22,6 +22,7 @@ services:
     image: axllent/mailpit:latest
     ports:
       - "8025:8025"
+      - "1025:1025"   # SMTP, for a server run outside Docker (e.g. from VS Code)
 
 volumes:
   data:

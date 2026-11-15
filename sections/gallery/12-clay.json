@@ -1,0 +1,130 @@
+{
+  "format": "mailstudio-template",
+  "version": 1,
+  "id": "clay",
+  "name": "Clay",
+  "description": "A practical getting-started email in warm terracotta: three simple steps, help when you need it, and one button.",
+  "category": "welcome",
+  "tags": [
+    "onboarding",
+    "getting started",
+    "new customer"
+  ],
+  "author": "MailStudio",
+  "subject": "Getting started in three steps",
+  "preheader": "Everything you need to get going today.",
+  "document": {
+    "schema": 2,
+    "brand": {
+      "width": 600,
+      "padding": 36,
+      "radius": 12,
+      "fontSize": 16,
+      "fonts": {
+        "heading": "Arial, Helvetica, sans-serif",
+        "body": "Arial, Helvetica, sans-serif",
+        "small": "Arial, Helvetica, sans-serif"
+      },
+      "button": {
+        "bold": true,
+        "italic": false
+      },
+      "flatFeatured": false,
+      "light": {
+        "outer": "#efe4dc",
+        "background": "#fffdfb",
+        "featured": "#f6e5dd",
+        "text": "#54443d",
+        "heading": "#2a1912",
+        "link": "#a8442a",
+        "accent": "#a8442a",
+        "buttonText": "#ffffff"
+      },
+      "dark": {
+        "outer": "#140d0a",
+        "background": "#1e1511",
+        "featured": "#38231b",
+        "text": "#e6d6ce",
+        "heading": "#fdf3ee",
+        "link": "#f2a68c",
+        "accent": "#d8714f",
+        "buttonText": "#1e0a03"
+      }
+    },
+    "sections": [
+      {
+        "id": "header",
+        "type": "header",
+        "settings": {
+          "tagline": "Getting started",
+          "featured": "off"
+        }
+      },
+      {
+        "id": "hero",
+        "type": "hero",
+        "settings": {
+          "eyebrow": "You're all set",
+          "title": "Let's get you started",
+          "description": "A short welcome, then straight to the useful part. New customers want to get going.",
+          "featured": "off"
+        }
+      },
+      {
+        "id": "steps",
+        "type": "contents",
+        "settings": {
+          "title": "Three steps",
+          "items": "Set up your account — it takes two minutes\nTry the one feature everyone loves first\nInvite a friend or teammate",
+          "featured": "on"
+        }
+      },
+      {
+        "id": "step1",
+        "type": "text",
+        "settings": {
+          "heading": "1. Set up your account",
+          "body": "Say exactly what to do and how long it takes. Link straight to the right page.",
+          "featured": "off"
+        }
+      },
+      {
+        "id": "step2",
+        "type": "text",
+        "settings": {
+          "heading": "2. Try your first …",
+          "body": "Describe the quick win — the moment people see why they signed up.",
+          "featured": "off"
+        }
+      },
+      {
+        "id": "button",
+        "type": "button",
+        "settings": {
+          "text": "Open my account",
+          "url": "https://example.com",
+          "featured": "off"
+        }
+      },
+      {
+        "id": "help",
+        "type": "columns",
+        "settings": {
+          "leftTitle": "Need a hand?",
+          "leftBody": "Reply to this email — a real person will answer.",
+          "rightTitle": "Guides",
+          "rightBody": "Short how-tos for everything, in one place.",
+          "featured": "on"
+        }
+      },
+      {
+        "id": "footer",
+        "type": "footer",
+        "settings": {
+          "note": "You're receiving this because you've just opened an account with us.",
+          "featured": "on"
+        }
+      }
+    ]
+  }
+}

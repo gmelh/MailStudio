@@ -1,0 +1,122 @@
+{
+  "format": "mailstudio-template",
+  "version": 1,
+  "id": "marigold",
+  "name": "Marigold",
+  "description": "A friendly request for feedback in sunny marigold: why it matters, how long it takes, and one big button.",
+  "category": "other",
+  "tags": [
+    "feedback",
+    "survey",
+    "review",
+    "nps"
+  ],
+  "author": "MailStudio",
+  "subject": "Can you spare two minutes?",
+  "preheader": "Tell us how we're doing — it really helps.",
+  "document": {
+    "schema": 2,
+    "brand": {
+      "width": 600,
+      "padding": 36,
+      "radius": 14,
+      "fontSize": 16,
+      "fonts": {
+        "heading": "Tahoma, Geneva, sans-serif",
+        "body": "Tahoma, Geneva, sans-serif",
+        "small": "Tahoma, Geneva, sans-serif"
+      },
+      "button": {
+        "bold": true,
+        "italic": false
+      },
+      "flatFeatured": false,
+      "light": {
+        "outer": "#f8efdc",
+        "background": "#fffdf7",
+        "featured": "#fdf0d5",
+        "text": "#4f4434",
+        "heading": "#2a1d06",
+        "link": "#8a4d05",
+        "accent": "#a15c07",
+        "buttonText": "#ffffff"
+      },
+      "dark": {
+        "outer": "#120e06",
+        "background": "#1b150b",
+        "featured": "#33270f",
+        "text": "#e6dcc8",
+        "heading": "#fff8ea",
+        "link": "#f7c56b",
+        "accent": "#e0a034",
+        "buttonText": "#1b1102"
+      }
+    },
+    "sections": [
+      {
+        "id": "header",
+        "type": "header",
+        "settings": {
+          "tagline": "We'd love your thoughts",
+          "featured": "off"
+        }
+      },
+      {
+        "id": "hero",
+        "type": "hero",
+        "settings": {
+          "eyebrow": "Two minutes",
+          "title": "How are we doing?",
+          "description": "Say why you're asking and what you'll do with the answers. People help when they know it counts.",
+          "featured": "off"
+        }
+      },
+      {
+        "id": "ask",
+        "type": "text",
+        "settings": {
+          "heading": "Five quick questions",
+          "body": "Tell people how long it takes — honestly — and that every answer is read.\n\nIf there's a thank-you for taking part, mention it here.",
+          "featured": "on"
+        }
+      },
+      {
+        "id": "button",
+        "type": "button",
+        "settings": {
+          "text": "Start the survey",
+          "url": "https://example.com",
+          "featured": "off"
+        }
+      },
+      {
+        "id": "why",
+        "type": "columns",
+        "settings": {
+          "leftTitle": "Last time you told us…",
+          "leftBody": "…something people asked for. Say what you changed because of it.",
+          "rightTitle": "So we…",
+          "rightBody": "…did something about it. Showing results earns more replies.",
+          "featured": "off"
+        }
+      },
+      {
+        "id": "thanks",
+        "type": "text",
+        "settings": {
+          "heading": "Thank you",
+          "body": "A short, genuine thank-you, signed by a person.",
+          "featured": "off"
+        }
+      },
+      {
+        "id": "footer",
+        "type": "footer",
+        "settings": {
+          "note": "You're receiving this because you're a customer. Taking part is entirely optional.",
+          "featured": "on"
+        }
+      }
+    ]
+  }
+}

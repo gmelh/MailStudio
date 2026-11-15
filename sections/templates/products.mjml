@@ -1,0 +1,23 @@
+<mj-section css-class="ms-s-{{section_id}}{{#s.featured_on}} ms-featured{{/s.featured_on}}"{{#s.featured_on}} background-color="{{brand.featured}}"{{/s.featured_on}} padding="28px {{brand.padding}}px 4px">
+  
+  <mj-column width="{{#s.count_is_2}}50%{{/s.count_is_2}}{{#s.count_is_3}}33.33%{{/s.count_is_3}}" vertical-align="top" padding="0 6px 24px">
+    {{#s.image1_ok}}<mj-image{{#s.link1_ok}} href="{{s.link1}}"{{/s.link1_ok}} src="{{s.image1}}" alt="{{s.alt1}}" border-radius="6px" padding="0 0 12px" fluid-on-mobile="true" />{{/s.image1_ok}}
+    <mj-text css-class="ms-text" padding="0"><h3 class="ms-heading" style="{{brand.h3}};font-size:18px;margin-bottom:6px">{{s.name1}}</h3>{{#s.text1}}<p style="margin:0;font-size:15px;line-height:1.5">{{s.text1}}</p>{{/s.text1}}{{#s.price1}}<p class="ms-heading" style="margin:8px 0 0;font-size:16px;font-weight:700;color:{{brand.heading}}">{{s.price1}}</p>{{/s.price1}}</mj-text>
+    {{#s.link1_ok}}<mj-button css-class="ms-button" href="{{s.link1}}" align="left" font-size="14px" inner-padding="10px 18px" padding="14px 0 0">{{s.buttonText}}</mj-button>{{/s.link1_ok}}
+  </mj-column>
+  
+  
+  <mj-column width="{{#s.count_is_2}}50%{{/s.count_is_2}}{{#s.count_is_3}}33.33%{{/s.count_is_3}}" vertical-align="top" padding="0 6px 24px">
+    {{#s.image2_ok}}<mj-image{{#s.link2_ok}} href="{{s.link2}}"{{/s.link2_ok}} src="{{s.image2}}" alt="{{s.alt2}}" border-radius="6px" padding="0 0 12px" fluid-on-mobile="true" />{{/s.image2_ok}}
+    <mj-text css-class="ms-text" padding="0"><h3 class="ms-heading" style="{{brand.h3}};font-size:18px;margin-bottom:6px">{{s.name2}}</h3>{{#s.text2}}<p style="margin:0;font-size:15px;line-height:1.5">{{s.text2}}</p>{{/s.text2}}{{#s.price2}}<p class="ms-heading" style="margin:8px 0 0;font-size:16px;font-weight:700;color:{{brand.heading}}">{{s.price2}}</p>{{/s.price2}}</mj-text>
+    {{#s.link2_ok}}<mj-button css-class="ms-button" href="{{s.link2}}" align="left" font-size="14px" inner-padding="10px 18px" padding="14px 0 0">{{s.buttonText}}</mj-button>{{/s.link2_ok}}
+  </mj-column>
+  
+  {{#s.count_is_3}}
+  <mj-column width="{{#s.count_is_2}}50%{{/s.count_is_2}}{{#s.count_is_3}}33.33%{{/s.count_is_3}}" vertical-align="top" padding="0 6px 24px">
+    {{#s.image3_ok}}<mj-image{{#s.link3_ok}} href="{{s.link3}}"{{/s.link3_ok}} src="{{s.image3}}" alt="{{s.alt3}}" border-radius="6px" padding="0 0 12px" fluid-on-mobile="true" />{{/s.image3_ok}}
+    <mj-text css-class="ms-text" padding="0"><h3 class="ms-heading" style="{{brand.h3}};font-size:18px;margin-bottom:6px">{{s.name3}}</h3>{{#s.text3}}<p style="margin:0;font-size:15px;line-height:1.5">{{s.text3}}</p>{{/s.text3}}{{#s.price3}}<p class="ms-heading" style="margin:8px 0 0;font-size:16px;font-weight:700;color:{{brand.heading}}">{{s.price3}}</p>{{/s.price3}}</mj-text>
+    {{#s.link3_ok}}<mj-button css-class="ms-button" href="{{s.link3}}" align="left" font-size="14px" inner-padding="10px 18px" padding="14px 0 0">{{s.buttonText}}</mj-button>{{/s.link3_ok}}
+  </mj-column>
+  {{/s.count_is_3}}
+</mj-section>

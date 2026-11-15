@@ -1,0 +1,71 @@
+{
+  // Terminal → Run Task… lists these.
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "setup: everything (run once)",
+      "dependsOrder": "sequence",
+      "dependsOn": ["setup: python", "setup: web"],
+      "problemMatcher": []
+    },
+    {
+      "label": "setup: python",
+      "type": "shell",
+      "command": "python3 -m venv .venv && .venv/bin/pip install -e 'server[dev]'",
+      "windows": {
+        "command": "py -3.12 -m venv .venv; .venv\\Scripts\\pip install -e 'server[dev]'"
+      },
+      "options": { "cwd": "${workspaceFolder}" },
+      "problemMatcher": []
+    },
+    {
+      "label": "setup: web",
+      "type": "shell",
+      "command": "npm ci",
+      "options": { "cwd": "${workspaceFolder}/web" },
+      "problemMatcher": []
+    },
+    {
+      "label": "web: build",
+      "type": "shell",
+      "command": "npm run build",
+      "options": { "cwd": "${workspaceFolder}/web" },
+      "group": "build",
+      "problemMatcher": "$tsc"
+    },
+    {
+      "label": "web: watch",
+      "type": "shell",
+      "command": "npm run dev",
+      "options": { "cwd": "${workspaceFolder}/web" },
+      "isBackground": true,
+      "problemMatcher": {
+        "owner": "esbuild",
+        "pattern": { "regexp": "^✘ \\[ERROR\\] (.*)$", "message": 1 },
+        "background": {
+          "activesBegin": true,
+          "beginsPattern": "\\[watch\\] build started",
+          "endsPattern": "\\[watch\\] build finished"
+        }
+      }
+    },
+    {
+      "label": "web: typecheck",
+      "type": "shell",
+      "command": "npm run typecheck",
+      "options": { "cwd": "${workspaceFolder}/web" },
+      "problemMatcher": "$tsc"
+    },
+    {
+      "label": "check: everything (as on GitHub)",
+      "type": "shell",
+      "command": "cd server && ruff check . && ruff format --check . && mypy mailstudio && pytest -q && cd ../web && npm run typecheck && npm run build",
+      "windows": {
+        "command": "cd server; ruff check .; if ($?) { ruff format --check . }; if ($?) { mypy mailstudio }; if ($?) { pytest -q }; if ($?) { cd ../web; npm run typecheck }; if ($?) { npm run build }"
+      },
+      "options": { "cwd": "${workspaceFolder}" },
+      "group": "test",
+      "problemMatcher": []
+    }
+  ]
+}

@@ -59,6 +59,28 @@ def client(settings: SesSettings) -> SESV2Client:
     )
 
 
+_NEW_KEY = "Create a new access key for the user in IAM and paste both parts again."
+_CREDENTIAL_ERRORS = {
+    "InvalidSignatureException": "The secret access key doesn't belong to this access key ID. "
+    "AWS shows a secret only once, when the key is created. " + _NEW_KEY,
+    "SignatureDoesNotMatch": "The secret access key doesn't belong to this access key ID. "
+    "AWS shows a secret only once, when the key is created. " + _NEW_KEY,
+    "UnrecognizedClientException": "AWS doesn't recognise this access key ID: it may have been deleted "
+    "or mistyped. " + _NEW_KEY,
+    "InvalidClientTokenId": "AWS doesn't recognise this access key ID: it may have been deleted "
+    "or mistyped. " + _NEW_KEY,
+    "AccessDeniedException": "The keys work, but the IAM user isn't allowed to use SES. "
+    "Attach the MailStudio policy to it in IAM (the policy is in the guide above).",
+}
+
+
+def explain(exc: ClientError) -> str:
+    """What an AWS error means for the owner, falling back to AWS's own words."""
+    error = exc.response.get("Error", {})
+    code = str(error.get("Code", ""))
+    return _CREDENTIAL_ERRORS.get(code, f"{code}: {error.get('Message', '')}")
+
+
 def _error_code(exc: ClientError) -> str:
     return str(exc.response.get("Error", {}).get("Code", ""))
 

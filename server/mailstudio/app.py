@@ -11,7 +11,19 @@ from fastapi import APIRouter, FastAPI
 
 from . import __version__, errors, public, signup, web
 from .accounts import LoginThrottle
-from .api import assets, auth, campaigns, contacts, lists, sending, setup, suppressions, system, users
+from .api import (
+    assets,
+    auth,
+    campaigns,
+    contacts,
+    lists,
+    sending,
+    setup,
+    suppressions,
+    system,
+    templates,
+    users,
+)
 from .api import settings as settings_api
 from .config import Settings
 from .db import migrate
@@ -41,7 +53,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
             thread.join(timeout=30)
 
     app = FastAPI(
-        title="Mail Studio API",
+        title="MailStudio API",
         version=__version__,
         summary="Self-hosted email campaigns without the marketing machinery.",
         lifespan=lifespan,
@@ -64,6 +76,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         lists,
         suppressions,
         campaigns,
+        templates,
         assets,
         setup,
     ):

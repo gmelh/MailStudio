@@ -1,30 +1,62 @@
 {
-  "$comment": "Style presets: one click restyles an email's typography and shape. Colours and logo stay as they are.",
+  "$comment": "Style presets: one click restyles an email's typography, shape and whether feature sections have their own background. Colours and logo stay as they are.",
   "presets": {
     "modern": {
       "label": "Modern",
       "description": "Clean sans-serif type and softly rounded corners.",
       "brand": {
-        "fonts": { "heading": "Arial, Helvetica, sans-serif", "body": "Arial, Helvetica, sans-serif", "small": "Arial, Helvetica, sans-serif" },
-        "radius": 8, "padding": 32, "fontSize": 16, "button": { "bold": true, "italic": false }
+        "fonts": {
+          "heading": "Arial, Helvetica, sans-serif",
+          "body": "Arial, Helvetica, sans-serif",
+          "small": "Arial, Helvetica, sans-serif"
+        },
+        "radius": 8,
+        "padding": 32,
+        "fontSize": 16,
+        "button": {
+          "bold": true,
+          "italic": false
+        },
+        "flatFeatured": false
       }
     },
     "editorial": {
       "label": "Editorial",
       "description": "Serif headings and generous margins, like a magazine.",
       "brand": {
-        "fonts": { "heading": "Georgia, serif", "body": "Georgia, serif", "small": "Verdana, Geneva, sans-serif" },
-        "radius": 0, "padding": 44, "fontSize": 17, "button": { "bold": false, "italic": true }
+        "fonts": {
+          "heading": "Georgia, serif",
+          "body": "Georgia, serif",
+          "small": "Verdana, Geneva, sans-serif"
+        },
+        "radius": 0,
+        "padding": 44,
+        "fontSize": 17,
+        "button": {
+          "bold": false,
+          "italic": true
+        },
+        "flatFeatured": false
       }
     },
     "minimal": {
       "label": "Minimal",
       "description": "Plain and quiet: no feature backgrounds, square corners.",
       "brand": {
-        "fonts": { "heading": "Verdana, Geneva, sans-serif", "body": "Verdana, Geneva, sans-serif", "small": "Verdana, Geneva, sans-serif" },
-        "radius": 0, "padding": 28, "fontSize": 15, "button": { "bold": false, "italic": false }
-      },
-      "flatFeatured": true
+        "fonts": {
+          "heading": "Verdana, Geneva, sans-serif",
+          "body": "Verdana, Geneva, sans-serif",
+          "small": "Verdana, Geneva, sans-serif"
+        },
+        "radius": 0,
+        "padding": 28,
+        "fontSize": 15,
+        "button": {
+          "bold": false,
+          "italic": false
+        },
+        "flatFeatured": true
+      }
     }
   }
 }

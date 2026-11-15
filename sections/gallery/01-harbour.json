@@ -1,0 +1,157 @@
+{
+  "format": "mailstudio-template",
+  "version": 1,
+  "id": "harbour",
+  "name": "Harbour",
+  "description": "A calm, editorial monthly newsletter in deep teal: contents, two stories, a quote and a closing link.",
+  "category": "newsletter",
+  "tags": [
+    "monthly",
+    "editorial"
+  ],
+  "author": "MailStudio",
+  "subject": "The Harbour Letter — this month's news",
+  "preheader": "Three stories, one big idea, and what's coming next.",
+  "document": {
+    "schema": 2,
+    "brand": {
+      "width": 600,
+      "padding": 44,
+      "radius": 0,
+      "fontSize": 17,
+      "fonts": {
+        "heading": "Georgia, serif",
+        "body": "Georgia, serif",
+        "small": "Verdana, Geneva, sans-serif"
+      },
+      "button": {
+        "bold": false,
+        "italic": true
+      },
+      "flatFeatured": false,
+      "light": {
+        "outer": "#e4ecee",
+        "background": "#ffffff",
+        "featured": "#e2f0f1",
+        "text": "#3c4f56",
+        "heading": "#0f3340",
+        "link": "#0b6b74",
+        "accent": "#0e7c86",
+        "buttonText": "#ffffff"
+      },
+      "dark": {
+        "outer": "#0b1619",
+        "background": "#112227",
+        "featured": "#173840",
+        "text": "#c8dadd",
+        "heading": "#eef7f8",
+        "link": "#6fd3dc",
+        "accent": "#2aa6b1",
+        "buttonText": "#06191c"
+      }
+    },
+    "sections": [
+      {
+        "id": "header",
+        "type": "header",
+        "settings": {
+          "tagline": "The monthly letter",
+          "featured": "off"
+        }
+      },
+      {
+        "id": "hero",
+        "type": "hero",
+        "settings": {
+          "eyebrow": "Issue 12 · November",
+          "title": "Notes from a busy month",
+          "description": "A short welcome that sets the tone for the issue. Tell readers what's inside and why it matters to them.",
+          "featured": "on"
+        }
+      },
+      {
+        "id": "contents",
+        "type": "contents",
+        "settings": {
+          "title": "In this issue",
+          "items": "What we learned this month\nA story from our community\nWhat's coming in December",
+          "featured": "off"
+        }
+      },
+      {
+        "id": "story1",
+        "type": "text",
+        "settings": {
+          "heading": "What we learned this month",
+          "body": "Open with the story your readers will care about most. Keep paragraphs short — two or three sentences reads well on a phone.\n\nA second paragraph can add detail, a **key figure**, or a link to read more.",
+          "featured": "off"
+        }
+      },
+      {
+        "id": "divider1",
+        "type": "divider",
+        "settings": {
+          "featured": "off"
+        }
+      },
+      {
+        "id": "story2",
+        "type": "text",
+        "settings": {
+          "heading": "A story from our community",
+          "body": "Share something a customer, member or colleague did. People read stories about people.\n\nFinish with a single, clear thought.",
+          "featured": "off"
+        }
+      },
+      {
+        "id": "quote",
+        "type": "quote",
+        "settings": {
+          "text": "The best newsletters feel like a letter from someone you know.",
+          "author": "A happy reader",
+          "featured": "on"
+        }
+      },
+      {
+        "id": "next",
+        "type": "text",
+        "settings": {
+          "heading": "What's coming in December",
+          "body": "A sentence or two about what's next, so readers look forward to the next issue.",
+          "featured": "off"
+        }
+      },
+      {
+        "id": "button",
+        "type": "button",
+        "settings": {
+          "text": "Read the full issue",
+          "url": "https://example.com",
+          "featured": "off"
+        }
+      },
+      {
+        "id": "social",
+        "type": "social",
+        "settings": {
+          "title": "Follow along",
+          "website": "https://example.com",
+          "instagram": "https://instagram.com/",
+          "linkedin": "https://linkedin.com/",
+          "style": "circle",
+          "colour": "accent",
+          "size": "32",
+          "featured": "off"
+        }
+      },
+      {
+        "id": "footer",
+        "type": "footer",
+        "settings": {
+          "note": "You're receiving this because you subscribed to our monthly letter.",
+          "featured": "on"
+        }
+      }
+    ]
+  }
+}

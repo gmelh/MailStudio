@@ -1,6 +1,6 @@
 import { useState } from 'preact/hooks';
 import { api, type Session } from '../api';
-import { Brand } from './Shell';
+import { Brand } from '../nav';
 import { Button, Field, Notice, useSubmit } from '../ui';
 
 export function Login({ onDone }: { onDone: (session: Session) => void }) {

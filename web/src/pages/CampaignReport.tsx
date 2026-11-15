@@ -2,10 +2,12 @@
 
 import { useEffect, useState } from 'preact/hooks';
 import { api, type Campaign, type CampaignStats, type RenderedEmail } from '../api';
+import { isBoolean, usePref } from '../prefs';
 import { Link, navigate } from '../router';
-import { Button, count, describe, formatDate, Loading, Notice, PageHeader, useLoad } from '../ui';
+import { Button, CopyText, count, describe, formatDate, Loading, Notice, PageHeader, useLoad } from '../ui';
 import { Stat } from './Import';
 import { STATUS_LABELS } from './Campaigns';
+import { forScheme } from '../editor/Preview';
 
 const LIVE = new Set(['scheduled', 'sending', 'paused']);
 
@@ -47,7 +49,7 @@ export function CampaignReport({ id }: { id: string }) {
 function Report({ campaign, stats, reload }: { campaign: Campaign; stats: CampaignStats; reload: () => void }) {
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
-  const [showEmail, setShowEmail] = useState(false);
+  const [showEmail, setShowEmail] = usePref('report-show-email', false, isBoolean);
 
   const act = async (action: string, question?: string) => {
     if (question && !confirm(question)) return;
@@ -114,6 +116,8 @@ function Report({ campaign, stats, reload }: { campaign: Campaign; stats: Campai
         <Notice tone="error">Sending paused by itself: {campaign.last_error} Fix it in <Link href="/settings">Settings</Link>, then resume.</Notice>
       )}
 
+      {campaign.status !== 'draft' && campaign.status !== 'scheduled' && <ShareLink id={campaign.id} />}
+
       {stats.total > 0 && (
         <div class="progress" role="progressbar" aria-valuenow={percent} aria-valuemin={0} aria-valuemax={100} aria-label="Sent so far">
           <div class="progress__bar" style={{ width: `${percent}%` }} />
@@ -141,7 +145,7 @@ function Report({ campaign, stats, reload }: { campaign: Campaign; stats: Campai
       <section class="card report__email">
         <div class="report__email-head">
           <h2 class="card__title">The email</h2>
-          <Button onClick={() => setShowEmail((s) => !s)}>{showEmail ? 'Hide' : 'Show'}</Button>
+          <Button onClick={() => setShowEmail(!showEmail)}>{showEmail ? 'Hide' : 'Show'}</Button>
         </div>
         {showEmail && <SentEmail id={campaign.id} />}
       </section>
@@ -154,8 +158,20 @@ function SentEmail({ id }: { id: string }) {
   return (
     <Loading result={email}>
       {() => email.state === 'ready' && (
-        <iframe class="report__frame" title="The email" sandbox="" srcDoc={email.data.html} />
+        <iframe class="report__frame" title="The email" sandbox="" style={{ colorScheme: 'light' }} srcDoc={forScheme(email.data.html)} />
       )}
     </Loading>
+  );
+}
+
+/** A web copy anyone can open, for social media: no personal details. */
+function ShareLink({ id }: { id: string }) {
+  const [share] = useLoad(() => api<{ url: string }>(`/campaigns/${id}/share`), [id]);
+  if (share.state !== 'ready') return null;
+  return (
+    <p class="report__share small">
+      <strong>Share it:</strong> <CopyText text={share.data.url} />
+      <span class="muted"> A web copy anyone can open, with readers' personal details left out.</span>
+    </p>
   );
 }

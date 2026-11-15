@@ -2,6 +2,7 @@
 
 import { useState } from 'preact/hooks';
 import { api, type MailingList, type Member, type MemberStatus } from '../api';
+import { oneOf, usePref } from '../prefs';
 import { Link, navigate } from '../router';
 import { SignupFormCard } from './SignupFormCard';
 import {
@@ -25,7 +26,7 @@ export function ListDetail({ id }: { id: string }) {
 }
 
 function Detail({ list, reload }: { list: MailingList; reload: () => void }) {
-  const [tab, setTab] = useState<MemberStatus>('subscribed');
+  const [tab, setTab] = usePref<MemberStatus>('list-tab', 'subscribed', oneOf('subscribed', 'pending', 'unsubscribed'));
   const [editing, setEditing] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const members = usePaged<Member>(`/lists/${list.id}/members?status=${tab}`);

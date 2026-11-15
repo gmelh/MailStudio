@@ -1,0 +1,128 @@
+{
+  "format": "mailstudio-template",
+  "version": 1,
+  "id": "bulletin",
+  "name": "Bulletin",
+  "description": "A classic, newspaper-style announcement in navy and serif: the news, the details, a quote, and where to read more.",
+  "category": "announcement",
+  "tags": [
+    "news",
+    "press",
+    "company news"
+  ],
+  "author": "MailStudio",
+  "subject": "News: an important update from us",
+  "preheader": "Here's what's changing, and what it means for you.",
+  "document": {
+    "schema": 2,
+    "brand": {
+      "width": 600,
+      "padding": 40,
+      "radius": 0,
+      "fontSize": 17,
+      "fonts": {
+        "heading": "\"Times New Roman\", Times, serif",
+        "body": "Georgia, serif",
+        "small": "Arial, Helvetica, sans-serif"
+      },
+      "button": {
+        "bold": false,
+        "italic": false
+      },
+      "flatFeatured": true,
+      "light": {
+        "outer": "#ecedf0",
+        "background": "#ffffff",
+        "featured": "#eef1f6",
+        "text": "#3b3f47",
+        "heading": "#0f1626",
+        "link": "#1f3a7a",
+        "accent": "#1f2a44",
+        "buttonText": "#ffffff"
+      },
+      "dark": {
+        "outer": "#0a0c10",
+        "background": "#12151c",
+        "featured": "#1c2232",
+        "text": "#d0d4dd",
+        "heading": "#f5f6f9",
+        "link": "#9fb6ec",
+        "accent": "#5571ad",
+        "buttonText": "#ffffff"
+      }
+    },
+    "sections": [
+      {
+        "id": "header",
+        "type": "header",
+        "settings": {
+          "tagline": "News",
+          "featured": "off"
+        }
+      },
+      {
+        "id": "hero",
+        "type": "hero",
+        "settings": {
+          "eyebrow": "Announcement · 15 November",
+          "title": "An important update from us",
+          "description": "The news in one or two sentences — who, what, when. Readers should get it without reading further.",
+          "featured": "off"
+        }
+      },
+      {
+        "id": "divider1",
+        "type": "divider",
+        "settings": {
+          "featured": "off"
+        }
+      },
+      {
+        "id": "details",
+        "type": "text",
+        "settings": {
+          "heading": "What's changing",
+          "body": "The details, in order of importance. Keep paragraphs short.\n\nIf dates or prices are involved, put them here plainly.",
+          "featured": "off"
+        }
+      },
+      {
+        "id": "you",
+        "type": "columns",
+        "settings": {
+          "leftTitle": "What it means for you",
+          "leftBody": "The practical effect on readers, honestly put.",
+          "rightTitle": "What you need to do",
+          "rightBody": "Nothing — or the one step they should take, and by when.",
+          "featured": "on"
+        }
+      },
+      {
+        "id": "quote",
+        "type": "quote",
+        "settings": {
+          "text": "A short quote from the person behind the decision, explaining why.",
+          "author": "Name, role",
+          "featured": "off"
+        }
+      },
+      {
+        "id": "button",
+        "type": "button",
+        "settings": {
+          "text": "Read the full announcement",
+          "url": "https://example.com",
+          "featured": "off"
+        }
+      },
+      {
+        "id": "footer",
+        "type": "footer",
+        "settings": {
+          "note": "You're receiving this because you're a customer or subscriber.",
+          "featured": "on"
+        }
+      }
+    ]
+  }
+}

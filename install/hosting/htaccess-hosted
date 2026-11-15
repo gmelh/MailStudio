@@ -1,0 +1,20 @@
+# get.mailstudio.email, with install.sh uploaded next to this file.
+# Save this as ".htaccess" in the subdomain's folder (Apache or LiteSpeed, e.g. Hostinger).
+Options -Indexes
+
+RewriteEngine On
+# Only HTTPS
+RewriteCond %{HTTPS} !=on
+RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+# "/" is the installer; anything that isn't a real file is a 404.
+# (RewriteEngine On here also stops a WordPress .htaccess in a parent folder applying.)
+RewriteRule ^$ install.sh [L]
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteRule ^ - [R=404,L]
+
+# Show the script as text in browsers, and never cache an old version.
+<FilesMatch "^install\.sh(\.sha256)?$">
+  ForceType "text/plain; charset=utf-8"
+  Header set Cache-Control "no-cache"
+  Header set X-Content-Type-Options "nosniff"
+</FilesMatch>

@@ -1,0 +1,8 @@
+<mj-wrapper css-class="ms-s-{{section_id}}{{#s.featured_on}} ms-featured{{/s.featured_on}}"{{#s.featured_on}} background-color="{{brand.featured}}"{{/s.featured_on}} padding="{{#s.edge_on}}0{{/s.edge_on}}{{^s.edge_on}}16px {{brand.padding}}px{{/s.edge_on}}">
+  <mj-section css-class="ms-hero"{{#s.url_ok}} background-url="{{s.url}}" background-size="cover" background-position="center center" background-repeat="no-repeat"{{/s.url_ok}} background-color="{{#s.tone_is_light}}{{brand.heading}}{{/s.tone_is_light}}{{#s.tone_is_dark}}{{brand.featured}}{{/s.tone_is_dark}}" padding="{{#s.height_is_short}}48{{/s.height_is_short}}{{#s.height_is_medium}}88{{/s.height_is_medium}}{{#s.height_is_tall}}136{{/s.height_is_tall}}px {{brand.padding}}px"{{^s.edge_on}} border-radius="{{brand.radius}}px"{{/s.edge_on}}>
+    <mj-column>
+      <mj-text align="{{s.align}}" color="{{#s.tone_is_light}}#ffffff{{/s.tone_is_light}}{{#s.tone_is_dark}}{{brand.heading}}{{/s.tone_is_dark}}" font-size="17px" line-height="1.5" padding="0"><h1 style="margin:0 0 12px;font-family:{{brand.fonts.heading}};font-size:34px;line-height:1.15;font-weight:800;letter-spacing:-0.5px;color:{{#s.tone_is_light}}#ffffff{{/s.tone_is_light}}{{#s.tone_is_dark}}{{brand.heading}}{{/s.tone_is_dark}}">{{s.title}}</h1>{{{s.text_html}}}</mj-text>
+      {{#s.buttonUrl_ok}}<mj-button css-class="ms-button" align="{{s.align}}" href="{{s.buttonUrl}}" padding="20px 0 0">{{s.buttonText}}</mj-button>{{/s.buttonUrl_ok}}
+    </mj-column>
+  </mj-section>
+</mj-wrapper>

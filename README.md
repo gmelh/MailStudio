@@ -1,4 +1,4 @@
-# Mail Studio
+# MailStudio
 
 Self-hosted email campaigns without the marketing machinery.
 One container, SQLite, a section-based editor, and a complete API.
@@ -22,6 +22,11 @@ curl -fsSL https://get.mailstudio.email | sudo bash
 
 Then open the address it gives you and follow **Get set up**. See [install/](install/README.md).
 
+## Working on MailStudio
+
+See [VS Code Setup](VS%20Code%20Setup.md): setting up, running and debugging in VS Code, local
+test email, the checks, and how the project fits together.
+
 ## Status
 
 Phase 1 (sending core), done:
@@ -34,7 +39,7 @@ Phase 1 (sending core), done:
 - [x] Signed unsubscribe page and RFC 8058 one-click unsubscribe
 - [x] Send queue and worker: scheduling, rate limit, retries, pause/resume/cancel, crash-safe, never sends twice
       (gate test: 5,000 contacts, crash midway, zero duplicates)
-- [x] Amazon SES sending, bounce and complaint notifications into suppressions, domain checks
+- [x] Sending through Postmark, Mailgun, SMTP2GO, AuthSMTP (or any SMTP server) or Amazon SES; bounces, complaints and unsubscribes into suppressions; domain checks
 
 **Phase 1 is complete.**
 
@@ -47,3 +52,8 @@ Phase 2 (web app and v1.0):
 - [x] Signup form and double opt-in
 - [x] Setup wizard and one-line installer with automatic HTTPS
 - [ ] Docs and the stranger test
+
+## Credits
+
+Social icons are made from [Font Awesome Free](https://fontawesome.com) icons by Fonticons, Inc.,
+licensed under [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/); see `sections/social/README.md`.

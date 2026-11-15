@@ -189,7 +189,7 @@ def test_checklist_without_aws(client: TestClient, auth: Headers) -> None:
     )
     done = steps()
     assert done["business"] and done["sender"] and done["audience"]
-    assert not done["ses"] and not done["domain"]
+    assert not done["provider"] and not done["domain"]
     assert client.get("/api/v1/setup", headers=auth).json()["domain"] == "bakery.example"
 
 

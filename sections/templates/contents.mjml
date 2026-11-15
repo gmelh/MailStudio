@@ -1,4 +1,4 @@
-<mj-section css-class="ms-s-{{section_id}}">
+<mj-section css-class="ms-s-{{section_id}}{{#s.featured_on}} ms-featured{{/s.featured_on}}"{{#s.featured_on}} background-color="{{brand.featured}}"{{/s.featured_on}}>
   <mj-column>
     <mj-text css-class="ms-text"><h3 class="ms-heading" style="{{brand.h3}}">{{s.title}}</h3><ul style="margin:8px 0 0;padding-left:22px;line-height:2">{{#s.items_lines}}<li>{{.}}</li>{{/s.items_lines}}</ul></mj-text>
   </mj-column>

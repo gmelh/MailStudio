@@ -1,0 +1,10 @@
+# get.mailstudio.email, sending people to install.sh in the newest GitHub release.
+# Save this as ".htaccess" in the subdomain's folder; nothing else is needed there.
+# Each release made by .github/workflows/release.yml attaches install.sh and its checksum.
+# (GitHub's "latest" skips releases marked as pre-releases, such as v1.0.0-rc.1.)
+RewriteEngine On
+RewriteCond %{HTTPS} !=on
+RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+RewriteRule ^(install\.sh)?$ https://github.com/gmelh/MailStudio/releases/latest/download/install.sh [R=302,L]
+RewriteRule ^install\.sh\.sha256$ https://github.com/gmelh/MailStudio/releases/latest/download/install.sh.sha256 [R=302,L]
+RewriteRule ^ - [R=404,L]

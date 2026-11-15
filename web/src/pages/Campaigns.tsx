@@ -2,6 +2,7 @@ import { useState } from 'preact/hooks';
 import { api, type Campaign, type CampaignSummary } from '../api';
 import { Link, navigate } from '../router';
 import { Button, count, describe, EmptyState, formatDate, Notice, PageHeader, usePaged } from '../ui';
+import { TemplatePicker } from './TemplatePicker';
 
 export const STATUS_LABELS: Record<CampaignSummary['status'], string> = {
   draft: 'Draft',
@@ -18,6 +19,7 @@ export function Campaigns() {
   const campaigns = usePaged<CampaignSummary>('/campaigns');
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [picking, setPicking] = useState(false);
 
   const run = async (work: () => Promise<void>) => {
     setBusy(true);
@@ -30,10 +32,6 @@ export function Campaigns() {
       setBusy(false);
     }
   };
-  const create = () => run(async () => {
-    const campaign = await api<Campaign>('/campaigns', 'POST', { name: 'Untitled campaign' });
-    navigate(`/campaigns/${campaign.id}`);
-  });
   const copy = (c: CampaignSummary) => run(async () => {
     const campaign = await api<Campaign>(`/campaigns/${c.id}/duplicate`, 'POST');
     navigate(`/campaigns/${campaign.id}`);
@@ -45,11 +43,12 @@ export function Campaigns() {
       campaigns.reload();
     });
   };
-  const newButton = <Button variant="primary" busy={busy} onClick={() => void create()}>New campaign</Button>;
+  const newButton = <Button variant="primary" busy={busy} onClick={() => setPicking(true)}>New campaign</Button>;
 
   return (
     <>
       <PageHeader title="Campaigns" intro="Newsletters and announcements you've written or sent." actions={newButton} />
+      {picking && <TemplatePicker onClose={() => setPicking(false)} />}
       {error && <Notice tone="error">{error}</Notice>}
       {campaigns.state === 'loading' && <p class="muted">Loading…</p>}
       {campaigns.state === 'error' && <Notice tone="error">{campaigns.error}</Notice>}

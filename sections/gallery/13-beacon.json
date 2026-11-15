@@ -1,0 +1,126 @@
+{
+  "format": "mailstudio-template",
+  "version": 1,
+  "id": "beacon",
+  "name": "Beacon",
+  "description": "A punchy what's-new email in black and yellow: the headline feature, a quick list of improvements, and one button.",
+  "category": "announcement",
+  "tags": [
+    "product update",
+    "what's new",
+    "changelog"
+  ],
+  "author": "MailStudio",
+  "subject": "What's new this month",
+  "preheader": "One big new feature and a handful of improvements.",
+  "document": {
+    "schema": 2,
+    "brand": {
+      "width": 600,
+      "padding": 36,
+      "radius": 0,
+      "fontSize": 15,
+      "fonts": {
+        "heading": "Verdana, Geneva, sans-serif",
+        "body": "Verdana, Geneva, sans-serif",
+        "small": "Verdana, Geneva, sans-serif"
+      },
+      "button": {
+        "bold": true,
+        "italic": false
+      },
+      "flatFeatured": true,
+      "light": {
+        "outer": "#f4f4f0",
+        "background": "#ffffff",
+        "featured": "#fef9c3",
+        "text": "#3f3f46",
+        "heading": "#111111",
+        "link": "#111111",
+        "accent": "#111111",
+        "buttonText": "#fde047"
+      },
+      "dark": {
+        "outer": "#0a0a0a",
+        "background": "#141414",
+        "featured": "#2a2706",
+        "text": "#d9d9d4",
+        "heading": "#ffffff",
+        "link": "#fde047",
+        "accent": "#fde047",
+        "buttonText": "#111111"
+      }
+    },
+    "sections": [
+      {
+        "id": "header",
+        "type": "header",
+        "settings": {
+          "tagline": "What's new",
+          "featured": "off"
+        }
+      },
+      {
+        "id": "hero",
+        "type": "hero",
+        "settings": {
+          "eyebrow": "New this month",
+          "title": "The feature you asked for is here",
+          "description": "One sentence on what it does, and one on why it matters. Plain words beat clever ones.",
+          "featured": "on"
+        }
+      },
+      {
+        "id": "button1",
+        "type": "button",
+        "settings": {
+          "text": "Try it now",
+          "url": "https://example.com",
+          "featured": "off"
+        }
+      },
+      {
+        "id": "how",
+        "type": "text",
+        "settings": {
+          "heading": "How it works",
+          "body": "Explain it in two or three short steps, the way you'd tell a friend.\n\nIf there's a setting to switch on, say where it is.",
+          "featured": "off"
+        }
+      },
+      {
+        "id": "divider",
+        "type": "divider",
+        "settings": {
+          "featured": "off"
+        }
+      },
+      {
+        "id": "also",
+        "type": "contents",
+        "settings": {
+          "title": "Also new",
+          "items": "A smaller improvement people will notice\nSomething that's now faster\nA fix for that annoying thing",
+          "featured": "off"
+        }
+      },
+      {
+        "id": "feedback",
+        "type": "text",
+        "settings": {
+          "heading": "Tell us what you think",
+          "body": "Invite replies. Product updates that ask for feedback get better product.",
+          "featured": "on"
+        }
+      },
+      {
+        "id": "footer",
+        "type": "footer",
+        "settings": {
+          "note": "You're receiving this because you use our product. Update your email preferences any time.",
+          "featured": "on"
+        }
+      }
+    ]
+  }
+}

@@ -1,7 +1,8 @@
-<mj-section css-class="ms-s-{{section_id}} ms-featured" background-color="{{brand.featured}}" padding="44px {{brand.padding}}px">
+<mj-section css-class="ms-s-{{section_id}}{{#s.featured_on}} ms-featured{{/s.featured_on}}"{{#s.featured_on}} background-color="{{brand.featured}}"{{/s.featured_on}} padding="44px {{brand.padding}}px">
   <mj-column>
     <mj-text css-class="ms-text" align="center" font-family="{{brand.fonts.small}}" font-size="11px" font-weight="800" letter-spacing="2px"><span style="text-transform:uppercase">{{s.eyebrow}}</span></mj-text>
     <mj-text css-class="ms-text" align="center" padding="12px 0 20px"><h2 class="ms-heading" style="{{brand.h2}}">{{s.title}}</h2>{{{s.body_html}}}</mj-text>
+    {{#s.code}}<mj-text align="center" padding="0 0 22px"><span class="ms-heading" style="display:inline-block;border:2px dashed {{brand.accent}};border-radius:6px;padding:10px 22px;font-family:'Courier New',Courier,monospace;font-size:22px;font-weight:700;letter-spacing:3px;color:{{brand.heading}}">{{s.code}}</span></mj-text>{{/s.code}}
     {{#s.url_ok}}<mj-button css-class="ms-button" href="{{s.url}}">{{s.button}}</mj-button>{{/s.url_ok}}
   </mj-column>
 </mj-section>

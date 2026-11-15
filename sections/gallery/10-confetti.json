@@ -1,0 +1,148 @@
+{
+  "format": "mailstudio-template",
+  "version": 1,
+  "id": "confetti",
+  "name": "Confetti",
+  "description": "A cheerful thank-you after an event in bright pink: highlights, a quote from the day, and what comes next.",
+  "category": "event",
+  "tags": [
+    "thank you",
+    "follow-up",
+    "after the event"
+  ],
+  "author": "MailStudio",
+  "subject": "Thank you for coming!",
+  "preheader": "Highlights, slides and a little something for next time.",
+  "document": {
+    "schema": 2,
+    "brand": {
+      "width": 600,
+      "padding": 36,
+      "radius": 20,
+      "fontSize": 16,
+      "fonts": {
+        "heading": "\"Trebuchet MS\", Arial, sans-serif",
+        "body": "\"Trebuchet MS\", Arial, sans-serif",
+        "small": "Arial, Helvetica, sans-serif"
+      },
+      "button": {
+        "bold": true,
+        "italic": false
+      },
+      "flatFeatured": false,
+      "light": {
+        "outer": "#fbe9f1",
+        "background": "#ffffff",
+        "featured": "#fde4ef",
+        "text": "#56404a",
+        "heading": "#2b0f1d",
+        "link": "#b0174f",
+        "accent": "#c2185b",
+        "buttonText": "#ffffff"
+      },
+      "dark": {
+        "outer": "#160a10",
+        "background": "#1f1017",
+        "featured": "#3b1a29",
+        "text": "#ecd3de",
+        "heading": "#fff0f6",
+        "link": "#ff9cc4",
+        "accent": "#ec4f8e",
+        "buttonText": "#1f0610"
+      }
+    },
+    "sections": [
+      {
+        "id": "header",
+        "type": "header",
+        "settings": {
+          "tagline": "Thank you",
+          "featured": "off"
+        }
+      },
+      {
+        "id": "hero",
+        "type": "hero",
+        "settings": {
+          "eyebrow": "That was fun",
+          "title": "Thank you for coming!",
+          "description": "A warm thank-you to everyone who joined us. Say how many came and what made the day special.",
+          "featured": "on"
+        }
+      },
+      {
+        "id": "highlights",
+        "type": "contents",
+        "settings": {
+          "title": "Highlights",
+          "items": "The moment everyone's still talking about\nWhat we announced on the day\nThe winners, the stars and the helpers",
+          "featured": "off"
+        }
+      },
+      {
+        "id": "quote",
+        "type": "quote",
+        "settings": {
+          "text": "The best afternoon I've had all year — I'll be back next time.",
+          "author": "A guest on the day",
+          "featured": "off"
+        }
+      },
+      {
+        "id": "missed",
+        "type": "text",
+        "settings": {
+          "heading": "Missed something?",
+          "body": "The slides, photos and recordings are all in one place. Share them with anyone who couldn't make it.",
+          "featured": "off"
+        }
+      },
+      {
+        "id": "button",
+        "type": "button",
+        "settings": {
+          "text": "See the photos",
+          "url": "https://example.com",
+          "featured": "off"
+        }
+      },
+      {
+        "id": "nextone",
+        "type": "event",
+        "settings": {
+          "eyebrow": "Save the date",
+          "title": "See you at the next one",
+          "date": "Saturday 12 September",
+          "time": "2pm – 5pm",
+          "place": "Same place as before",
+          "description": "Early-bird tickets open next month.",
+          "button": "Get notified",
+          "url": "https://example.com",
+          "featured": "on"
+        }
+      },
+      {
+        "id": "social",
+        "type": "social",
+        "settings": {
+          "title": "Share your photos",
+          "style": "circle",
+          "colour": "accent",
+          "size": "32",
+          "instagram": "https://instagram.com/",
+          "facebook": "https://facebook.com/",
+          "tiktok": "https://tiktok.com/",
+          "featured": "off"
+        }
+      },
+      {
+        "id": "footer",
+        "type": "footer",
+        "settings": {
+          "note": "You're receiving this because you came along. Thank you!",
+          "featured": "on"
+        }
+      }
+    ]
+  }
+}

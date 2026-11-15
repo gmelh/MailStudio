@@ -13,6 +13,11 @@
     {{#dark_css}}<mj-style>{{{dark_css}}}</mj-style>{{/dark_css}}
   </mj-head>
   <mj-body css-class="ms-outer" width="{{brand.width}}px" background-color="{{brand.outer}}">
+    {{#brand.webLink}}<mj-section css-class="ms-weblink" padding="12px {{brand.padding}}px 10px">
+      <mj-column>
+        <mj-text css-class="ms-muted" align="center" font-family="{{brand.fonts.small}}" font-size="12px" color="{{brand.muted}}" padding="0"><a class="ms-link" href="{{merge.web_url}}" style="color:{{brand.muted}}">View in browser</a></mj-text>
+      </mj-column>
+    </mj-section>{{/brand.webLink}}
     <mj-wrapper css-class="ms-body" background-color="{{brand.background}}" border-radius="{{brand.radius}}px" padding="0">
 {{{sections}}}
 {{{compliance}}}

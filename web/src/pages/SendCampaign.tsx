@@ -16,6 +16,7 @@ export function SendCampaign({ id }: { id: string }) {
       all<MailingList>('/lists'),
       api<Settings>('/settings'),
       api<SendingAccount>('/sending/account'),
+      api<ImageChecks>(`/campaigns/${id}/checks`),
     ]),
     [id],
   );
@@ -25,9 +26,9 @@ export function SendCampaign({ id }: { id: string }) {
       <Loading result={data}>
         {() => {
           if (data.state !== 'ready') return null;
-          const [campaign, lists, settings, account] = data.data;
+          const [campaign, lists, settings, account, images] = data.data;
           if (campaign.status !== 'draft') return <Redirect to={`/campaigns/${id}/report`} />;
-          return <SendForm initial={campaign} lists={lists} settings={settings} account={account} />;
+          return <SendForm initial={campaign} lists={lists} settings={settings} account={account} images={images} />;
         }}
       </Loading>
     </>
@@ -39,8 +40,14 @@ function Redirect({ to }: { to: string }) {
   return null;
 }
 
-function SendForm({ initial, lists, settings, account }: {
-  initial: Campaign; lists: MailingList[]; settings: Settings; account: SendingAccount;
+/** From GET /campaigns/{id}/checks: problems stop sending; warnings are worth fixing. */
+interface ImageChecks {
+  problems: string[];
+  warnings: string[];
+}
+
+function SendForm({ initial, lists, settings, account, images }: {
+  initial: Campaign; lists: MailingList[]; settings: Settings; account: SendingAccount; images: ImageChecks;
 }) {
   const { session } = useSession();
   const [campaign, setCampaign] = useState(initial);
@@ -75,7 +82,8 @@ function SendForm({ initial, lists, settings, account }: {
     [Boolean(campaign.from_email), 'It has a from address'],
     [campaign.lists.length > 0, 'It goes to at least one list'],
     [campaign.audience > 0, campaign.lists.length ? `${count(campaign.audience, 'person', 'people')} will get it` : 'Somebody will get it'],
-    [Boolean(account.provider), account.provider && account.provider !== 'ses' ? `Sending through ${account.provider}` : 'Amazon SES is connected', '/settings#ses'],
+    [!images.problems.length, 'Every image can be seen by recipients', `/campaigns/${campaign.id}`],
+    [Boolean(account.provider), account.label ? `Sending through ${account.label}` : account.provider ? `Sending through ${account.provider}` : 'A sending service is chosen', '/settings#sending-service'],
   ];
   const ready = checks.every(([ok]) => ok) && !saveError;
 
@@ -141,6 +149,14 @@ function SendForm({ initial, lists, settings, account }: {
                 </li>
               ))}
             </ul>
+            {images.problems.map((p) => <Notice key={p} tone="error">{p}</Notice>)}
+            {images.warnings.length > 0 && (
+              <details class="image-advice" open={images.warnings.length <= 3}>
+                <summary>{count(images.warnings.length, 'suggestion', 'suggestions')} for your images</summary>
+                <ul>{images.warnings.map((w) => <li key={w}>{w}</li>)}</ul>
+                <p class="muted small"><Link href={`/campaigns/${campaign.id}`}>Fix in the editor</Link>, or send as it is.</p>
+              </details>
+            )}
             {account.warnings.map((w) => <Notice key={w}>{w}</Notice>)}
 
             <fieldset class="consent">

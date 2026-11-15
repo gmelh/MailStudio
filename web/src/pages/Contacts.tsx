@@ -2,6 +2,7 @@
 
 import { useState } from 'preact/hooks';
 import { all, api, type Contact, type MailingList } from '../api';
+import { isString, usePref } from '../prefs';
 import { Link, navigate } from '../router';
 import {
   Button, Checkbox, count, EmptyState, Field, formatDate, fullName, Notice, PageHeader,
@@ -16,10 +17,12 @@ export const SUPPRESSION_LABELS: Record<NonNullable<Contact['suppressed']>, stri
 
 export function Contacts() {
   const [search, setSearch] = useState('');
-  const [listId, setListId] = useState('');
+  const [chosenList, setListId] = usePref('contacts-list', '', isString);
   const [adding, setAdding] = useState(false);
   const q = useDebounced(search.trim());
   const [lists] = useLoad(() => all<MailingList>('/lists'));
+  // A remembered list that's since been deleted means "Everyone".
+  const listId = lists.state === 'ready' && !lists.data.some((l) => l.id === chosenList) ? '' : chosenList;
   const params = new URLSearchParams();
   if (q) params.set('q', q);
   if (listId) params.set('list_id', listId);

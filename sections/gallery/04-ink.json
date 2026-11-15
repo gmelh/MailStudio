@@ -1,0 +1,137 @@
+{
+  "format": "mailstudio-template",
+  "version": 1,
+  "id": "ink",
+  "name": "Ink",
+  "description": "A quiet, minimal launch announcement in ink and violet: one big idea, three reasons, and a single button.",
+  "category": "announcement",
+  "tags": [
+    "launch",
+    "product",
+    "minimal"
+  ],
+  "author": "MailStudio",
+  "subject": "Introducing something new",
+  "preheader": "It's here — and we think you'll love it.",
+  "document": {
+    "schema": 2,
+    "brand": {
+      "width": 600,
+      "padding": 40,
+      "radius": 0,
+      "fontSize": 15,
+      "fonts": {
+        "heading": "Verdana, Geneva, sans-serif",
+        "body": "Verdana, Geneva, sans-serif",
+        "small": "Verdana, Geneva, sans-serif"
+      },
+      "button": {
+        "bold": false,
+        "italic": false
+      },
+      "flatFeatured": true,
+      "light": {
+        "outer": "#f1f0f5",
+        "background": "#ffffff",
+        "featured": "#f1effa",
+        "text": "#4a4757",
+        "heading": "#15131c",
+        "link": "#6741d9",
+        "accent": "#5f3dc4",
+        "buttonText": "#ffffff"
+      },
+      "dark": {
+        "outer": "#0e0d12",
+        "background": "#16151c",
+        "featured": "#221f30",
+        "text": "#d3d0de",
+        "heading": "#f7f6fb",
+        "link": "#b9a6ff",
+        "accent": "#8f6ef0",
+        "buttonText": "#0e0b1a"
+      }
+    },
+    "sections": [
+      {
+        "id": "header",
+        "type": "header",
+        "settings": {
+          "tagline": "",
+          "featured": "off"
+        }
+      },
+      {
+        "id": "hero",
+        "type": "hero",
+        "settings": {
+          "eyebrow": "Introducing",
+          "title": "The new way to do the thing you do",
+          "description": "One sentence that explains what's new and who it's for. Make it plain, not clever.",
+          "featured": "on"
+        }
+      },
+      {
+        "id": "button1",
+        "type": "button",
+        "settings": {
+          "text": "See what's new",
+          "url": "https://example.com",
+          "featured": "off"
+        }
+      },
+      {
+        "id": "divider1",
+        "type": "divider",
+        "settings": {
+          "featured": "off"
+        }
+      },
+      {
+        "id": "reasons",
+        "type": "columns",
+        "settings": {
+          "leftTitle": "Faster",
+          "leftBody": "Say what's quicker and by how much, in everyday words.",
+          "rightTitle": "Simpler",
+          "rightBody": "Say what people no longer have to do.",
+          "featured": "off"
+        }
+      },
+      {
+        "id": "text",
+        "type": "text",
+        "settings": {
+          "heading": "Why we built it",
+          "body": "A short, honest story about the problem you saw and how this solves it.\n\nReaders trust a reason more than a list of features.",
+          "featured": "off"
+        }
+      },
+      {
+        "id": "quote",
+        "type": "quote",
+        "settings": {
+          "text": "It does exactly what it says, and nothing it doesn't.",
+          "author": "An early user",
+          "featured": "off"
+        }
+      },
+      {
+        "id": "button2",
+        "type": "button",
+        "settings": {
+          "text": "Try it today",
+          "url": "https://example.com",
+          "featured": "off"
+        }
+      },
+      {
+        "id": "footer",
+        "type": "footer",
+        "settings": {
+          "note": "You're receiving this because you asked to hear about new releases.",
+          "featured": "on"
+        }
+      }
+    ]
+  }
+}

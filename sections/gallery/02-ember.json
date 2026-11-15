@@ -1,0 +1,125 @@
+{
+  "format": "mailstudio-template",
+  "version": 1,
+  "id": "ember",
+  "name": "Ember",
+  "description": "A bold, warm sale email with a discount code front and centre, reasons to buy, and a strong call to action.",
+  "category": "promotion",
+  "tags": [
+    "sale",
+    "offer",
+    "coupon"
+  ],
+  "author": "MailStudio",
+  "subject": "30% off everything — this weekend only",
+  "preheader": "Use your code at checkout before Sunday midnight.",
+  "document": {
+    "schema": 2,
+    "brand": {
+      "width": 600,
+      "padding": 32,
+      "radius": 10,
+      "fontSize": 16,
+      "fonts": {
+        "heading": "Arial, Helvetica, sans-serif",
+        "body": "Arial, Helvetica, sans-serif",
+        "small": "Arial, Helvetica, sans-serif"
+      },
+      "button": {
+        "bold": true,
+        "italic": false
+      },
+      "flatFeatured": false,
+      "light": {
+        "outer": "#f6ece6",
+        "background": "#ffffff",
+        "featured": "#fde8df",
+        "text": "#57463f",
+        "heading": "#2b1d17",
+        "link": "#b03a0a",
+        "accent": "#c2410c",
+        "buttonText": "#ffffff"
+      },
+      "dark": {
+        "outer": "#160f0c",
+        "background": "#1f1612",
+        "featured": "#3a2219",
+        "text": "#e6d5cd",
+        "heading": "#fff4ee",
+        "link": "#ffa07a",
+        "accent": "#f76b2a",
+        "buttonText": "#1f0d05"
+      }
+    },
+    "sections": [
+      {
+        "id": "header",
+        "type": "header",
+        "settings": {
+          "tagline": "Weekend sale",
+          "featured": "off"
+        }
+      },
+      {
+        "id": "hero",
+        "type": "hero",
+        "settings": {
+          "eyebrow": "This weekend only",
+          "title": "30% off everything",
+          "description": "Our biggest sale of the season starts now. Stock up on favourites, or try something new for less.",
+          "featured": "off"
+        }
+      },
+      {
+        "id": "offer",
+        "type": "offer",
+        "settings": {
+          "eyebrow": "Your code",
+          "title": "Save 30% at checkout",
+          "body": "Valid on everything in store and online until Sunday at midnight.",
+          "code": "WEEKEND30",
+          "button": "Shop the sale",
+          "url": "https://example.com",
+          "featured": "on"
+        }
+      },
+      {
+        "id": "why",
+        "type": "columns",
+        "settings": {
+          "leftTitle": "Free delivery",
+          "leftBody": "On every order over $50, anywhere in the country.",
+          "rightTitle": "Easy returns",
+          "rightBody": "Changed your mind? Send it back within 30 days.",
+          "featured": "off"
+        }
+      },
+      {
+        "id": "text",
+        "type": "text",
+        "settings": {
+          "heading": "Don't miss out",
+          "body": "Popular sizes and colours go quickly. When they're gone, they're gone — so shop early for the best choice.",
+          "featured": "off"
+        }
+      },
+      {
+        "id": "button",
+        "type": "button",
+        "settings": {
+          "text": "Start shopping",
+          "url": "https://example.com",
+          "featured": "off"
+        }
+      },
+      {
+        "id": "footer",
+        "type": "footer",
+        "settings": {
+          "note": "Offer ends Sunday at midnight. Can't be combined with other offers.",
+          "featured": "on"
+        }
+      }
+    ]
+  }
+}

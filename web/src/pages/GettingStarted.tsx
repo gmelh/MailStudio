@@ -3,22 +3,22 @@
 import type { ComponentChildren } from 'preact';
 import { useEffect, useState } from 'preact/hooks';
 import { api, type Settings, type SetupStatus, type SetupStep } from '../api';
+import { setupChanged } from '../nav';
 import { Link } from '../router';
 import { Button, Loading, Notice, PageHeader, useLoad } from '../ui';
+import { BounceCard, SendingServiceCard } from './SendingService';
 import { BusinessCard, DomainCard, NotificationsCard, SenderCard, SesCard } from './Settings';
 
 const TITLES: Record<SetupStep, [title: string, why: string]> = {
   business: ['Your business details', 'Your name and postal address go at the bottom of every email.'],
   sender: ['Who emails come from', 'The name and address people see in their inbox.'],
-  ses: ['Connect Amazon SES', 'The service that delivers your emails. About US$0.10 per thousand.'],
+  provider: ['Choose how your emails are sent', 'Postmark, Mailgun, SMTP2GO, AuthSMTP or Amazon SES delivers them for you.'],
   domain: ['Prove your emails are really from you', 'A few DNS records, so inboxes trust you and spam folders don\'t.'],
   notifications: ['Handle bounces and spam reports', 'Stop emailing addresses that don\'t work or don\'t want you.'],
   production: ['Ask Amazon to let you send to anyone', 'New accounts can only email addresses they\'ve verified.'],
   audience: ['Bring in your subscribers', 'Import a spreadsheet, or start collecting signups.'],
 };
 
-/** Shared with the sidebar, so finishing a step updates its count. */
-export const setupChanged = new EventTarget();
 
 export function GettingStarted() {
   const [data, reload] = useLoad(() => Promise.all([api<SetupStatus>('/setup'), api<Settings>('/settings')]));
@@ -36,7 +36,7 @@ export function GettingStarted() {
 
   return (
     <>
-      <PageHeader title="Get set up" intro="Seven steps from a fresh install to your first campaign. Most take a few minutes; Amazon's approval can take a day." />
+      <PageHeader title="Get set up" intro="A few steps from a fresh install to your first campaign. Most take a few minutes." />
       <Loading result={data}>
         {() => {
           if (data.state !== 'ready') return null;
@@ -49,7 +49,7 @@ export function GettingStarted() {
               </div>
               <p class="muted setup-count">{doneCount} of {setup.steps.length} done</p>
               {!setup.https && (
-                <Notice>This Mail Studio is at {setup.base_url}. For sending to real people, install it with the one-line installer, which gives it a secure https:// address.</Notice>
+                <Notice>This MailStudio is at {setup.base_url}. For sending to real people, install it with the one-line installer, which gives it a secure https:// address.</Notice>
               )}
               {setup.complete && (
                 <Notice tone="success">All set. <Link href="/campaigns">Write your first campaign →</Link></Notice>
@@ -101,14 +101,16 @@ function StepBody({ step, settings, setup, onChange }: {
           <p class="hint">Use an address at your own domain (like news@yourbakery.com.au), not Gmail or Outlook: those can't be verified for sending.</p>
         </>
       );
-    case 'ses':
-      return <SesGuide settings={settings} onSaved={onChange} />;
+    case 'provider':
+      return <SendingServiceCard settings={settings} onSaved={onChange} ses={() => <SesGuide settings={settings} onSaved={onChange} />} />;
     case 'domain':
       return setup.domain
         ? <DomainCard settings={settings} onChecked={(ready) => ready && onChange()} />
         : <Notice>Set the from address first (step 2): this step proves you own its domain.</Notice>;
     case 'notifications':
-      return <NotificationsCard settings={settings} onDone={onChange} />;
+      return settings.provider.active === 'ses'
+        ? <NotificationsCard settings={settings} onDone={onChange} />
+        : <BounceCard settings={settings} onDone={onChange} />;
     case 'production':
       return <ProductionGuide onCheck={onChange} />;
     case 'audience':
@@ -126,39 +128,12 @@ function StepBody({ step, settings, setup, onChange }: {
 }
 
 function SesGuide({ settings, onSaved }: { settings: Settings; onSaved: () => void }) {
-  const [policy] = useLoad(() => api<unknown>('/sending/iam-policy'));
-  const [copied, setCopied] = useState(false);
-  const text = policy.state === 'ready' ? JSON.stringify(policy.data, null, 2) : '';
-  return (
-    <>
-      <div class="card form-card form-card--wide guide">
-        <h2>Get your Amazon keys</h2>
-        <ol>
-          <li>Sign in to <a href="https://console.aws.amazon.com/" target="_blank" rel="noopener">the AWS console</a> (or create a free account).
-            Pick the region nearest your subscribers at the top right, and note it.</li>
-          <li>Open <a href="https://console.aws.amazon.com/iam/home#/users" target="_blank" rel="noopener">IAM → Users</a> and choose
-            <strong> Create user</strong>. Name it <code>mailstudio</code>. Don't give it console access.</li>
-          <li>On the permissions step, choose <strong>Attach policies directly → Create policy → JSON</strong>, paste the policy below,
-            save it as <code>MailStudio</code>, then attach it to the user.</li>
-          <li>Open the user, go to <strong>Security credentials → Create access key</strong>, choose
-            <strong> Application running outside AWS</strong>, and copy both keys into the form below.</li>
-        </ol>
-        <textarea class="code" readOnly rows={8} value={text} aria-label="IAM policy" onFocus={(e) => e.currentTarget.select()} />
-        <div class="actions">
-          <Button onClick={() => void navigator.clipboard?.writeText(text).then(() => { setCopied(true); setTimeout(() => setCopied(false), 1500); })}>
-            {copied ? 'Copied' : 'Copy policy'}
-          </Button>
-        </div>
-        <p class="muted small">These permissions let Mail Studio send email and set up its own notifications, and nothing else in your account.</p>
-      </div>
-      <SesCard settings={settings} onSaved={onSaved} />
-    </>
-  );
+  return <SesCard settings={settings} onSaved={onSaved} embedded />;
 }
 
 function ProductionGuide({ onCheck }: { onCheck: () => void }) {
   return (
-    <div class="card form-card form-card--wide guide">
+    <div class="card form-card guide">
       <p>Every new Amazon SES account starts in a “sandbox”: it can only send to addresses you've verified. To email your subscribers, ask Amazon
         to lift that. It's a short form and is usually answered within a day.</p>
       <ol>

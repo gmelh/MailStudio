@@ -2,7 +2,7 @@
 
 import { useState } from 'preact/hooks';
 import { api, type Session } from '../api';
-import { Brand } from './Shell';
+import { Brand } from '../nav';
 import { Button, Field, Notice, useSubmit } from '../ui';
 
 export function Setup({ onDone }: { onDone: (session: Session) => void }) {
@@ -17,7 +17,7 @@ export function Setup({ onDone }: { onDone: (session: Session) => void }) {
     <main class="auth">
       <form class="card auth__card" onSubmit={onSubmit}>
         <Brand />
-        <h1>Welcome to Mail Studio</h1>
+        <h1>Welcome to MailStudio</h1>
         <p class="muted">Create your account. You can add other people later.</p>
         {error && <Notice tone="error">{error}</Notice>}
         <Field label="Your name" value={name} onValue={setName} autoComplete="name" required />
