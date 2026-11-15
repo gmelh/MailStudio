@@ -214,9 +214,13 @@ def _check_templates(args: argparse.Namespace) -> int:
             check_sections(document, library)
             for scheme in ("light", "dark"):
                 html = render.render(
-                    document, library, subject=template.subject, preheader=template.preheader,
+                    document,
+                    library,
+                    subject=template.subject,
+                    preheader=template.preheader,
                     business=render.Business(name="Your Company", address="Your business address"),
-                    scheme=scheme, asset_base=getattr(args, "asset_base", None),
+                    scheme=scheme,
+                    asset_base=getattr(args, "asset_base", None),
                 ).html
                 if args.out:
                     Path(args.out).mkdir(parents=True, exist_ok=True)
@@ -251,16 +255,18 @@ def _build_gallery(args: argparse.Namespace) -> int:
     for path in sorted(Path(args.source).glob("*.json")):
         template = gallery.parse(json.loads(path.read_text(encoding="utf-8")))
         shutil.copyfile(path, out / "templates" / f"{template.id}.json")
-        entries.append({
-            "id": template.id,
-            "name": template.name,
-            "description": template.description,
-            "category": template.category,
-            "tags": template.tags,
-            "author": template.author,
-            "file": f"templates/{template.id}.json",
-            "preview": f"previews/{template.id}-light.html",
-        })
+        entries.append(
+            {
+                "id": template.id,
+                "name": template.name,
+                "description": template.description,
+                "category": template.category,
+                "tags": template.tags,
+                "author": template.author,
+                "file": f"templates/{template.id}.json",
+                "preview": f"previews/{template.id}-light.html",
+            }
+        )
     index = {"format": "mailstudio-gallery", "version": 1, "templates": entries}
     (out / "index.json").write_text(json.dumps(index, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
     print(f"Wrote {out / 'index.json'} with {len(entries)} templates")
@@ -320,7 +326,8 @@ def main(argv: list[str] | None = None) -> int:
         "--out", default="gallery-site/gallery", help="Where to write index.json and the files"
     )
     build.add_argument(
-        "--site", default="https://mailstudio.email",
+        "--site",
+        default="https://mailstudio.email",
         help="The website's address; previews load social icons from its /social/ folder",
     )
     build.set_defaults(run=_build_gallery)

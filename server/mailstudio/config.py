@@ -58,6 +58,8 @@ class Settings:
             base_url=os.environ.get("MAILSTUDIO_BASE_URL", "http://localhost:8080").rstrip("/"),
             sections_dir=Path(os.environ.get("MAILSTUDIO_SECTIONS_DIR", str(_REPO_SECTIONS))).resolve(),
             web_dir=Path(os.environ.get("MAILSTUDIO_WEB_DIR", str(_REPO_WEB))).resolve(),
-            gallery_url=os.environ.get("MAILSTUDIO_GALLERY_URL", "https://mailstudio.email/gallery/index.json").strip(),
+            gallery_url=os.environ.get(
+                "MAILSTUDIO_GALLERY_URL", "https://mailstudio.email/gallery/index.json"
+            ).strip(),
             run_worker=os.environ.get("MAILSTUDIO_WORKER", "1") == "1",
         )

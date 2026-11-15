@@ -305,9 +305,7 @@ class CampaignCreate(Strict):
     template: Template | None = Field(
         None, description="Start from this template (ignored if `document` is given)"
     )
-    template_id: str | None = Field(
-        None, description="Start from a template bundled with the app, by its id"
-    )
+    template_id: str | None = Field(None, description="Start from a template bundled with the app, by its id")
     colours: Colours = Field(
         "template", description="Use the template's colours, or the brand colours from Settings"
     )
