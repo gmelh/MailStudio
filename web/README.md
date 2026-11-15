@@ -1,4 +1,4 @@
-# Mail Studio web app
+# MailStudio web app
 
 Preact + TypeScript, bundled with esbuild. The server serves the build from `web/dist`,
 on the same address as the API, so there's nothing extra to deploy.

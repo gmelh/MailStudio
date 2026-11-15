@@ -89,4 +89,4 @@ jobs:
             echo "install.sh SHA-256: \`${sum}\`"
           } > notes.md
           gh release create "$TAG" install.sh install.sh.sha256 \
-            --title "Mail Studio ${version}" --notes-file notes.md $prerelease
+            --title "MailStudio ${version}" --notes-file notes.md $prerelease

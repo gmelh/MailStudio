@@ -69,6 +69,16 @@
         },
         "dark": {
           "$ref": "#/$defs/Palette"
+        },
+        "flatFeatured": {
+          "default": false,
+          "title": "Flatfeatured",
+          "type": "boolean"
+        },
+        "webLink": {
+          "default": true,
+          "title": "Weblink",
+          "type": "boolean"
         }
       },
       "title": "Brand",
@@ -268,7 +278,9 @@
           "link": "#a8c4ff",
           "outer": "#10151f",
           "text": "#d0d9e6"
-        }
+        },
+        "flatFeatured": false,
+        "webLink": true
       }
     },
     "sections": {
@@ -281,6 +293,6 @@
       "type": "array"
     }
   },
-  "title": "Mail Studio campaign document",
+  "title": "MailStudio campaign document",
   "type": "object"
 }

@@ -1,4 +1,4 @@
-# Mail Studio server
+# MailStudio server
 
 The API and the sending worker. Python 3.12+, FastAPI, SQLite, and
 [mrml](https://github.com/jdrouet/mrml) for rendering email from the shared [`sections/`](../sections/README.md).
@@ -28,13 +28,53 @@ copy of the database while the app runs (the installer's `mailstudio backup` use
 | `MAILSTUDIO_BASE_URL` | `http://localhost:8080` | The install's public address, used in unsubscribe links |
 | `MAILSTUDIO_WEB_DIR` | `../web/dist` | The built web app, served at `/` |
 | `MAILSTUDIO_WORKER` | `1` | Run the sending worker inside `mailstudio serve`; set `0` and run `mailstudio worker` separately if preferred |
-| `MAILSTUDIO_ALLOW_SMTP_SENDING` | unset | Development only: send campaigns over the SMTP in Settings (e.g. Mailpit). Plain SMTP can't report bounces, so production installs use Amazon SES |
+| `MAILSTUDIO_GALLERY_URL` | `https://mailstudio.email/gallery/index.json` | The online template gallery offered under New campaign; set it empty to turn the gallery off |
+| `MAILSTUDIO_ALLOW_SMTP_SENDING` | unset | Development only: with no sending service chosen, send campaigns over the test-email SMTP in Settings (e.g. Mailpit) |
+
+## Choosing a sending service
+
+Campaigns go through one service, chosen in Settings (`"provider": {"active": "…"}`):
+
+| `active` | Service | Sends with | Bounces, complaints and unsubscribes arrive by |
+| --- | --- | --- | --- |
+| `postmark` | Postmark | `POST /email` on a Broadcasts message stream | Webhook: Bounce, SpamComplaint, SubscriptionChange |
+| `mailgun` | Mailgun (US or EU) | `POST /v3/<domain>/messages.mime` (the finished MIME message) | Webhook, HMAC-signed: failed, complained, unsubscribed |
+| `smtp2go` | SMTP2GO | `POST /v3/email/mime` (the finished MIME message) | Webhook (JSON or form): bounce, spam, unsubscribe |
+| `authsmtp` / `smtp` | AuthSMTP or any SMTP server | SMTP, with the bounce address as envelope sender | Bounce mailbox read over IMAP every 5 minutes |
+| `ses` | Amazon SES | `SendEmail` with the raw message | SNS (see below) |
+
+Installs from before the choice existed keep sending through SES. Credentials go in their own
+settings groups (`postmark`, `mailgun`, `smtp2go`, `relay`, `ses`); secrets are write-only.
+`POST /api/v1/sending/check` tries the saved credentials for real (and, for SMTP, the bounce
+mailbox) and says what to fix.
+
+**Webhooks.** Each service posts to `https://<your address>/webhooks/<service>/<token>`, where the
+token is derived from the install's secret, so the address can't be guessed;
+`GET /api/v1/sending/account` returns it as `webhook_url`. A wrong token gets 404. Mailgun's
+events are also checked against its HTTP webhook signing key when one is saved. Settings shows
+bounce handling as working once the first event arrives.
+
+**Postmark and unsubscribes.** Broadcast streams add Postmark's own unsubscribe link and
+one-click headers unless Postmark support has switched on "Manage unsubscribes on your own".
+Until then MailStudio leaves its List-Unsubscribe headers out (two sets break one-click
+unsubscribe) and takes Postmark's unsubscribes from the SubscriptionChange webhook. Once it's
+on, tick `postmark.own_unsubscribes` and MailStudio's headers are sent.
+
+**SMTP bounces.** SMTP can't report bounces, so relays send with `relay.bounce_address` as the
+SMTP envelope sender (AuthSMTP needs it authorised, like the from address), and the worker
+reads that mailbox (`relay.imap_*`) every 5 minutes. Delivery status reports (RFC 3464),
+spam reports (ARF) and old-style "Returned mail" bounces that name one address are applied
+and marked read; anything else stays unread for a person. The original Message-ID in the
+report links a bounce to its campaign.
+
+Problems that would stop every message (bad credentials, an unverified sender, a refused
+sender address) pause the campaign, as for SES, instead of failing each email.
 
 ## Connecting Amazon SES
 
 Until the Phase 2 setup wizard automates it, connecting SES takes five steps:
 
-1. **Access key.** In AWS IAM, create a user for Mail Studio with an access key and a policy
+1. **Access key.** In AWS IAM, create a user for MailStudio with an access key and a policy
    allowing `ses:SendEmail`, `ses:SendRawEmail`, `ses:GetAccount`, `ses:GetEmailIdentity`
    and `ses:CreateEmailIdentity`.
 2. **Settings.** `PATCH /api/v1/settings` with
@@ -46,7 +86,7 @@ Until the Phase 2 setup wizard automates it, connecting SES takes five steps:
 4. **Bounces and complaints.** Create an SNS topic, set it as the domain identity's bounce,
    complaint (and optionally delivery) notification topic in SES, and put its ARN in
    Settings as `ses.notification_topic_arn`. Then subscribe `https://<your address>/webhooks/ses`
-   to the topic (HTTPS); Mail Studio confirms the subscription itself.
+   to the topic (HTTPS); MailStudio confirms the subscription itself.
 5. **Production access.** New SES accounts start in the sandbox. `GET /api/v1/sending/account`
    warns until production access is granted, and also if the sending rate in Settings is
    above the account's limit.
@@ -93,32 +133,40 @@ Interactive docs: `/api/docs`. OpenAPI: `/api/v1/openapi.json`.
 | POST | `/lists/{id}/members/{contact_id}/unsubscribe` | write | Unsubscribe |
 | GET / POST | `/suppressions` | read / write | List / add a manual suppression |
 | GET / DELETE | `/suppressions/{email}` | read / write | Check / lift a manual suppression |
-| GET / PATCH | `/settings` | read / write | Business details, sender defaults, brand profile, SMTP (password write-only) |
+| GET / PATCH | `/settings` | read / write | Business details, sender defaults, brand profile, the sending service and its credentials, test-email SMTP (secrets write-only) |
 | GET / POST | `/campaigns` | read / write | List / create a draft (defaults to a starter email in the brand) |
 | GET / PATCH / DELETE | `/campaigns/{id}` | read / write | Get / update / delete (drafts only) |
 | POST | `/campaigns/{id}/preview` | read | Rendered subject, HTML and text, personalised for a contact or sample data |
 | POST | `/campaigns/{id}/duplicate` | write | Copy any campaign into a new draft (design, subject, sender, audience) |
-| POST | `/campaigns/{id}/test` | send | Send to up to 5 addresses, subject prefixed "[Test]": via the SMTP in Settings if set, otherwise SES |
+| POST | `/campaigns/{id}/test` | send | Send to up to 5 addresses, subject prefixed "[Test]": via the test-email SMTP in Settings if set, otherwise the sending service |
 | POST | `/render` | read | Render any campaign document without saving it (the editor's live preview uses this) |
 | GET | `/sections` | read | Section types, their fields and defaults, and style presets, from `sections/` |
 | POST | `/assets` | write | Upload an image (multipart: `file`): resized to 1200px wide and compressed for email |
 | GET / DELETE | `/assets/{id}` | read / write | Image details / delete |
-| POST | `/campaigns/{id}/schedule` | send | Check it's ready, then send now or at `at` (ISO time with offset) |
+| GET | `/campaigns/{id}/share` | read | A link to a web copy of a sent campaign anyone can open (no personal details) |
+| GET | `/campaigns/{id}/checks` | read | Image checks: `problems` (images recipients can't load) stop sending; `warnings` cover descriptions, sharpness, weight and image-only emails |
+| POST | `/campaigns/{id}/schedule` | send | Check it's ready (images included), then send now or at `at` (ISO time with offset) |
 | POST | `/campaigns/{id}/pause` · `/resume` | send | Pause or resume sending |
 | POST | `/campaigns/{id}/cancel` | send | Scheduled → back to draft; sending → stop, skip the rest |
-| GET | `/campaigns/{id}/stats` | read | Queued, sent, failed, skipped; delivered, bounced and complained from SES; unsubscribed |
-| GET | `/sending/account` | read | Connected provider, SES sandbox status, quota, and setup warnings |
-| POST | `/sending/domain` | write | Register a sending domain with SES; returns the DNS records to add |
-| GET | `/sending/domain/{domain}` | read | Live check of DKIM, DMARC and SPF records, and whether the domain is ready |
+| GET | `/campaigns/{id}/stats` | read | Queued, sent, failed, skipped; delivered, bounced and complained as reported by the service; unsubscribed |
+| GET | `/sending/account` | read | The sending service, its bounce handling and webhook address, SES sandbox status and quota, and setup warnings |
+| POST | `/sending/check` | write | Try the sending service's saved credentials (and an SMTP relay's bounce mailbox); says what to fix |
+| POST | `/sending/domain` | write | With SES, register a sending domain and return the DNS records to add; otherwise check DMARC and SPF |
+| GET | `/sending/domain/{domain}` | read | Live check of DKIM (SES), DMARC and SPF records, and whether the domain is ready |
 | POST | `/sending/notifications` | write | Create the SNS topic and SES configuration set in your AWS account and subscribe this install (needs https) |
-| GET | `/sending/iam-policy` | read | The AWS permissions Mail Studio needs |
+| GET | `/sending/iam-policy` | read | The AWS permissions MailStudio needs |
 | GET | `/setup` | read | The getting-started checklist: what's done so far |
 
 Public pages (no key): `GET /u/{token}` shows the unsubscribe confirmation;
 `POST /u/{token}` unsubscribes, from the page's button or a mail app's one-click
 unsubscribe (RFC 8058). A GET never unsubscribes, because mail scanners prefetch links.
-`POST /webhooks/ses` receives SES notifications from SNS (see below).
+`POST /webhooks/ses` receives SES notifications from SNS (see below), and
+`POST /webhooks/{postmark|mailgun|smtp2go}/{token}` receives the other services' events.
 `GET /assets/{id}.{jpg|png|gif}` serves uploaded images publicly, because mail apps fetch them.
+`GET /social/{network}-{circle|plain}-{rrggbb}.png` serves social icons in any colour, made on
+first use and kept in the data folder. `GET /v/{token}` is a reader's own web copy of an email
+("View in browser", using the same token as unsubscribing), and `GET /v/s/{token}` the shareable
+copy, with personal details left out.
 
 ### Signup forms and double opt-in
 
@@ -203,8 +251,13 @@ automatic plain-text part. The result keeps the owner's merge tags
 (`{{first_name|there}}`, `{{unsubscribe_url}}`), which are filled per recipient in
 one pass with values HTML-escaped. Templates are logic-free, so neither content nor
 subscriber data can run code. The campaign document's JSON Schema is generated
-from the models: `mailstudio export-schema` writes `schema/campaign.schema.json`, and a
-test fails if the committed copy is out of date.
+from the models: `mailstudio export-schema` writes `schema/campaign.schema.json` (and
+`schema/template.schema.json` for template files), and a test fails if a committed copy
+is out of date.
+
+Templates (whole designed emails to start from) are described in
+[`sections/gallery/README.md`](../sections/gallery/README.md): the file format, the ones
+bundled with the app, and how the online gallery at mailstudio.email is built.
 
 ## Logins
 
@@ -232,10 +285,14 @@ Secure on https installs. Only a hash of each session token is stored. Locked ou
 | `mailstudio/tokens.py` | Signed unsubscribe tokens |
 | `mailstudio/mailer.py` | Message building and SMTP (test sends) |
 | `mailstudio/worker.py` | The sending worker |
-| `mailstudio/providers.py` | Provider interface and SMTP (development) |
+| `mailstudio/providers.py` | Provider interface, choosing the provider, and SMTP sending (relays and development) |
+| `mailstudio/esp.py` | Postmark, Mailgun and SMTP2GO over HTTPS (standard library only), and their connection checks |
 | `mailstudio/ses.py` | Amazon SES: sending, account, domain identity |
-| `mailstudio/notifications.py` | SNS signature checks; bounces and complaints into suppressions |
+| `mailstudio/notifications.py` | SNS signature checks; SES, Postmark, Mailgun and SMTP2GO events into suppressions |
+| `mailstudio/bounces.py` | The SMTP bounce mailbox: IMAP polling and DSN/ARF parsing |
 | `mailstudio/domain.py` | DNS checks for the sending domain |
+| `mailstudio/social.py` | Social icons, coloured on demand from `sections/social` |
+| `mailstudio/images.py` | Image checks before sending, and pointing MailStudio's own images at the install's address |
 | `mailstudio/db.py` | Connection settings, transactions, migrations |
 | `mailstudio/migrations/` | Numbered SQL migrations |
 | `mailstudio/cli.py` | `mailstudio` command |

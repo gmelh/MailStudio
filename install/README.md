@@ -1,4 +1,4 @@
-# Installing Mail Studio
+# Installing MailStudio
 
 On a fresh Ubuntu or Debian server (1 GB of memory is plenty):
 
@@ -8,7 +8,7 @@ curl -fsSL https://get.mailstudio.email | sudo bash
 
 Before you run it, point an address at the server: in your domain's DNS settings add an
 **A record** for, say, `mail.yourbusiness.com` with the server's IP address. The installer
-checks it, installs Docker if needed, starts Mail Studio behind [Caddy](https://caddyserver.com)
+checks it, installs Docker if needed, starts MailStudio behind [Caddy](https://caddyserver.com)
 (which gets and renews the HTTPS certificate), and tells you where to create your account.
 
 Then open the address and follow **Get set up** in the app.
@@ -33,7 +33,7 @@ provider's snapshots): a backup on the same server doesn't help if the server is
 ```
 /opt/mailstudio/
   .env          your address and the image version (edit, then `mailstudio restart`)
-  compose.yml   the two containers: Mail Studio and Caddy (rewritten by the installer)
+  compose.yml   the two containers: MailStudio and Caddy (rewritten by the installer)
   Caddyfile     HTTPS settings (rewritten by the installer)
   data/         the database and uploaded images
   backups/      daily backups
@@ -57,7 +57,7 @@ your data and settings.
 # 1. Set the version in server/pyproject.toml, server/mailstudio/__init__.py and web/package.json
 git commit -am "Version 0.8.0" && git push
 # 2. Tag it; pushing the tag starts .github/workflows/release.yml
-git tag -a v0.8.0 -m "Mail Studio 0.8.0"
+git tag -a v0.8.0 -m "MailStudio 0.8.0"
 git push origin v0.8.0
 ```
 

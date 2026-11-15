@@ -9,10 +9,10 @@ from __future__ import annotations
 
 from typing import Annotated, Any, Literal, get_args
 
-from pydantic import BaseModel, ConfigDict, Field, StringConstraints
+from pydantic import BaseModel, ConfigDict, Field, StringConstraints, model_validator
 
 from .errors import ProblemError
-from .sections import Library
+from .sections import HEX_COLOUR, Library
 
 MAX_SECTIONS = 300
 MAX_SETTING = 20_000
@@ -79,6 +79,29 @@ class Brand(_Model):
     logo: Annotated[str, Field(max_length=2000)] = ""
     light: Palette = Palette()
     dark: Palette = Field(default_factory=_dark)
+    # Plain feature sections: the headline, offers and footer use the email's background
+    # colour instead of their own (the Minimal style). The "featured" colours are kept, so
+    # switching back restores them.
+    flatFeatured: bool = False
+    # A small "View in browser" link above the email, to its web version.
+    webLink: bool = True
+
+    @model_validator(mode="before")
+    @classmethod
+    def _plain_features_from_before(cls, data: Any) -> Any:
+        """Before `flatFeatured` existed, Minimal made feature sections plain by copying the
+        background colour over the feature colour. Read those documents as plain."""
+        if not isinstance(data, dict) or "flatFeatured" in data:
+            return data
+        palettes = [data.get("light"), data.get("dark")]
+        if all(
+            isinstance(p, dict)
+            and p.get("featured")
+            and str(p["featured"]).lower() == str(p.get("background", "")).lower()
+            for p in palettes
+        ):
+            return {**data, "flatFeatured": True}
+        return data
 
 
 class Section(_Model):
@@ -133,6 +156,10 @@ def check_sections(document: Document, library: Library) -> None:
                 error(i, f"Longer than {MAX_SETTING:,} characters", key)
             elif field.kind == "image" and value.startswith("data:"):
                 error(i, "Use a hosted image URL, not an embedded image", key)
+            elif field.kind == "toggle" and value not in ("on", "off"):
+                error(i, "Must be 'on' or 'off'", key)
+            elif field.kind == "colour" and not HEX_COLOUR.match(value):
+                error(i, "Must be a colour like #1a2b3c", key)
 
     if errors:
         raise ProblemError(

@@ -1,7 +1,8 @@
-<mj-section css-class="ms-s-{{section_id}} ms-featured" background-color="{{brand.featured}}">
+{{^s.edge_on}}
+<mj-section css-class="ms-s-{{section_id}}{{#s.featured_on}} ms-featured{{/s.featured_on}}"{{#s.featured_on}} background-color="{{brand.featured}}"{{/s.featured_on}}>
   {{^s.position_is_right}}
   <mj-column width="50%" vertical-align="middle">
-    {{#s.url_ok}}<mj-image src="{{s.url}}" alt="{{s.alt}}" border-radius="6px" padding="0 24px 16px 0" />{{/s.url_ok}}
+    {{#s.url_ok}}<mj-image{{#s.link_ok}} href="{{s.link}}"{{/s.link_ok}} src="{{s.url}}" alt="{{s.alt}}" border-radius="6px" padding="0 24px 16px 0" />{{/s.url_ok}}
   </mj-column>
   <mj-column width="50%" vertical-align="middle">
     <mj-text css-class="ms-text"><h3 class="ms-heading" style="{{brand.h3}}">{{s.title}}</h3>{{{s.body_html}}}</mj-text>
@@ -12,7 +13,28 @@
     <mj-text css-class="ms-text" padding="0 24px 16px 0"><h3 class="ms-heading" style="{{brand.h3}}">{{s.title}}</h3>{{{s.body_html}}}</mj-text>
   </mj-column>
   <mj-column width="50%" vertical-align="middle">
-    {{#s.url_ok}}<mj-image src="{{s.url}}" alt="{{s.alt}}" border-radius="6px" />{{/s.url_ok}}
+    {{#s.url_ok}}<mj-image{{#s.link_ok}} href="{{s.link}}"{{/s.link_ok}} src="{{s.url}}" alt="{{s.alt}}" border-radius="6px" />{{/s.url_ok}}
   </mj-column>
   {{/s.position_is_right}}
 </mj-section>
+{{/s.edge_on}}
+{{#s.edge_on}}
+<mj-section css-class="ms-s-{{section_id}}{{#s.featured_on}} ms-featured{{/s.featured_on}}"{{#s.featured_on}} background-color="{{brand.featured}}"{{/s.featured_on}} padding="0">
+  {{^s.position_is_right}}
+  <mj-column width="50%" vertical-align="top">
+    <mj-image{{#s.link_ok}} href="{{s.link}}"{{/s.link_ok}} src="{{s.url}}" alt="{{s.alt}}" padding="0" fluid-on-mobile="true" />
+  </mj-column>
+  <mj-column width="50%" vertical-align="middle">
+    <mj-text css-class="ms-text" padding="24px {{brand.padding}}px 24px 24px"><h3 class="ms-heading" style="{{brand.h3}}">{{s.title}}</h3>{{{s.body_html}}}</mj-text>
+  </mj-column>
+  {{/s.position_is_right}}
+  {{#s.position_is_right}}
+  <mj-column width="50%" vertical-align="middle">
+    <mj-text css-class="ms-text" padding="24px 24px 24px {{brand.padding}}px"><h3 class="ms-heading" style="{{brand.h3}}">{{s.title}}</h3>{{{s.body_html}}}</mj-text>
+  </mj-column>
+  <mj-column width="50%" vertical-align="top">
+    <mj-image{{#s.link_ok}} href="{{s.link}}"{{/s.link_ok}} src="{{s.url}}" alt="{{s.alt}}" padding="0" fluid-on-mobile="true" />
+  </mj-column>
+  {{/s.position_is_right}}
+</mj-section>
+{{/s.edge_on}}

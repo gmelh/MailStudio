@@ -1,0 +1,135 @@
+{
+  "format": "mailstudio-template",
+  "version": 1,
+  "id": "haven",
+  "name": "Haven",
+  "description": "A gentle first hello in sky blue: who you are, what to expect from your emails, and a place to start.",
+  "category": "welcome",
+  "tags": [
+    "welcome",
+    "new subscriber",
+    "first email"
+  ],
+  "author": "MailStudio",
+  "subject": "Welcome — we're glad you're here",
+  "preheader": "Here's what to expect, and a good place to start.",
+  "document": {
+    "schema": 2,
+    "brand": {
+      "width": 600,
+      "padding": 44,
+      "radius": 10,
+      "fontSize": 16,
+      "fonts": {
+        "heading": "Georgia, serif",
+        "body": "Arial, Helvetica, sans-serif",
+        "small": "Arial, Helvetica, sans-serif"
+      },
+      "button": {
+        "bold": true,
+        "italic": false
+      },
+      "flatFeatured": false,
+      "light": {
+        "outer": "#e6f1f8",
+        "background": "#ffffff",
+        "featured": "#e0f0fa",
+        "text": "#3d4f5c",
+        "heading": "#0c2433",
+        "link": "#0369a1",
+        "accent": "#0369a1",
+        "buttonText": "#ffffff"
+      },
+      "dark": {
+        "outer": "#08121a",
+        "background": "#0f1c26",
+        "featured": "#16324a",
+        "text": "#c8dae6",
+        "heading": "#eef6fb",
+        "link": "#7cc7f2",
+        "accent": "#2b9ad6",
+        "buttonText": "#04131d"
+      }
+    },
+    "sections": [
+      {
+        "id": "header",
+        "type": "header",
+        "settings": {
+          "tagline": "",
+          "featured": "off"
+        }
+      },
+      {
+        "id": "hero",
+        "type": "hero",
+        "settings": {
+          "eyebrow": "Welcome",
+          "title": "We're glad you're here",
+          "description": "Thank people for joining, in a sentence or two. Then tell them, honestly, what they've signed up for.",
+          "featured": "on"
+        }
+      },
+      {
+        "id": "who",
+        "type": "text",
+        "settings": {
+          "heading": "A little about us",
+          "body": "Who you are, what you do, and why you started. Keep it human — this is a first impression.",
+          "featured": "off"
+        }
+      },
+      {
+        "id": "expect",
+        "type": "columns",
+        "settings": {
+          "leftTitle": "What you'll get",
+          "leftBody": "How often you'll write, and what kind of things you'll send.",
+          "rightTitle": "What you won't",
+          "rightBody": "No spam, no selling your address. Unsubscribe any time.",
+          "featured": "off"
+        }
+      },
+      {
+        "id": "start",
+        "type": "text",
+        "settings": {
+          "heading": "A good place to start",
+          "body": "Point new readers to the one thing most people love first: a popular article, a guide, or your best-seller.",
+          "featured": "on"
+        }
+      },
+      {
+        "id": "button",
+        "type": "button",
+        "settings": {
+          "text": "Start here",
+          "url": "https://example.com",
+          "featured": "off"
+        }
+      },
+      {
+        "id": "social",
+        "type": "social",
+        "settings": {
+          "title": "Say hello",
+          "style": "circle",
+          "colour": "accent",
+          "size": "32",
+          "website": "https://example.com",
+          "instagram": "https://instagram.com/",
+          "linkedin": "https://linkedin.com/",
+          "featured": "off"
+        }
+      },
+      {
+        "id": "footer",
+        "type": "footer",
+        "settings": {
+          "note": "You're receiving this because you just subscribed. Welcome aboard!",
+          "featured": "on"
+        }
+      }
+    ]
+  }
+}

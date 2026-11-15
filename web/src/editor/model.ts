@@ -96,18 +96,52 @@ export function updatePalette(
 }
 
 /** Restyle: fonts, sizes and shapes from the preset; colours and logo stay. */
+/**
+ * Apply a style: fonts, corners, spacing, button text, and whether feature sections have
+ * their own background. Colours and logo are left alone.
+ */
 export function applyPreset(doc: CampaignDocument, preset: Preset): CampaignDocument {
-  const brand: Brand = { ...doc.brand, ...preset.brand };
-  if (preset.flatFeatured) {
-    brand.light = { ...brand.light, featured: brand.light.background };
-    brand.dark = { ...brand.dark, featured: brand.dark.background };
-  }
-  return { ...doc, brand };
+  const brand: Brand = { ...doc.brand, ...preset.brand, flatFeatured: preset.brand.flatFeatured ?? false };
+  return { ...doc, brand: brand.flatFeatured ? brand : restoreFeatured(brand) };
+}
+
+/** Whether the email's brand currently matches a style exactly. */
+export function presetMatches(brand: Brand, preset: Preset): boolean {
+  const p = preset.brand;
+  return (p.fonts === undefined || (Object.keys(p.fonts) as Array<keyof Brand['fonts']>).every((k) => brand.fonts[k] === p.fonts![k]))
+    && (p.radius === undefined || brand.radius === p.radius)
+    && (p.padding === undefined || brand.padding === p.padding)
+    && (p.fontSize === undefined || brand.fontSize === p.fontSize)
+    && (p.button === undefined || (brand.button.bold === p.button.bold && brand.button.italic === p.button.italic))
+    && Boolean(brand.flatFeatured) === Boolean(p.flatFeatured);
+}
+
+/**
+ * Earlier versions made Minimal's plain feature sections by overwriting the feature colour
+ * with the background colour, so it was lost. When feature backgrounds come back on and
+ * the two are still identical, give them a gentle tint of the button colour again.
+ */
+export function restoreFeatured(brand: Brand): Brand {
+  const fix = (p: Palette, amount: number): Palette =>
+    p.featured.toLowerCase() === p.background.toLowerCase() ? { ...p, featured: mix(p.accent, p.background, amount) } : p;
+  return { ...brand, light: fix(brand.light, 0.11), dark: fix(brand.dark, 0.17) };
+}
+
+/** `amount` of colour `a` over colour `b` (both #rrggbb). */
+function mix(a: string, b: string, amount: number): string {
+  const channel = (hex: string, i: number) => parseInt(hex.slice(1 + i * 2, 3 + i * 2), 16);
+  if (!/^#[0-9a-f]{6}$/i.test(a) || !/^#[0-9a-f]{6}$/i.test(b)) return b;
+  return '#' + [0, 1, 2]
+    .map((i) => Math.round(channel(a, i) * amount + channel(b, i) * (1 - amount)).toString(16).padStart(2, '0'))
+    .join('');
 }
 
 /** A short line describing a section in the outline, from its first non-empty text. */
 export function summary(section: Section, definition?: SectionDef): string {
-  const values = definition ? definition.fields.map((f) => section.settings[f.key] || definition.defaults[f.key] || '') : Object.values(section.settings);
+  const values = definition
+    ? definition.fields.filter((f) => f.kind !== 'toggle' && f.kind !== 'select')
+        .map((f) => section.settings[f.key] || definition.defaults[f.key] || '')
+    : Object.values(section.settings);
   const text = values.find((v) => v && !/^(https?:|data:|#|\d+$)/.test(v)) ?? '';
   return text.replace(/\s+/g, ' ').slice(0, 60);
 }

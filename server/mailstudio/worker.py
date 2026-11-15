@@ -11,6 +11,7 @@ Each `tick()`:
 3. Claims a batch of due jobs, sends them at the configured rate, and records each
    result: sent, retry later (with increasing delays), or failed.
 4. Marks campaigns `sent` once nothing is left queued.
+5. For SMTP relays, checks the bounce mailbox every few minutes (`bounces.py`).
 
 Every state change is its own short transaction, so the API stays responsive and a
 crash at any point leaves the queue consistent.
@@ -28,7 +29,7 @@ from dataclasses import dataclass
 from datetime import UTC, datetime, timedelta
 from typing import Any
 
-from . import mailer, render, tokens
+from . import bounces, mailer, render, tokens
 from .config import Settings
 from .db import connect, now, transaction
 from .document import Document, check_sections
@@ -101,6 +102,7 @@ class Worker:
         result.recovered = self.recover_interrupted()
         self.send_batch(result)
         result.finished = self.finish_campaigns()
+        bounces.poll_if_due(self.conn, self.clock())  # SMTP relays only; at most every few minutes
         return result
 
     def run(self, stop: threading.Event, idle_seconds: float = 2.0) -> None:
@@ -262,8 +264,10 @@ class Worker:
     def _message(self, snapshot: dict[str, Any], campaign_id: str, contact_id: str, secret: bytes) -> Any:
         row = self.conn.execute("SELECT * FROM contacts WHERE id = ?", (contact_id,)).fetchone()
         contact = {**dict(row), "fields": json.loads(row["fields"])}
-        unsubscribe_url = f"{self.app.base_url}/u/{tokens.make(secret, contact_id, campaign_id)}"
-        values = render.merge_values(contact, unsubscribe_url)
+        token = tokens.make(secret, contact_id, campaign_id)
+        unsubscribe_url = f"{self.app.base_url}/u/{token}"
+        # The web version uses the same token: it's the reader's own copy.
+        values = render.merge_values(contact, unsubscribe_url, f"{self.app.base_url}/v/{token}")
         email = mailer.build(
             mailer.Message(
                 to=contact["email"],
@@ -383,6 +387,7 @@ def build_snapshot(conn: sqlite3.Connection, app: Settings, campaign: dict[str, 
         subject=campaign["subject"],
         preheader=campaign["preheader"],
         business=render.Business(name=business.name or "This email was sent by us", address=business.address),
+        asset_base=app.base_url,
     )
     return {
         "subject": rendered.subject,

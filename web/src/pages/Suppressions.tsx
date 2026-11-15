@@ -12,7 +12,7 @@ export function Suppressions() {
   const [email, setEmail] = useState('');
   const [error, setError] = useState<string | null>(null);
   const add = useSubmit(async () => {
-    await api('/suppressions', 'POST', { email, detail: 'Added in Mail Studio' });
+    await api('/suppressions', 'POST', { email, detail: 'Added in MailStudio' });
     setEmail('');
     items.reload();
   });
@@ -27,7 +27,7 @@ export function Suppressions() {
       <p class="crumbs"><Link href="/contacts">← Contacts</Link></p>
       <PageHeader
         title="Addresses never emailed"
-        intro="Mail Studio skips these on every list. Bounces and spam complaints are added automatically and stay blocked, which protects your sending reputation."
+        intro="MailStudio skips these on every list. Bounces and spam complaints are added automatically and stay blocked, which protects your sending reputation."
       />
       <form class="toolbar" onSubmit={add.onSubmit}>
         <Field label="Block an address" type="email" value={email} onValue={setEmail} placeholder="someone@example.com" required />

@@ -1,5 +1,5 @@
 {
-  // Debug Mail Studio: press F5 and pick one of these from the Run and Debug panel.
+  // Debug MailStudio: press F5 and pick one of these from the Run and Debug panel.
   "version": "0.2.0",
   "configurations": [
     {

@@ -5,7 +5,7 @@ from __future__ import annotations
 import json
 import secrets
 import sqlite3
-from typing import Any
+from typing import Any, Literal
 
 from pydantic import BaseModel, EmailStr, Field
 
@@ -52,6 +52,88 @@ class SesSettings(BaseModel):
         return bool(self.region and self.access_key_id and self.secret_access_key)
 
 
+ProviderName = Literal["", "ses", "postmark", "mailgun", "smtp2go", "authsmtp", "smtp"]
+PROVIDER_LABELS: dict[str, str] = {
+    "ses": "Amazon SES",
+    "postmark": "Postmark",
+    "mailgun": "Mailgun",
+    "smtp2go": "SMTP2GO",
+    "authsmtp": "AuthSMTP",
+    "smtp": "SMTP server",
+}
+
+
+class ProviderChoice(BaseModel):
+    """Which service sends campaigns. Empty on installs from before there was a choice:
+    those send with Amazon SES if it's connected (see `active_provider`)."""
+
+    active: ProviderName = ""
+
+
+class PostmarkSettings(BaseModel):
+    server_token: str = Field("", max_length=200)
+    message_stream: str = Field(
+        "broadcast",
+        max_length=100,
+        description="The Broadcast message stream's ID (Postmark's default: broadcast)",
+    )
+    own_unsubscribes: bool = Field(
+        False,
+        description="True once Postmark has turned on 'Manage unsubscribes on your own' for the stream. "
+        "Until then Postmark adds its own unsubscribe link and headers, "
+        "so MailStudio leaves its headers out.",
+    )
+
+    @property
+    def configured(self) -> bool:
+        return bool(self.server_token and self.message_stream)
+
+
+class MailgunSettings(BaseModel):
+    api_key: str = Field("", max_length=200)
+    domain: str = Field("", max_length=253, examples=["mg.yourbakery.com.au"])
+    region: Literal["us", "eu"] = "us"
+    webhook_signing_key: str = Field("", max_length=200)
+
+    @property
+    def configured(self) -> bool:
+        return bool(self.api_key and self.domain)
+
+
+class Smtp2goSettings(BaseModel):
+    api_key: str = Field("", max_length=200)
+
+    @property
+    def configured(self) -> bool:
+        return bool(self.api_key)
+
+
+class RelaySettings(BaseModel):
+    """An SMTP relay for campaigns (AuthSMTP, or any SMTP server), and the mailbox its
+    bounces come back to. SMTP can't report bounces any other way."""
+
+    host: str = Field("", max_length=255)
+    port: int = Field(587, ge=1, le=65535)
+    username: str = Field("", max_length=255)
+    password: str = Field("", max_length=1000)
+    security: str = Field("starttls", pattern="^(starttls|tls|none)$")
+    bounce_address: EmailStr | None = Field(
+        None, description="Envelope sender: where bounces go. AuthSMTP needs it authorised on the account."
+    )
+    imap_host: str = Field("", max_length=255)
+    imap_port: int = Field(993, ge=1, le=65535)
+    imap_username: str = Field("", max_length=255)
+    imap_password: str = Field("", max_length=1000)
+
+    @property
+    def configured(self) -> bool:
+        return bool(self.host)
+
+    @property
+    def mailbox_configured(self) -> bool:
+        return bool(self.bounce_address and self.imap_host and self.imap_username and self.imap_password)
+
+
 class Sending(BaseModel):
     rate_per_second: int = Field(
         10,
@@ -68,6 +150,21 @@ GROUPS: dict[str, type[BaseModel]] = {
     "smtp": Smtp,
     "sending": Sending,
     "ses": SesSettings,
+    "provider": ProviderChoice,
+    "postmark": PostmarkSettings,
+    "mailgun": MailgunSettings,
+    "smtp2go": Smtp2goSettings,
+    "relay": RelaySettings,
+}
+
+# Fields never sent back to the browser; it's told only whether each one is set.
+SECRETS: dict[str, tuple[str, ...]] = {
+    "smtp": ("password",),
+    "ses": ("secret_access_key",),
+    "postmark": ("server_token",),
+    "mailgun": ("api_key", "webhook_signing_key"),
+    "smtp2go": ("api_key",),
+    "relay": ("password", "imap_password"),
 }
 
 
@@ -86,6 +183,23 @@ def _put(conn: sqlite3.Connection, key: str, value: Any) -> None:
         " ON CONFLICT (key) DO UPDATE SET value = excluded.value, updated_at = excluded.updated_at",
         (key, json.dumps(value), now()),
     )
+
+
+def active_provider(conn: sqlite3.Connection) -> str:
+    """The provider campaigns go through, or "" when none is chosen."""
+    chosen = get_group(conn, "provider", ProviderChoice).active
+    if chosen:
+        return chosen
+    return "ses" if get_group(conn, "ses", SesSettings).configured else ""
+
+
+def get_value(conn: sqlite3.Connection, key: str) -> Any:
+    row = conn.execute("SELECT value FROM settings WHERE key = ?", (key,)).fetchone()
+    return json.loads(row["value"]) if row else None
+
+
+def put_value(conn: sqlite3.Connection, key: str, value: Any) -> None:
+    _put(conn, key, value)
 
 
 def secret_key(conn: sqlite3.Connection) -> bytes:

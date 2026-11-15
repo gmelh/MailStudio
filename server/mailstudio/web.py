@@ -16,8 +16,8 @@ from .config import Settings
 router = APIRouter(include_in_schema=False)
 _RESERVED = ("api/", "u/", "c/", "f/", "webhooks/", "assets/")
 
-_NOT_BUILT = """<!doctype html><meta charset="utf-8"><title>Mail Studio</title>
-<p style="font:16px system-ui;margin:3em">The Mail Studio API is running, but the web app hasn't been built.
+_NOT_BUILT = """<!doctype html><meta charset="utf-8"><title>MailStudio</title>
+<p style="font:16px system-ui;margin:3em">The MailStudio API is running, but the web app hasn't been built.
 Run <code>npm run build</code> in <code>web/</code>, or use the Docker image.</p>"""
 
 

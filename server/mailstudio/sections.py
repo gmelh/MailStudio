@@ -3,12 +3,16 @@
 from __future__ import annotations
 
 import json
+import re
 from dataclasses import dataclass
 from functools import cache
 from pathlib import Path
 from typing import Any, Literal
 
-FieldKind = Literal["text", "textarea", "url", "image", "number", "select"]
+FieldKind = Literal["text", "textarea", "url", "image", "number", "select", "toggle", "colour"]
+
+TOGGLE_VALUES = ("on", "off")
+HEX_COLOUR = re.compile(r"^#[0-9a-fA-F]{6}$")
 
 
 @dataclass(frozen=True, slots=True)
@@ -20,6 +24,8 @@ class FieldDef:
     max: int | None = None
     options: tuple[str, ...] = ()
     fallback: str | None = None
+    needs: str | None = None
+    """Toggles: only on when this other field has a value (e.g. an image)."""
 
 
 @dataclass(frozen=True, slots=True)
@@ -51,6 +57,7 @@ def _field(raw: dict[str, Any]) -> FieldDef:
         max=raw.get("max"),
         options=tuple(value for value, _ in raw.get("options", [])),
         fallback=raw.get("fallback"),
+        needs=raw.get("needs"),
     )
 
 
@@ -63,6 +70,11 @@ def load(directory: Path) -> Library:
         fields = tuple(_field(f) for f in raw["fields"])
         if set(raw["defaults"]) != {f.key for f in fields}:
             raise ValueError(f"Section {type_!r}: defaults must cover exactly its fields")
+        for f in fields:
+            if f.kind == "colour" and not HEX_COLOUR.match(raw["defaults"][f.key]):
+                raise ValueError(f"Section {type_!r}: colour {f.key!r} defaults to a #rrggbb colour")
+            if f.kind == "toggle" and raw["defaults"][f.key] not in TOGGLE_VALUES:
+                raise ValueError(f"Section {type_!r}: toggle {f.key!r} defaults to 'on' or 'off'")
         sections[type_] = SectionDef(
             type=type_,
             label=raw["label"],

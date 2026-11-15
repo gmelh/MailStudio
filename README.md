@@ -1,4 +1,4 @@
-# Mail Studio
+# MailStudio
 
 Self-hosted email campaigns without the marketing machinery.
 One container, SQLite, a section-based editor, and a complete API.
@@ -22,27 +22,10 @@ curl -fsSL https://get.mailstudio.email | sudo bash
 
 Then open the address it gives you and follow **Get set up**. See [install/](install/README.md).
 
-## Working on Mail Studio
+## Working on MailStudio
 
-You need Python 3.12 and Node 22. In VS Code, open this folder, install the recommended
-extensions when asked, then run **Terminal → Run Task… → setup: everything (run once)**.
-Select `.venv` as the Python interpreter, and press **F5** with **Server (with sending worker)**
-to run it under the debugger at http://localhost:8080, rebuilding the web app as you edit.
-**Web app in Edge** (or Chrome) debugs the browser side; **Tests: this file** runs the open
-test file. **check: everything (as on GitHub)** runs the same checks as `ci.yml`.
-
-Without VS Code:
-
-```sh
-python3 -m venv .venv && .venv/bin/pip install -e "server[dev]"
-(cd web && npm ci && npm run dev) &      # rebuilds web/dist on change
-.venv/bin/mailstudio serve               # http://localhost:8080, data in ./data
-```
-
-To send real test campaigns locally, run Mailpit (`docker compose up -d mailpit`), start the
-server with `MAILSTUDIO_ALLOW_SMTP_SENDING=1` (the VS Code configurations set it), and in
-Settings → Test emails use server `127.0.0.1`, port `1025`, security none. Caught emails
-appear at http://localhost:8025.
+See [VS Code Setup](VS%20Code%20Setup.md): setting up, running and debugging in VS Code, local
+test email, the checks, and how the project fits together.
 
 ## Status
 
@@ -56,7 +39,7 @@ Phase 1 (sending core), done:
 - [x] Signed unsubscribe page and RFC 8058 one-click unsubscribe
 - [x] Send queue and worker: scheduling, rate limit, retries, pause/resume/cancel, crash-safe, never sends twice
       (gate test: 5,000 contacts, crash midway, zero duplicates)
-- [x] Amazon SES sending, bounce and complaint notifications into suppressions, domain checks
+- [x] Sending through Postmark, Mailgun, SMTP2GO, AuthSMTP (or any SMTP server) or Amazon SES; bounces, complaints and unsubscribes into suppressions; domain checks
 
 **Phase 1 is complete.**
 
@@ -69,3 +52,8 @@ Phase 2 (web app and v1.0):
 - [x] Signup form and double opt-in
 - [x] Setup wizard and one-line installer with automatic HTTPS
 - [ ] Docs and the stranger test
+
+## Credits
+
+Social icons are made from [Font Awesome Free](https://fontawesome.com) icons by Fonticons, Inc.,
+licensed under [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/); see `sections/social/README.md`.

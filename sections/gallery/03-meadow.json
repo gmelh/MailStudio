@@ -1,0 +1,132 @@
+{
+  "format": "mailstudio-template",
+  "version": 1,
+  "id": "meadow",
+  "name": "Meadow",
+  "description": "A friendly invitation in fresh greens: the event details, what to expect, and an RSVP button.",
+  "category": "event",
+  "tags": [
+    "invitation",
+    "workshop",
+    "rsvp"
+  ],
+  "author": "MailStudio",
+  "subject": "You're invited: Spring Open Day",
+  "preheader": "Join us on Saturday 14 March — save your place.",
+  "document": {
+    "schema": 2,
+    "brand": {
+      "width": 600,
+      "padding": 36,
+      "radius": 16,
+      "fontSize": 16,
+      "fonts": {
+        "heading": "\"Trebuchet MS\", Arial, sans-serif",
+        "body": "Arial, Helvetica, sans-serif",
+        "small": "Arial, Helvetica, sans-serif"
+      },
+      "button": {
+        "bold": true,
+        "italic": false
+      },
+      "flatFeatured": false,
+      "light": {
+        "outer": "#eaf2e6",
+        "background": "#fcfdf9",
+        "featured": "#e4f0dc",
+        "text": "#44523d",
+        "heading": "#1f3318",
+        "link": "#356b24",
+        "accent": "#3f7d2a",
+        "buttonText": "#ffffff"
+      },
+      "dark": {
+        "outer": "#0d140b",
+        "background": "#141d11",
+        "featured": "#22331b",
+        "text": "#cfdcc8",
+        "heading": "#f0f7ec",
+        "link": "#9fd88a",
+        "accent": "#6cb352",
+        "buttonText": "#0b1608"
+      }
+    },
+    "sections": [
+      {
+        "id": "header",
+        "type": "header",
+        "settings": {
+          "tagline": "Events",
+          "featured": "off"
+        }
+      },
+      {
+        "id": "hero",
+        "type": "hero",
+        "settings": {
+          "eyebrow": "You're invited",
+          "title": "Spring Open Day",
+          "description": "Come and meet the team, see what we've been working on, and enjoy an afternoon with good company.",
+          "featured": "off"
+        }
+      },
+      {
+        "id": "event",
+        "type": "event",
+        "settings": {
+          "eyebrow": "Save the date",
+          "title": "Spring Open Day",
+          "date": "Saturday 14 March",
+          "time": "10am – 3pm",
+          "place": "Our studio, 12 Example Street",
+          "placeLink": "https://example.com",
+          "description": "Free entry. Bring a friend — everyone is welcome.",
+          "button": "RSVP now",
+          "url": "https://example.com",
+          "featured": "on"
+        }
+      },
+      {
+        "id": "agenda",
+        "type": "columns",
+        "settings": {
+          "leftTitle": "Morning",
+          "leftBody": "Welcome and tours from 10am, with coffee and something sweet.",
+          "rightTitle": "Afternoon",
+          "rightBody": "Hands-on sessions from 1pm, then questions and a chat.",
+          "featured": "off"
+        }
+      },
+      {
+        "id": "text",
+        "type": "text",
+        "settings": {
+          "heading": "What to expect",
+          "body": "Tell guests what they'll see and do, and anything they should bring.\n\nKeep it short and practical: parking, access, food and drink.",
+          "featured": "off"
+        }
+      },
+      {
+        "id": "social",
+        "type": "social",
+        "settings": {
+          "title": "Share the day",
+          "facebook": "https://facebook.com/",
+          "instagram": "https://instagram.com/",
+          "style": "circle",
+          "colour": "accent",
+          "size": "32",
+          "featured": "off"
+        }
+      },
+      {
+        "id": "footer",
+        "type": "footer",
+        "settings": {
+          "note": "Can't make it? Reply to this email and we'll keep you posted on the next one.",
+          "featured": "on"
+        }
+      }
+    ]
+  }
+}

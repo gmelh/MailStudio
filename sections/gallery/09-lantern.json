@@ -1,0 +1,128 @@
+{
+  "format": "mailstudio-template",
+  "version": 1,
+  "id": "lantern",
+  "name": "Lantern",
+  "description": "A clear, professional invitation to an online session: what you'll learn, who's speaking, and a register button.",
+  "category": "event",
+  "tags": [
+    "webinar",
+    "online",
+    "workshop",
+    "registration"
+  ],
+  "author": "MailStudio",
+  "subject": "Free webinar: get more from your email",
+  "preheader": "Live on Thursday 20 March — save your seat.",
+  "document": {
+    "schema": 2,
+    "brand": {
+      "width": 600,
+      "padding": 36,
+      "radius": 6,
+      "fontSize": 16,
+      "fonts": {
+        "heading": "Arial, Helvetica, sans-serif",
+        "body": "Arial, Helvetica, sans-serif",
+        "small": "Arial, Helvetica, sans-serif"
+      },
+      "button": {
+        "bold": true,
+        "italic": false
+      },
+      "flatFeatured": false,
+      "light": {
+        "outer": "#e9edf5",
+        "background": "#ffffff",
+        "featured": "#e8eefc",
+        "text": "#3e4759",
+        "heading": "#121a2e",
+        "link": "#2554c7",
+        "accent": "#2554c7",
+        "buttonText": "#ffffff"
+      },
+      "dark": {
+        "outer": "#0a0d16",
+        "background": "#11162a",
+        "featured": "#1b2547",
+        "text": "#cdd5e8",
+        "heading": "#f2f5fc",
+        "link": "#9db6ff",
+        "accent": "#5b82f0",
+        "buttonText": "#070d22"
+      }
+    },
+    "sections": [
+      {
+        "id": "header",
+        "type": "header",
+        "settings": {
+          "tagline": "Live online",
+          "featured": "off"
+        }
+      },
+      {
+        "id": "hero",
+        "type": "hero",
+        "settings": {
+          "eyebrow": "Free webinar",
+          "title": "Get more from every email you send",
+          "description": "A 45-minute live session with practical ideas you can use the same afternoon.",
+          "featured": "off"
+        }
+      },
+      {
+        "id": "event",
+        "type": "event",
+        "settings": {
+          "eyebrow": "Live online",
+          "title": "Get more from your email",
+          "date": "Thursday 20 March",
+          "time": "11am – 11:45am AWST",
+          "place": "Online — the link arrives when you register",
+          "description": "Can't make it live? Register anyway and we'll send you the recording.",
+          "button": "Save my seat",
+          "url": "https://example.com",
+          "featured": "on"
+        }
+      },
+      {
+        "id": "learn",
+        "type": "contents",
+        "settings": {
+          "title": "You'll learn",
+          "items": "How to write subject lines people open\nThe one layout that works on every phone\nWhat to measure — and what to ignore",
+          "featured": "off"
+        }
+      },
+      {
+        "id": "speakers",
+        "type": "columns",
+        "settings": {
+          "leftTitle": "Your host",
+          "leftBody": "A sentence about who's presenting and why they know this topic.",
+          "rightTitle": "Q&A",
+          "rightBody": "Bring your questions — the last 15 minutes are yours.",
+          "featured": "off"
+        }
+      },
+      {
+        "id": "button",
+        "type": "button",
+        "settings": {
+          "text": "Register free",
+          "url": "https://example.com",
+          "featured": "off"
+        }
+      },
+      {
+        "id": "footer",
+        "type": "footer",
+        "settings": {
+          "note": "You're receiving this because you've joined one of our sessions or subscribed to updates.",
+          "featured": "on"
+        }
+      }
+    ]
+  }
+}

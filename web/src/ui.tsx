@@ -1,7 +1,7 @@
 /** Small building blocks shared by every screen. */
 
 import type { ComponentChildren } from 'preact';
-import { useCallback, useEffect, useState } from 'preact/hooks';
+import { useCallback, useEffect, useRef, useState } from 'preact/hooks';
 import { api, ApiError } from './api';
 
 // ---------------------------------------------------------------------------
@@ -12,13 +12,21 @@ export type Loaded<T> =
   | { state: 'error'; error: string }
   | { state: 'ready'; data: T };
 
-/** Run `load` on mount (and when `reload` is called); track loading and errors. */
+/**
+ * Run `load` on mount (and when `reload` is called); track loading and errors.
+ * A reload keeps showing what's there until the fresh data arrives, so forms on the
+ * page keep their messages and nothing jumps; new `deps` start from "loading".
+ */
 export function useLoad<T>(load: () => Promise<T>, deps: unknown[] = []): [Loaded<T>, () => void] {
   const [result, setResult] = useState<Loaded<T>>({ state: 'loading' });
   const [version, setVersion] = useState(0);
+  const loadedFor = useRef<unknown[] | null>(null);
   useEffect(() => {
     let current = true;
-    setResult({ state: 'loading' });
+    const previous = loadedFor.current;
+    const sameDeps = previous !== null && previous.length === deps.length && deps.every((d, i) => Object.is(d, previous[i]));
+    loadedFor.current = deps;
+    if (!sameDeps) setResult({ state: 'loading' });
     load()
       .then((data) => current && setResult({ state: 'ready', data }))
       .catch((error: unknown) => current && setResult({ state: 'error', error: describe(error) }));
@@ -84,7 +92,7 @@ export class UserError extends Error {}
 export function describe(error: unknown): string {
   if (error instanceof ApiError) return error.summary;
   if (error instanceof UserError) return error.message;
-  if (error instanceof TypeError) return "Couldn't reach Mail Studio. Check your connection and try again.";
+  if (error instanceof TypeError) return "Couldn't reach MailStudio. Check your connection and try again.";
   return 'Something went wrong. Please try again.';
 }
 
@@ -265,4 +273,17 @@ export function fullName(person: { first_name: string; last_name: string }): str
 
 export function count(n: number, singular: string, plural = `${singular}s`): string {
   return `${n.toLocaleString()} ${n === 1 ? singular : plural}`;
+}
+
+/** Text with a Copy button, for values people paste somewhere else. */
+export function CopyText({ text }: { text: string }) {
+  const [copied, setCopied] = useState(false);
+  return (
+    <span class="copy">
+      <code>{text}</code>
+      <button type="button" class="copy__button" onClick={() => {
+        void navigator.clipboard?.writeText(text).then(() => { setCopied(true); setTimeout(() => setCopied(false), 1500); });
+      }}>{copied ? 'Copied' : 'Copy'}</button>
+    </span>
+  );
 }

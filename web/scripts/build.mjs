@@ -1,4 +1,4 @@
-// Builds the web app into dist/, which the Mail Studio server serves.
+// Builds the web app into dist/, which the MailStudio server serves.
 //   node scripts/build.mjs           production build (minified)
 //   node scripts/build.mjs --watch   rebuild on change; run `mailstudio serve` alongside
 import { build, context } from 'esbuild';

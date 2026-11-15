@@ -1,26 +1,45 @@
-/** Light or dark appearance for the app itself (not the emails being designed). */
+/**
+ * Light or dark appearance for the app itself (not the emails being designed).
+ * Until someone picks one, the app follows the computer's own setting.
+ * index.html applies the remembered choice before the page first paints, so there's no flash.
+ */
 
-const KEY = 'mailstudio:ui-theme';
+import { useEffect } from 'preact/hooks';
+import { getPref, hasPref, oneOf, setPref, usePref } from './prefs';
+
 export type Theme = 'light' | 'dark';
+const KEY = 'theme';
+const valid = oneOf<Theme>('light', 'dark');
+const systemQuery = () => matchMedia('(prefers-color-scheme: dark)');
+const system = (): Theme => (systemQuery().matches ? 'dark' : 'light');
 
-function stored(): Theme | null {
+/** Earlier versions stored the word itself under "mailstudio:ui-theme"; carry it over once. */
+function migrate(): void {
   try {
-    const value = localStorage.getItem(KEY);
-    return value === 'light' || value === 'dark' ? value : null;
+    const old = localStorage.getItem('mailstudio:ui-theme');
+    if (old === 'light' || old === 'dark') setPref(KEY, old);
+    localStorage.removeItem('mailstudio:ui-theme');
   } catch {
-    return null;
+    // Storage unavailable: nothing to carry over.
   }
 }
 
-export function initialTheme(): Theme {
-  return stored() ?? (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
-}
-
-export function applyTheme(theme: Theme): void {
+function apply(theme: Theme): void {
   document.documentElement.dataset.theme = theme;
-  try {
-    localStorage.setItem(KEY, theme);
-  } catch {
-    // Storage unavailable (private mode): the choice lasts for this visit only.
-  }
+}
+
+/** At start-up: apply the remembered theme, and follow the computer's setting until one is chosen. */
+export function startTheme(): void {
+  migrate();
+  apply(getPref(KEY, system(), valid));
+  systemQuery().addEventListener('change', () => {
+    if (!hasPref(KEY)) apply(system());
+  });
+}
+
+/** The current theme and a way to change (and remember) it. */
+export function useTheme(): [Theme, (theme: Theme) => void] {
+  const [theme, setTheme] = usePref<Theme>(KEY, system(), valid);
+  useEffect(() => apply(theme), [theme]);
+  return [theme, setTheme];
 }

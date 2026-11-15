@@ -1,0 +1,382 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://mailstudio.email/schema/template.schema.json",
+  "$defs": {
+    "Brand": {
+      "additionalProperties": false,
+      "properties": {
+        "width": {
+          "default": 600,
+          "maximum": 900,
+          "minimum": 400,
+          "title": "Width",
+          "type": "integer"
+        },
+        "padding": {
+          "default": 32,
+          "maximum": 70,
+          "minimum": 8,
+          "title": "Padding",
+          "type": "integer"
+        },
+        "radius": {
+          "default": 6,
+          "maximum": 32,
+          "minimum": 0,
+          "title": "Radius",
+          "type": "integer"
+        },
+        "fontSize": {
+          "default": 16,
+          "maximum": 24,
+          "minimum": 12,
+          "title": "Fontsize",
+          "type": "integer"
+        },
+        "fonts": {
+          "$ref": "#/$defs/Fonts",
+          "default": {
+            "heading": "Arial, Helvetica, sans-serif",
+            "body": "Arial, Helvetica, sans-serif",
+            "small": "Arial, Helvetica, sans-serif"
+          }
+        },
+        "button": {
+          "$ref": "#/$defs/ButtonStyle",
+          "default": {
+            "bold": true,
+            "italic": false
+          }
+        },
+        "logo": {
+          "default": "",
+          "maxLength": 2000,
+          "title": "Logo",
+          "type": "string"
+        },
+        "light": {
+          "$ref": "#/$defs/Palette",
+          "default": {
+            "outer": "#e9edf4",
+            "background": "#ffffff",
+            "featured": "#eaf0fc",
+            "text": "#4e5b70",
+            "heading": "#273449",
+            "link": "#4768da",
+            "accent": "#4768da",
+            "buttonText": "#ffffff"
+          }
+        },
+        "dark": {
+          "$ref": "#/$defs/Palette"
+        },
+        "flatFeatured": {
+          "default": false,
+          "title": "Flatfeatured",
+          "type": "boolean"
+        },
+        "webLink": {
+          "default": true,
+          "title": "Weblink",
+          "type": "boolean"
+        }
+      },
+      "title": "Brand",
+      "type": "object"
+    },
+    "ButtonStyle": {
+      "additionalProperties": false,
+      "properties": {
+        "bold": {
+          "default": true,
+          "title": "Bold",
+          "type": "boolean"
+        },
+        "italic": {
+          "default": false,
+          "title": "Italic",
+          "type": "boolean"
+        }
+      },
+      "title": "ButtonStyle",
+      "type": "object"
+    },
+    "Document": {
+      "description": "`name`, `subject` and `id` from an editor export are accepted and ignored:\nthose belong to the campaign, not its design.",
+      "properties": {
+        "schema": {
+          "const": 2,
+          "default": 2,
+          "title": "Schema",
+          "type": "integer"
+        },
+        "brand": {
+          "$ref": "#/$defs/Brand",
+          "default": {
+            "width": 600,
+            "padding": 32,
+            "radius": 6,
+            "fontSize": 16,
+            "fonts": {
+              "body": "Arial, Helvetica, sans-serif",
+              "heading": "Arial, Helvetica, sans-serif",
+              "small": "Arial, Helvetica, sans-serif"
+            },
+            "button": {
+              "bold": true,
+              "italic": false
+            },
+            "logo": "",
+            "light": {
+              "accent": "#4768da",
+              "background": "#ffffff",
+              "buttonText": "#ffffff",
+              "featured": "#eaf0fc",
+              "heading": "#273449",
+              "link": "#4768da",
+              "outer": "#e9edf4",
+              "text": "#4e5b70"
+            },
+            "dark": {
+              "accent": "#7698ef",
+              "background": "#171c26",
+              "buttonText": "#ffffff",
+              "featured": "#26344a",
+              "heading": "#f1f5fa",
+              "link": "#a8c4ff",
+              "outer": "#10151f",
+              "text": "#d0d9e6"
+            },
+            "flatFeatured": false,
+            "webLink": true
+          }
+        },
+        "sections": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/Section"
+          },
+          "maxItems": 300,
+          "title": "Sections",
+          "type": "array"
+        }
+      },
+      "title": "Document",
+      "type": "object"
+    },
+    "Fonts": {
+      "additionalProperties": false,
+      "properties": {
+        "heading": {
+          "default": "Arial, Helvetica, sans-serif",
+          "enum": [
+            "Arial, Helvetica, sans-serif",
+            "Georgia, serif",
+            "Verdana, Geneva, sans-serif",
+            "Tahoma, Geneva, sans-serif",
+            "\"Trebuchet MS\", Arial, sans-serif",
+            "\"Times New Roman\", Times, serif"
+          ],
+          "title": "Heading",
+          "type": "string"
+        },
+        "body": {
+          "default": "Arial, Helvetica, sans-serif",
+          "enum": [
+            "Arial, Helvetica, sans-serif",
+            "Georgia, serif",
+            "Verdana, Geneva, sans-serif",
+            "Tahoma, Geneva, sans-serif",
+            "\"Trebuchet MS\", Arial, sans-serif",
+            "\"Times New Roman\", Times, serif"
+          ],
+          "title": "Body",
+          "type": "string"
+        },
+        "small": {
+          "default": "Arial, Helvetica, sans-serif",
+          "enum": [
+            "Arial, Helvetica, sans-serif",
+            "Georgia, serif",
+            "Verdana, Geneva, sans-serif",
+            "Tahoma, Geneva, sans-serif",
+            "\"Trebuchet MS\", Arial, sans-serif",
+            "\"Times New Roman\", Times, serif"
+          ],
+          "title": "Small",
+          "type": "string"
+        }
+      },
+      "title": "Fonts",
+      "type": "object"
+    },
+    "Palette": {
+      "additionalProperties": false,
+      "properties": {
+        "outer": {
+          "default": "#e9edf4",
+          "pattern": "^#[0-9a-fA-F]{6}$",
+          "title": "Outer",
+          "type": "string"
+        },
+        "background": {
+          "default": "#ffffff",
+          "pattern": "^#[0-9a-fA-F]{6}$",
+          "title": "Background",
+          "type": "string"
+        },
+        "featured": {
+          "default": "#eaf0fc",
+          "pattern": "^#[0-9a-fA-F]{6}$",
+          "title": "Featured",
+          "type": "string"
+        },
+        "text": {
+          "default": "#4e5b70",
+          "pattern": "^#[0-9a-fA-F]{6}$",
+          "title": "Text",
+          "type": "string"
+        },
+        "heading": {
+          "default": "#273449",
+          "pattern": "^#[0-9a-fA-F]{6}$",
+          "title": "Heading",
+          "type": "string"
+        },
+        "link": {
+          "default": "#4768da",
+          "pattern": "^#[0-9a-fA-F]{6}$",
+          "title": "Link",
+          "type": "string"
+        },
+        "accent": {
+          "default": "#4768da",
+          "pattern": "^#[0-9a-fA-F]{6}$",
+          "title": "Accent",
+          "type": "string"
+        },
+        "buttonText": {
+          "default": "#ffffff",
+          "pattern": "^#[0-9a-fA-F]{6}$",
+          "title": "Buttontext",
+          "type": "string"
+        }
+      },
+      "title": "Palette",
+      "type": "object"
+    },
+    "Section": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "maxLength": 64,
+          "minLength": 1,
+          "title": "Id",
+          "type": "string"
+        },
+        "type": {
+          "maxLength": 40,
+          "minLength": 1,
+          "title": "Type",
+          "type": "string"
+        },
+        "settings": {
+          "additionalProperties": {
+            "type": "string"
+          },
+          "default": {},
+          "title": "Settings",
+          "type": "object"
+        }
+      },
+      "required": [
+        "id",
+        "type"
+      ],
+      "title": "Section",
+      "type": "object"
+    }
+  },
+  "properties": {
+    "format": {
+      "const": "mailstudio-template",
+      "default": "mailstudio-template",
+      "title": "Format",
+      "type": "string"
+    },
+    "version": {
+      "const": 1,
+      "default": 1,
+      "title": "Version",
+      "type": "integer"
+    },
+    "id": {
+      "pattern": "^[a-z0-9][a-z0-9-]{0,62}$",
+      "title": "Id",
+      "type": "string"
+    },
+    "name": {
+      "maxLength": 60,
+      "minLength": 1,
+      "title": "Name",
+      "type": "string"
+    },
+    "description": {
+      "default": "",
+      "maxLength": 300,
+      "title": "Description",
+      "type": "string"
+    },
+    "category": {
+      "default": "other",
+      "enum": [
+        "newsletter",
+        "promotion",
+        "event",
+        "announcement",
+        "welcome",
+        "other"
+      ],
+      "title": "Category",
+      "type": "string"
+    },
+    "tags": {
+      "default": [],
+      "items": {
+        "maxLength": 30,
+        "type": "string"
+      },
+      "maxItems": 10,
+      "title": "Tags",
+      "type": "array"
+    },
+    "author": {
+      "default": "",
+      "maxLength": 100,
+      "title": "Author",
+      "type": "string"
+    },
+    "subject": {
+      "default": "",
+      "maxLength": 300,
+      "title": "Subject",
+      "type": "string"
+    },
+    "preheader": {
+      "default": "",
+      "maxLength": 300,
+      "title": "Preheader",
+      "type": "string"
+    },
+    "document": {
+      "$ref": "#/$defs/Document"
+    }
+  },
+  "required": [
+    "id",
+    "name",
+    "document"
+  ],
+  "title": "MailStudio email template",
+  "type": "object"
+}

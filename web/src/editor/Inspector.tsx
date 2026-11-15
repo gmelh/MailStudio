@@ -1,10 +1,10 @@
 /** Right panel: settings for whatever is selected in the outline. */
 
 import { useState } from 'preact/hooks';
-import { api, type Brand, type CampaignDocument, type Palette, type SectionLibrary } from '../api';
-import { Button, describe, Notice } from '../ui';
+import { api, type Brand, type CampaignDocument, type FieldDef, type Palette, type SectionLibrary } from '../api';
+import { Button, Checkbox, describe, Notice } from '../ui';
 import { ImageField, SettingField } from './fields';
-import { applyPreset, FONT_OPTIONS, LAYOUT_LIMITS, PALETTE_LABELS, updateBrand, updatePalette, type LayoutKey } from './model';
+import { applyPreset, FONT_OPTIONS, LAYOUT_LIMITS, PALETTE_LABELS, presetMatches, restoreFeatured, updateBrand, updatePalette, type LayoutKey } from './model';
 
 // ---------------------------------------------------------------------------
 // A section
@@ -31,13 +31,14 @@ export function SectionInspector({ document, library, sectionId, readOnly, onSet
     <>
       <h2 class="inspector__title">{definition.label}</h2>
       <div class="form">
-        {definition.fields.map((field) => (
+        {definition.fields.filter((field) => !hidden(field, section.settings, definition.defaults)).map((field) => (
           <SettingField
             key={`${section.id}-${field.key}`}
             field={field}
             value={section.settings[field.key] ?? definition.defaults[field.key] ?? ''}
             onValue={(value) => onSetting(field.key, value)}
             disabled={readOnly}
+            hint={field.key === 'featured' ? featuredHint(document) : field.hint}
           />
         ))}
         {!definition.fields.length && <p class="muted">This section has no settings.</p>}
@@ -55,6 +56,18 @@ export function SectionInspector({ document, library, sectionId, readOnly, onSet
       )}
     </>
   );
+}
+
+/** Fields that don't apply right now, per their `hideWhen` in sections.json. */
+function hidden(field: FieldDef, settings: Record<string, string>, defaults: Record<string, string>): boolean {
+  return Object.entries(field.hideWhen ?? {}).some(([key, values]) =>
+    (Array.isArray(values) ? values : [values]).includes(settings[key] ?? defaults[key] ?? ''));
+}
+
+function featuredHint(document: CampaignDocument): string {
+  return document.brand.flatFeatured
+    ? 'Feature backgrounds are off in Brand & style, so this section uses the email background for now.'
+    : 'Gives this section the feature colour from Brand & style.';
 }
 
 // ---------------------------------------------------------------------------
@@ -133,14 +146,18 @@ export function BrandPanel({ document, library, scheme, readOnly, onChange, onSc
       <fieldset class="form" disabled={readOnly}>
         <h3 class="panel-title">Style</h3>
         <div class="presets">
-          {Object.entries(library.presets).map(([key, preset]) => (
-            <button key={key} type="button" class="preset" onClick={() => onChange(applyPreset(document, preset))}>
-              <strong>{preset.label}</strong>
-              <small>{preset.description}</small>
-            </button>
-          ))}
+          {Object.entries(library.presets).map(([key, preset]) => {
+            const current = presetMatches(brand, preset);
+            return (
+              <button key={key} type="button" class={`preset${current ? ' is-active' : ''}`} aria-pressed={current}
+                      onClick={() => onChange(applyPreset(document, preset))}>
+                <strong>{preset.label}{current && <span class="preset__current"> · in use</span>}</strong>
+                <small>{preset.description}</small>
+              </button>
+            );
+          })}
         </div>
-        <p class="hint">A style changes fonts, spacing and corners. Your colours and logo stay.</p>
+        <p class="hint">A style changes fonts, spacing, corners and feature backgrounds. Your colours and logo stay.</p>
 
         <h3 class="panel-title">Logo</h3>
         <ImageField id="brand-logo" label="Logo" value={brand.logo} onValue={(logo) => set({ logo })} disabled={readOnly}
@@ -155,8 +172,14 @@ export function BrandPanel({ document, library, scheme, readOnly, onChange, onSc
           ))}
         </div>
         {scheme === 'dark' && <p class="hint">Used by mail apps in dark mode, like Apple Mail and Outlook. Gmail uses its own.</p>}
+        <Checkbox
+          label="Feature backgrounds"
+          hint="Sections with Feature background ticked get their own background colour. Off: every section uses the email's background."
+          checked={!brand.flatFeatured}
+          onChecked={(on) => onChange({ ...document, brand: on ? restoreFeatured({ ...brand, flatFeatured: false }) : { ...brand, flatFeatured: true } })}
+        />
         <div class="colours">
-          {(Object.keys(PALETTE_LABELS) as Array<keyof Palette>).map((key) => (
+          {(Object.keys(PALETTE_LABELS) as Array<keyof Palette>).filter((key) => key !== 'featured' || !brand.flatFeatured).map((key) => (
             <label key={key} class="colour">
               <input type="color" value={brand[scheme][key]}
                      onInput={(e) => onChange(updatePalette(document, scheme, key, e.currentTarget.value))} />
@@ -181,6 +204,14 @@ export function BrandPanel({ document, library, scheme, readOnly, onChange, onSc
           <button type="button" class={`toggle${brand.button.italic ? ' is-active' : ''}`} aria-pressed={brand.button.italic}
                   onClick={() => set({ button: { ...brand.button, italic: !brand.button.italic } })}><i>I</i></button>
         </div>
+
+        <h3 class="panel-title">Web version</h3>
+        <Checkbox
+          label="“View in browser” link"
+          hint="A small link above the email to its web version, for readers whose mail app shows it badly. Each reader sees their own copy."
+          checked={brand.webLink !== false}
+          onChecked={(on) => set({ webLink: on })}
+        />
 
         <h3 class="panel-title">Layout</h3>
         <div class="form-grid">

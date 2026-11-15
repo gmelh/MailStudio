@@ -29,6 +29,9 @@ class Settings:
     web_dir: Path = field(default=_REPO_WEB)
     """The built web app (`web/dist`); the Docker image copies it to /app/web."""
 
+    gallery_url: str = "https://mailstudio.email/gallery/index.json"
+    """The online template gallery's index; empty turns the gallery off."""
+
     run_worker: bool = False
     """Run the sending worker inside the web process (on by default for `mailstudio serve`)."""
 
@@ -55,5 +58,6 @@ class Settings:
             base_url=os.environ.get("MAILSTUDIO_BASE_URL", "http://localhost:8080").rstrip("/"),
             sections_dir=Path(os.environ.get("MAILSTUDIO_SECTIONS_DIR", str(_REPO_SECTIONS))).resolve(),
             web_dir=Path(os.environ.get("MAILSTUDIO_WEB_DIR", str(_REPO_WEB))).resolve(),
+            gallery_url=os.environ.get("MAILSTUDIO_GALLERY_URL", "https://mailstudio.email/gallery/index.json").strip(),
             run_worker=os.environ.get("MAILSTUDIO_WORKER", "1") == "1",
         )

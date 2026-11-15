@@ -5,12 +5,16 @@
 
 import { useCallback, useEffect, useRef, useState } from 'preact/hooks';
 import { api, type Campaign, type CampaignDocument, type SectionLibrary } from '../api';
-import { Link, navigate } from '../router';
+import { AppBar } from '../nav';
+import { Link, navigate, onLeave } from '../router';
 import { Button, describe, Notice } from '../ui';
 import { BrandPanel, EmailDetails, SectionInspector, type Details } from './Inspector';
 import { createSection, duplicate, insertAfter, moveTo, remove, updateSetting } from './model';
 import { Outline, type Selection } from './Outline';
 import { Preview } from './Preview';
+import { Splitter, usePanelWidths } from './Splitter';
+import { oneOf, usePref } from '../prefs';
+import { useTheme } from '../theme';
 
 const SAVE_DELAY_MS = 800;
 type SaveState = 'saved' | 'pending' | 'saving' | 'error';
@@ -31,13 +35,23 @@ export function CampaignEditor({ campaignId }: { campaignId: string }) {
 
   if (loadError) {
     return (
-      <div class="editor-message">
-        <Notice tone="error">{loadError}</Notice>
-        <Link href="/campaigns">← Back to campaigns</Link>
+      <div class="editor">
+        <AppBar />
+        <div class="editor-message">
+          <Notice tone="error">{loadError}</Notice>
+          <Link href="/campaigns">← Back to campaigns</Link>
+        </div>
       </div>
     );
   }
-  if (!campaign || !library) return <p class="editor-message muted">Opening the editor…</p>;
+  if (!campaign || !library) {
+    return (
+      <div class="editor">
+        <AppBar />
+        <p class="editor-message muted">Opening the editor…</p>
+      </div>
+    );
+  }
   return <Editor initial={campaign} library={library} />;
 }
 
@@ -48,8 +62,12 @@ function Editor({ initial, library }: { initial: Campaign; library: SectionLibra
     name: initial.name, subject: initial.subject, preheader: initial.preheader,
   });
   const [selection, setSelection] = useState<Selection>(initial.document.sections[0]?.id ?? 'email');
-  const [device, setDevice] = useState<'desktop' | 'mobile'>('desktop');
-  const [scheme, setScheme] = useState<'light' | 'dark'>('light');
+  // How you last previewed is how the next campaign opens.
+  const [device, setDevice] = usePref('editor-device', 'desktop', oneOf('desktop', 'mobile'));
+  // Which of the email's palettes is being edited and previewed (Brand & style → Colours).
+  const [scheme, setScheme] = usePref('editor-scheme', 'light', oneOf('light', 'dark'));
+  // Light or dark MailStudio itself (the toolbar switch; the same choice as the ☾ button).
+  const [theme, setTheme] = useTheme();
   const [saveState, setSaveState] = useState<SaveState>('saved');
   const [saveError, setSaveError] = useState<string | null>(null);
   const firstRender = useRef(true);
@@ -84,11 +102,24 @@ function Editor({ initial, library }: { initial: Campaign; library: SectionLibra
     };
   }, [save, readOnly]);
 
-  const goSend = () => {
-    const go = () => navigate(`/campaigns/${initial.id}/send`);
-    if (saveState === 'saved') go();
-    else void save().then(go).catch(() => undefined);
-  };
+  // Leaving the editor saves anything still waiting: within the app (the logo, the menu,
+  // Send…) the next screen opens once it's saved; the browser's Back button can't wait,
+  // so the save is just sent on its way.
+  const pending = useRef({ save, waiting: false });
+  pending.current = { save, waiting: saveState === 'pending' || saveState === 'saving' };
+  useEffect(() => {
+    const flush = () => (pending.current.waiting ? pending.current.save() : undefined);
+    const removeGuard = onLeave(flush);
+    return () => {
+      removeGuard();
+      if (pending.current.waiting) void pending.current.save().catch(() => undefined);
+    };
+  }, []);
+
+  const body = useRef<HTMLDivElement>(null);
+  const { widths, resize } = usePanelWidths(body);
+
+  const goSend = () => navigate(`/campaigns/${initial.id}/send`);  // saves first (see onLeave above)
 
   // Warn before leaving with unsaved changes.
   useEffect(() => {
@@ -109,6 +140,20 @@ function Editor({ initial, library }: { initial: Campaign; library: SectionLibra
     setSelection(section.id);
   }, [library, selectedSection]);
 
+  // Download the design and words as a template file, to reuse, share or send to the gallery.
+  const saveAsTemplate = async () => {
+    try {
+      if (pending.current.waiting) await pending.current.save();  // export what's on screen
+      const template = await api<{ id: string }>(`/campaigns/${initial.id}/template`);
+      const url = URL.createObjectURL(new Blob([JSON.stringify(template, null, 2) + '\n'], { type: 'application/json' }));
+      const link = Object.assign(window.document.createElement('a'), { href: url, download: `${template.id}.mstemplate.json` });
+      link.click();
+      setTimeout(() => URL.revokeObjectURL(url), 1000);
+    } catch (e) {
+      alert(`Couldn't save the template: ${describe(e)}`);
+    }
+  };
+
   const moveBy = (delta: -1 | 1) => {
     if (!selectedSection) return;
     setDocument((doc) => moveTo(doc, selectedSection, doc.sections.findIndex((s) => s.id === selectedSection) + delta));
@@ -116,6 +161,7 @@ function Editor({ initial, library }: { initial: Campaign; library: SectionLibra
 
   return (
     <div class="editor">
+      <AppBar />
       <header class="editor__bar">
         <Link href="/campaigns" class="editor__back">← Campaigns</Link>
         <div class="editor__title">
@@ -127,10 +173,11 @@ function Editor({ initial, library }: { initial: Campaign; library: SectionLibra
             <button type="button" class={device === 'desktop' ? 'is-active' : ''} onClick={() => setDevice('desktop')}>Desktop</button>
             <button type="button" class={device === 'mobile' ? 'is-active' : ''} onClick={() => setDevice('mobile')}>Mobile</button>
           </div>
-          <div class="segmented" role="group" aria-label="Preview colours">
-            <button type="button" class={scheme === 'light' ? 'is-active' : ''} onClick={() => setScheme('light')}>Light</button>
-            <button type="button" class={scheme === 'dark' ? 'is-active' : ''} onClick={() => setScheme('dark')}>Dark</button>
+          <div class="segmented" role="group" aria-label="MailStudio colours" title="Light or dark MailStudio (not the email)">
+            <button type="button" class={theme === 'light' ? 'is-active' : ''} aria-pressed={theme === 'light'} onClick={() => setTheme('light')}>Light</button>
+            <button type="button" class={theme === 'dark' ? 'is-active' : ''} aria-pressed={theme === 'dark'} onClick={() => setTheme('dark')}>Dark</button>
           </div>
+          <Button onClick={() => void saveAsTemplate()}>Save as template</Button>
           {readOnly
             ? <Link href={`/campaigns/${initial.id}/report`} class="btn btn--plain">Report</Link>
             : <Button variant="primary" onClick={goSend}>Send…</Button>}
@@ -148,7 +195,8 @@ function Editor({ initial, library }: { initial: Campaign; library: SectionLibra
         </div>
       )}
 
-      <div class="editor__body">
+      <div class="editor__body" ref={body}
+           style={`--left: ${widths.left}px; --right: ${widths.right}px`}>
         <aside class="editor__panel editor__panel--left">
           <Outline
             document={document}
@@ -160,8 +208,9 @@ function Editor({ initial, library }: { initial: Campaign; library: SectionLibra
             onMove={(id, index) => setDocument((doc) => moveTo(doc, id, index))}
           />
         </aside>
+        <Splitter side="left" width={widths.left} onResize={(w) => resize('left', w)} label="Resize the sections panel" />
 
-        <main class="editor__canvas" style={{ background: document.brand[scheme].outer }}>
+        <main class="editor__canvas" style={{ background: document.brand[scheme].outer, ...scrollbarFor(document.brand[scheme].outer) }}>
           <Preview
             document={document}
             subject={details.subject}
@@ -173,6 +222,7 @@ function Editor({ initial, library }: { initial: Campaign; library: SectionLibra
           />
         </main>
 
+        <Splitter side="right" width={widths.right} onResize={(w) => resize('right', w)} label="Resize the settings panel" />
         <aside class="editor__panel editor__panel--right">
           {selection === 'email' && (
             <EmailDetails details={details} readOnly={readOnly} onChange={(change) => setDetails((d) => ({ ...d, ...change }))} />
@@ -211,4 +261,15 @@ function Editor({ initial, library }: { initial: Campaign; library: SectionLibra
 function SaveStatus({ state }: { state: SaveState | 'readonly' }) {
   const text = { saved: 'All changes saved', pending: 'Unsaved changes', saving: 'Saving…', error: 'Not saved', readonly: 'Read only' }[state];
   return <span class={`save-status save-status--${state}`} role="status">{text}</span>;
+}
+
+/** The canvas shows the email's own background, so its scrollbar is shaded to suit
+ * that colour, not MailStudio's light or dark theme. */
+function scrollbarFor(background: string): Record<string, string> {
+  const hex = /^#[0-9a-f]{6}$/i.test(background) ? background : '#ffffff';
+  const [r, g, b] = [1, 3, 5].map((i) => parseInt(hex.slice(i, i + 2), 16) / 255) as [number, number, number];
+  const light = 0.2126 * r + 0.7152 * g + 0.0722 * b > 0.5;
+  return light
+    ? { '--ui-scrollbar': 'rgba(15, 23, 42, .22)', '--ui-scrollbar-hover': 'rgba(15, 23, 42, .45)' }
+    : { '--ui-scrollbar': 'rgba(226, 232, 240, .24)', '--ui-scrollbar-hover': 'rgba(226, 232, 240, .45)' };
 }

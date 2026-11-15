@@ -1,0 +1,126 @@
+{
+  "format": "mailstudio-template",
+  "version": 1,
+  "id": "postcard",
+  "name": "Postcard",
+  "description": "A warm, bookish weekly digest in cream and burgundy: a short note, a list of links worth reading, and a sign-off.",
+  "category": "newsletter",
+  "tags": [
+    "weekly",
+    "digest",
+    "roundup"
+  ],
+  "author": "MailStudio",
+  "subject": "This week: five things worth your time",
+  "preheader": "A short note, a few good reads, and one thing to try this weekend.",
+  "document": {
+    "schema": 2,
+    "brand": {
+      "width": 600,
+      "padding": 44,
+      "radius": 0,
+      "fontSize": 17,
+      "fonts": {
+        "heading": "\"Times New Roman\", Times, serif",
+        "body": "Georgia, serif",
+        "small": "Georgia, serif"
+      },
+      "button": {
+        "bold": false,
+        "italic": true
+      },
+      "flatFeatured": false,
+      "light": {
+        "outer": "#efe6da",
+        "background": "#fffdf8",
+        "featured": "#f5e9dc",
+        "text": "#4b3b35",
+        "heading": "#2a1a17",
+        "link": "#8f1d2c",
+        "accent": "#8f1d2c",
+        "buttonText": "#ffffff"
+      },
+      "dark": {
+        "outer": "#140d0c",
+        "background": "#1d1513",
+        "featured": "#2f1f1c",
+        "text": "#e3d6cf",
+        "heading": "#fbf2ec",
+        "link": "#f19aa6",
+        "accent": "#d9566a",
+        "buttonText": "#1a0507"
+      }
+    },
+    "sections": [
+      {
+        "id": "header",
+        "type": "header",
+        "settings": {
+          "tagline": "The weekly postcard",
+          "featured": "off"
+        }
+      },
+      {
+        "id": "hero",
+        "type": "hero",
+        "settings": {
+          "eyebrow": "Week 46",
+          "title": "Five things worth your time",
+          "description": "A short personal note to open. What caught your eye this week, and why you're sharing it.",
+          "featured": "on"
+        }
+      },
+      {
+        "id": "list",
+        "type": "contents",
+        "settings": {
+          "title": "This week's reads",
+          "items": "An article that changed how you think about something\nA tool or trick that saved you an hour\nA story from someone in your world\nSomething beautiful, just because\nOne thing to try this weekend",
+          "featured": "off"
+        }
+      },
+      {
+        "id": "pick",
+        "type": "text",
+        "settings": {
+          "heading": "Pick of the week",
+          "body": "Say a little more about the one thing you'd most like readers to open, and what they'll get from it.\n\nA line or two is plenty.",
+          "featured": "off"
+        }
+      },
+      {
+        "id": "button",
+        "type": "button",
+        "settings": {
+          "text": "Read the pick of the week",
+          "url": "https://example.com",
+          "featured": "off"
+        }
+      },
+      {
+        "id": "divider",
+        "type": "divider",
+        "settings": {
+          "featured": "off"
+        }
+      },
+      {
+        "id": "signoff",
+        "type": "text",
+        "settings": {
+          "heading": "Until next week",
+          "body": "A friendly sign-off in your own voice. Invite readers to reply — the best digests feel like a conversation.",
+          "featured": "off"
+        }
+      },
+      {
+        "id": "footer",
+        "type": "footer",
+        "settings": {
+          "note": "You're getting the weekly postcard because you signed up for it.",
+          "featured": "on"
+        }
+      }
+    ]
+  }
+}

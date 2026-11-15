@@ -18,6 +18,7 @@ from pydantic import (
 )
 
 from .document import Document
+from .gallery import Colours, Template
 
 MAX_TAGS = 50
 MAX_FIELDS = 50
@@ -301,6 +302,15 @@ class CampaignCreate(Strict):
     document: Document | None = Field(
         None, description="Defaults to a starter email in the brand from Settings"
     )
+    template: Template | None = Field(
+        None, description="Start from this template (ignored if `document` is given)"
+    )
+    template_id: str | None = Field(
+        None, description="Start from a template bundled with the app, by its id"
+    )
+    colours: Colours = Field(
+        "template", description="Use the template's colours, or the brand colours from Settings"
+    )
 
 
 class CampaignUpdate(Strict):
@@ -357,6 +367,12 @@ class RenderRequest(Strict):
     document: Document
     subject: Text300 = ""
     preheader: Text300 = ""
+    scheme: Literal["light", "dark"] = "light"
+
+
+class TemplatePreview(Strict):
+    template: Template
+    colours: Colours = "template"
     scheme: Literal["light", "dark"] = "light"
 
 

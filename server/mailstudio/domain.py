@@ -2,7 +2,9 @@
 
 Each record says exactly what to add, where, and whether it's there yet:
 
-- DKIM: three CNAME records from Amazon SES (Easy DKIM). Required.
+- DKIM: with Amazon SES, three CNAME records (Easy DKIM). Required. Other services
+  (Postmark, Mailgun, SMTP2GO, AuthSMTP) give their DKIM records in their own
+  dashboards and check them there, so `provider_note` says where to go instead.
 - DMARC: one TXT record at _dmarc.<domain>. Gmail and Yahoo require one for bulk senders.
 - SPF: not needed for SES's default setup, but more than one SPF record on the
   domain breaks SPF for everything else it sends, so that's flagged.
@@ -55,7 +57,20 @@ class Record:
     help: str
 
 
-def check(domain: str, identity: Identity | None) -> list[Record]:
+PROVIDER_NOTES = {
+    "postmark": "In Postmark, open Sender Signatures → Domains, add this domain, and add the DKIM and "
+    "Return-Path records it shows. Postmark checks them for you.",
+    "mailgun": "In Mailgun, open Sending → Domains, add this domain (or a subdomain like mg.yourdomain), "
+    "and add the records it shows, then choose Verify.",
+    "smtp2go": "In SMTP2GO, open Sending → Verified Senders → Sender Domains, add this domain, and add the "
+    "three CNAME records it shows.",
+    "authsmtp": "In the AuthSMTP control panel, authorise your from address and bounce address, and set up "
+    "DKIM and SPF for this domain as AuthSMTP's guide describes.",
+    "smtp": "Ask your SMTP provider for the DKIM and SPF records for this domain, and add them.",
+}
+
+
+def check(domain: str, identity: Identity | None, provider: str = "ses") -> list[Record]:
     records: list[Record] = []
 
     for token in identity.dkim_tokens if identity else []:
@@ -94,7 +109,7 @@ def check(domain: str, identity: Identity | None) -> list[Record]:
     spf = [r for r in txt_records(domain) if r.lower().startswith("v=spf1")]
     records.append(
         Record(
-            purpose="SPF (optional with Amazon SES)",
+            purpose="SPF (optional with Amazon SES)" if provider == "ses" else "SPF",
             type="TXT",
             host=domain,
             value="",
@@ -103,19 +118,29 @@ def check(domain: str, identity: Identity | None) -> list[Record]:
             help="Your domain has more than one SPF record, which makes SPF fail for all its email. "
             "Merge them into one."
             if len(spf) > 1
-            else "Nothing to do for Mail Studio.",
+            else "Nothing to do for MailStudio."
+            if provider == "ses"
+            else "If your sending service gave you an SPF record, add its part to this one record.",
         )
     )
     return records
 
 
-def summary(domain: str, identity: Identity | None, records: list[Record]) -> dict[str, Any]:
+def summary(
+    domain: str, identity: Identity | None, records: list[Record], provider: str = "ses"
+) -> dict[str, Any]:
     required_ok = all(r.status == "ok" for r in records if not r.purpose.startswith("SPF"))
+    if provider == "ses":
+        ready = bool(identity and identity.verified and identity.dkim_status == "SUCCESS" and required_ok)
+    else:
+        ready = required_ok  # the service checks its own DKIM records
     return {
         "domain": domain,
+        "provider": provider,
         "registered_with_ses": identity is not None,
         "ses_verified": bool(identity and identity.verified),
         "dkim_status": identity.dkim_status if identity else "NOT_STARTED",
-        "ready": bool(identity and identity.verified and identity.dkim_status == "SUCCESS" and required_ok),
+        "ready": ready,
+        "provider_note": PROVIDER_NOTES.get(provider, ""),
         "records": [asdict(r) for r in records],
     }

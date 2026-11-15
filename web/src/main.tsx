@@ -1,6 +1,6 @@
 import { render } from 'preact';
 import { App } from './app';
-import { applyTheme, initialTheme } from './theme';
+import { startTheme } from './theme';
 
-applyTheme(initialTheme());
+startTheme();
 render(<App />, document.getElementById('app')!);

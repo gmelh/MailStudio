@@ -1,0 +1,125 @@
+{
+  "format": "mailstudio-template",
+  "version": 1,
+  "id": "citrus",
+  "name": "Citrus",
+  "description": "A bright, zesty flash sale with a countdown feel: the offer, the code, and a reminder that time is short.",
+  "category": "promotion",
+  "tags": [
+    "flash sale",
+    "last chance",
+    "urgent"
+  ],
+  "author": "MailStudio",
+  "subject": "⏰ 24 hours only: 40% off",
+  "preheader": "Our flash sale ends tomorrow at midnight.",
+  "document": {
+    "schema": 2,
+    "brand": {
+      "width": 600,
+      "padding": 32,
+      "radius": 24,
+      "fontSize": 16,
+      "fonts": {
+        "heading": "Verdana, Geneva, sans-serif",
+        "body": "Verdana, Geneva, sans-serif",
+        "small": "Verdana, Geneva, sans-serif"
+      },
+      "button": {
+        "bold": true,
+        "italic": false
+      },
+      "flatFeatured": false,
+      "light": {
+        "outer": "#fff6cc",
+        "background": "#ffffff",
+        "featured": "#fff1a8",
+        "text": "#4a3f1a",
+        "heading": "#221a00",
+        "link": "#9a4300",
+        "accent": "#a64b00",
+        "buttonText": "#ffffff"
+      },
+      "dark": {
+        "outer": "#141100",
+        "background": "#1d1a08",
+        "featured": "#3a3305",
+        "text": "#ece3bd",
+        "heading": "#fffbe6",
+        "link": "#ffc84d",
+        "accent": "#f0b400",
+        "buttonText": "#1d1500"
+      }
+    },
+    "sections": [
+      {
+        "id": "header",
+        "type": "header",
+        "settings": {
+          "tagline": "Flash sale",
+          "featured": "off"
+        }
+      },
+      {
+        "id": "hero",
+        "type": "hero",
+        "settings": {
+          "eyebrow": "24 hours only",
+          "title": "40% off. Today only.",
+          "description": "Our fastest sale of the year. When the clock hits midnight, prices go back up.",
+          "featured": "off"
+        }
+      },
+      {
+        "id": "offer",
+        "type": "offer",
+        "settings": {
+          "eyebrow": "Use this code",
+          "title": "Take 40% off everything",
+          "body": "Ends tomorrow at midnight. While stocks last.",
+          "code": "FLASH40",
+          "button": "Grab the deal",
+          "url": "https://example.com",
+          "featured": "on"
+        }
+      },
+      {
+        "id": "bestsellers",
+        "type": "contents",
+        "settings": {
+          "title": "Going fast",
+          "items": "Our best-seller — back in stock\nThe one everyone's been asking for\nLimited colours, limited sizes",
+          "featured": "off"
+        }
+      },
+      {
+        "id": "why",
+        "type": "columns",
+        "settings": {
+          "leftTitle": "Ships today",
+          "leftBody": "Order by 2pm and it's on its way the same day.",
+          "rightTitle": "Free returns",
+          "rightBody": "Not quite right? Send it back within 30 days.",
+          "featured": "off"
+        }
+      },
+      {
+        "id": "button",
+        "type": "button",
+        "settings": {
+          "text": "Shop before midnight",
+          "url": "https://example.com",
+          "featured": "off"
+        }
+      },
+      {
+        "id": "footer",
+        "type": "footer",
+        "settings": {
+          "note": "Offer ends at midnight tonight. One use per customer.",
+          "featured": "on"
+        }
+      }
+    ]
+  }
+}

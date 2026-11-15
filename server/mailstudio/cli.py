@@ -159,7 +159,23 @@ def campaign_schema() -> str:
         "$schema": "https://json-schema.org/draft/2020-12/schema",
         "$id": "https://mailstudio.email/schema/campaign.schema.json",
         **schema,
-        "title": "Mail Studio campaign document",
+        "title": "MailStudio campaign document",
+    }
+    return json.dumps(schema, indent=2, ensure_ascii=False) + "\n"
+
+
+def template_schema() -> str:
+    """The JSON Schema for template files, as committed in schema/template.schema.json."""
+    import json
+
+    from .gallery import Template
+
+    schema = Template.model_json_schema(by_alias=True)
+    schema = {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "$id": "https://mailstudio.email/schema/template.schema.json",
+        **schema,
+        "title": "MailStudio email template",
     }
     return json.dumps(schema, indent=2, ensure_ascii=False) + "\n"
 
@@ -169,11 +185,90 @@ def _export_schema(args: argparse.Namespace) -> int:
 
     Path(args.path).write_text(campaign_schema(), encoding="utf-8")
     print(f"Wrote {args.path}")
+    templates = Path(args.path).with_name("template.schema.json")
+    templates.write_text(template_schema(), encoding="utf-8")
+    print(f"Wrote {templates}")
+    return 0
+
+
+def _check_templates(args: argparse.Namespace) -> int:
+    """Validate template files and render each, light and dark, the way the app will."""
+    import json
+    from pathlib import Path
+
+    from . import gallery, render
+    from .document import Brand, check_sections
+    from .errors import ProblemError
+    from .sections import load
+
+    library = load(Settings.from_env().sections_dir)
+    paths: list[Path] = []
+    for arg in args.paths:
+        paths += sorted(Path(arg).glob("*.json")) if Path(arg).is_dir() else [Path(arg)]
+    paths = [p for p in paths if p.name != "index.json"]
+    failed = 0
+    for path in paths:
+        try:
+            template = gallery.parse(json.loads(path.read_text(encoding="utf-8")))
+            document = gallery.apply(template, Brand(), "Your Company", "Your business address", "template")
+            check_sections(document, library)
+            for scheme in ("light", "dark"):
+                html = render.render(
+                    document, library, subject=template.subject, preheader=template.preheader,
+                    business=render.Business(name="Your Company", address="Your business address"),
+                    scheme=scheme, asset_base=getattr(args, "asset_base", None),
+                ).html
+                if args.out:
+                    Path(args.out).mkdir(parents=True, exist_ok=True)
+                    Path(args.out, f"{template.id}-{scheme}.html").write_text(html, encoding="utf-8")
+            print(f"ok    {path.name}  {template.name} ({template.category})")
+        except (ValueError, ProblemError) as exc:
+            failed += 1
+            detail = getattr(exc, "extra", {}).get("errors") or str(exc)
+            print(f"FAIL  {path.name}  {detail}")
+    print(f"{len(paths) - failed} of {len(paths)} templates OK")
+    return 1 if failed else 0
+
+
+def _build_gallery(args: argparse.Namespace) -> int:
+    """Turn a folder of template files into a gallery folder for mailstudio.email: each
+    template, an HTML preview of it, and the index.json the app reads."""
+    import json
+    import shutil
+    from pathlib import Path
+
+    from . import gallery
+
+    previews = argparse.Namespace(
+        paths=[args.source], out=str(Path(args.out) / "previews"), asset_base=args.site
+    )
+    if _check_templates(previews):
+        print("Not building the gallery: fix the templates above first.")
+        return 1
+    out = Path(args.out)
+    (out / "templates").mkdir(parents=True, exist_ok=True)
+    entries = []
+    for path in sorted(Path(args.source).glob("*.json")):
+        template = gallery.parse(json.loads(path.read_text(encoding="utf-8")))
+        shutil.copyfile(path, out / "templates" / f"{template.id}.json")
+        entries.append({
+            "id": template.id,
+            "name": template.name,
+            "description": template.description,
+            "category": template.category,
+            "tags": template.tags,
+            "author": template.author,
+            "file": f"templates/{template.id}.json",
+            "preview": f"previews/{template.id}-light.html",
+        })
+    index = {"format": "mailstudio-gallery", "version": 1, "templates": entries}
+    (out / "index.json").write_text(json.dumps(index, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
+    print(f"Wrote {out / 'index.json'} with {len(entries)} templates")
     return 0
 
 
 def main(argv: list[str] | None = None) -> int:
-    parser = argparse.ArgumentParser(prog="mailstudio", description="Mail Studio server")
+    parser = argparse.ArgumentParser(prog="mailstudio", description="MailStudio server")
     commands = parser.add_subparsers(dest="command", required=True)
 
     serve = commands.add_parser("serve", help="Run the web server and sending worker (applies migrations)")
@@ -213,6 +308,22 @@ def main(argv: list[str] | None = None) -> int:
     export = commands.add_parser("export-schema", help="Write the campaign document JSON Schema")
     export.add_argument("path", nargs="?", default="../schema/campaign.schema.json")
     export.set_defaults(run=_export_schema)
+
+    check = commands.add_parser("check-templates", help="Validate template files and render them")
+    check.add_argument("paths", nargs="+", help="Template files or folders of them")
+    check.add_argument("--out", help="Also write each rendered template here, light and dark")
+    check.set_defaults(run=_check_templates)
+
+    build = commands.add_parser("build-gallery", help="Build the template gallery for a website")
+    build.add_argument("source", nargs="?", default="../sections/gallery", help="Folder of template files")
+    build.add_argument(
+        "--out", default="gallery-site/gallery", help="Where to write index.json and the files"
+    )
+    build.add_argument(
+        "--site", default="https://mailstudio.email",
+        help="The website's address; previews load social icons from its /social/ folder",
+    )
+    build.set_defaults(run=_build_gallery)
 
     args = parser.parse_args(argv)
     result: int = args.run(args)

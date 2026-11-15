@@ -1,0 +1,5 @@
+<mj-section css-class="ms-s-{{section_id}}{{#s.featured_on}} ms-featured{{/s.featured_on}}"{{#s.featured_on}} background-color="{{brand.featured}}"{{/s.featured_on}} padding="0">
+  <mj-column>
+    <mj-spacer height="{{s.height}}px" />
+  </mj-column>
+</mj-section>

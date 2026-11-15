@@ -1,4 +1,4 @@
-<mj-section css-class="ms-s-{{section_id}} ms-featured" background-color="{{brand.featured}}" padding="26px {{brand.padding}}px">
+<mj-section css-class="ms-s-{{section_id}}{{#s.featured_on}} ms-featured{{/s.featured_on}}"{{#s.featured_on}} background-color="{{brand.featured}}"{{/s.featured_on}} padding="26px {{brand.padding}}px">
   <mj-column>
     <mj-text css-class="ms-muted" align="center" font-family="{{brand.fonts.small}}" font-size="12px" line-height="1.8" color="{{brand.muted}}"><strong>{{s.company}}</strong><br>{{s.address}}<br>{{s.note}}<br><a class="ms-link" href="{{merge.unsubscribe_url}}" style="color:{{brand.link}}">Unsubscribe</a></mj-text>
   </mj-column>

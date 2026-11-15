@@ -85,7 +85,7 @@ function ImportForm({ lists: initialLists }: { lists: MailingList[] }) {
   if (result) return <Summary {...result} onAgain={() => { setResult(null); setFile(null); }} />;
 
   return (
-    <form class="card form-card form-card--wide" onSubmit={onSubmit}>
+    <form class="card form-card" onSubmit={onSubmit}>
       {error && <Notice tone="error">{error}</Notice>}
 
       <h2>1. Choose the file</h2>
@@ -130,7 +130,7 @@ function ImportForm({ lists: initialLists }: { lists: MailingList[] }) {
 function Summary({ outcome, listName, onAgain }: { outcome: ImportResult; listName: string; onAgain: () => void }) {
   const skipped = outcome.skipped_unsubscribed + outcome.skipped_suppressed;
   return (
-    <section class="card form-card form-card--wide">
+    <section class="card form-card">
       <h2>Import finished</h2>
       <div class="stats">
         <Stat value={outcome.created} label="new contacts" />

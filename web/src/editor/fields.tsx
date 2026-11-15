@@ -3,7 +3,7 @@
 import type { RefObject } from 'preact';
 import { useRef, useState } from 'preact/hooks';
 import { upload, type Asset, type FieldDef } from '../api';
-import { describe } from '../ui';
+import { Checkbox, describe } from '../ui';
 
 const MERGE_TAGS: Array<[tag: string, label: string]> = [
   ['{{first_name|there}}', 'First name (or "there")'],
@@ -50,13 +50,18 @@ interface FieldProps {
   value: string;
   onValue: (value: string) => void;
   disabled?: boolean;
+  /** Extra help under the input. */
+  hint?: string;
 }
 
-export function SettingField({ field, value, onValue, disabled }: FieldProps) {
+export function SettingField({ field, value, onValue, disabled, hint }: FieldProps) {
   const id = `setting-${field.key}`;
   const ref = useRef<TextInput>(null);
 
   switch (field.kind) {
+    case 'toggle':
+      return <Checkbox label={field.label} checked={value === 'on'} hint={hint} disabled={disabled}
+                       onChecked={(on) => onValue(on ? 'on' : 'off')} />;
     case 'textarea':
       return (
         <div class="field">
@@ -72,6 +77,7 @@ export function SettingField({ field, value, onValue, disabled }: FieldProps) {
             disabled={disabled}
             onInput={(e) => onValue(e.currentTarget.value)}
           />
+          {hint && <small class="muted">{hint}</small>}
           <small class="muted">**bold**, *italic*, [link](https://…), a blank line between paragraphs, "- " for a list</small>
         </div>
       );
@@ -84,6 +90,18 @@ export function SettingField({ field, value, onValue, disabled }: FieldProps) {
               <option key={option} value={option}>{label}</option>
             ))}
           </select>
+          {hint && <small class="muted">{hint}</small>}
+        </label>
+      );
+    case 'colour':
+      return (
+        <label class="field" for={id}>
+          <span>{field.label}</span>
+          <span class="colour-field">
+            <input id={id} type="color" value={value} disabled={disabled} onInput={(e) => onValue(e.currentTarget.value)} />
+            <code>{value}</code>
+          </span>
+          {hint && <small class="muted">{hint}</small>}
         </label>
       );
     case 'number':
@@ -99,11 +117,12 @@ export function SettingField({ field, value, onValue, disabled }: FieldProps) {
             disabled={disabled}
             onInput={(e) => onValue(e.currentTarget.value)}
           />
+          {hint && <small class="muted">{hint}</small>}
         </label>
       );
     case 'image':
       return <ImageField id={id} label={field.label} value={value} onValue={onValue} disabled={disabled}
-                         hint={field.fallback === 'brand.logo' ? 'Leave empty to use the logo from Brand & style.' : undefined} />;
+                         hint={hint ?? (field.fallback === 'brand.logo' ? 'Leave empty to use the logo from Brand & style.' : undefined)} />;
     case 'url':
       return (
         <label class="field" for={id}>
@@ -116,6 +135,7 @@ export function SettingField({ field, value, onValue, disabled }: FieldProps) {
             disabled={disabled}
             onInput={(e) => onValue(e.currentTarget.value)}
           />
+          {hint && <small class="muted">{hint}</small>}
         </label>
       );
     default:
@@ -132,6 +152,7 @@ export function SettingField({ field, value, onValue, disabled }: FieldProps) {
             disabled={disabled}
             onInput={(e) => onValue(e.currentTarget.value)}
           />
+          {hint && <small class="muted">{hint}</small>}
         </div>
       );
   }

@@ -1,0 +1,14 @@
+<mj-wrapper css-class="ms-s-{{section_id}}{{#s.featured_on}} ms-featured{{/s.featured_on}}"{{#s.featured_on}} background-color="{{brand.featured}}"{{/s.featured_on}} padding="{{#s.edge_on}}0{{/s.edge_on}}{{^s.edge_on}}16px {{brand.padding}}px{{/s.edge_on}}">
+  <mj-section css-class="ms-video"{{#s.thumbnail_ok}} background-url="{{s.thumbnail}}" background-size="cover" background-position="center center" background-repeat="no-repeat"{{/s.thumbnail_ok}} background-color="#111827" padding="{{#s.edge_on}}145px{{/s.edge_on}}{{^s.edge_on}}128px{{/s.edge_on}} 20px"{{^s.edge_on}} border-radius="{{brand.radius}}px"{{/s.edge_on}}>
+    <mj-column>
+      {{#s.url_ok}}<mj-button href="{{s.url}}" background-color="#ffffff" color="#111827" font-size="16px" font-weight="700" border-radius="999px" inner-padding="14px 26px" padding="0">&#9654;&nbsp; {{s.buttonText}}</mj-button>{{/s.url_ok}}
+    </mj-column>
+  </mj-section>
+  {{#s.caption}}
+  <mj-section padding="12px {{#s.edge_on}}{{brand.padding}}px{{/s.edge_on}}{{^s.edge_on}}0{{/s.edge_on}} 0">
+    <mj-column>
+      <mj-text css-class="ms-text" align="center" font-size="14px">{{{s.caption_html}}}</mj-text>
+    </mj-column>
+  </mj-section>
+  {{/s.caption}}
+</mj-wrapper>

@@ -2,6 +2,8 @@
 
 Unsubscribe links carry a campaign ID; confirmation links carry a list ID and are
 signed with a different purpose, so neither kind can be passed off as the other.
+The "View in browser" link uses the same token as unsubscribing (both are the reader's
+own). Share links (`<campaign_id>.<signature>`) show a generic copy of a sent campaign.
 
 The signature (HMAC-SHA256 with the install's secret, truncated to 128 bits)
 stops anyone unsubscribing other people by guessing IDs.
@@ -50,3 +52,16 @@ def read_confirm(secret: bytes, token: str) -> tuple[str, str] | None:
     contact_id, list_id, signature = parts
     expected = _signature(secret, f"confirm:{contact_id}.{list_id}")
     return (contact_id, list_id) if hmac.compare_digest(signature, expected) else None
+
+
+def make_share(secret: bytes, campaign_id: str) -> str:
+    return f"{campaign_id}.{_signature(secret, f'share:{campaign_id}')}"
+
+
+def read_share(secret: bytes, token: str) -> str | None:
+    """Returns the campaign ID, or None if the token is malformed or forged."""
+    parts = token.split(".")
+    if len(parts) != 2 or not _ID.match(parts[0]):
+        return None
+    expected = _signature(secret, f"share:{parts[0]}")
+    return parts[0] if hmac.compare_digest(parts[1], expected) else None

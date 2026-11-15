@@ -9,7 +9,7 @@ from typing import Any
 
 import boto3
 import pytest
-from botocore.exceptions import ReadTimeoutError
+from botocore.exceptions import ClientError, ReadTimeoutError
 from botocore.stub import ANY, Stubber
 from cryptography import x509
 from cryptography.hazmat.primitives import hashes, serialization
@@ -95,7 +95,7 @@ def test_timeout_after_sending_is_never_retried(monkeypatch: pytest.MonkeyPatch)
 
 def test_ses_is_used_once_connected(settings: Settings, client: TestClient, auth: Headers) -> None:
     conn = connect(settings.database_path)
-    with pytest.raises(ProviderUnavailable, match="Amazon SES"):
+    with pytest.raises(ProviderUnavailable, match="No sending service"):
         configured_provider(conn)
     client.patch(
         "/api/v1/settings",
@@ -383,3 +383,13 @@ def test_domain_setup_lists_records_and_reports_progress(
     assert spf["status"] == "warning"
 
     assert client.get("/api/v1/sending/domain/not_a_domain", headers=auth).status_code == 422
+
+
+def test_credential_errors_say_what_to_do() -> None:
+    def error(code: str) -> ClientError:
+        return ClientError({"Error": {"Code": code, "Message": "AWS's own words"}}, "GetAccount")
+
+    assert "Create a new access key" in ses.explain(error("InvalidSignatureException"))
+    assert "doesn't recognise this access key ID" in ses.explain(error("UnrecognizedClientException"))
+    assert "Attach the MailStudio policy" in ses.explain(error("AccessDeniedException"))
+    assert ses.explain(error("Throttling")) == "Throttling: AWS's own words"

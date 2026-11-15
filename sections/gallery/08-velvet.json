@@ -1,0 +1,133 @@
+{
+  "format": "mailstudio-template",
+  "version": 1,
+  "id": "velvet",
+  "name": "Velvet",
+  "description": "An elegant members-only offer in deep plum: a personal note, an exclusive code, and the perks of being a regular.",
+  "category": "promotion",
+  "tags": [
+    "vip",
+    "loyalty",
+    "exclusive",
+    "members"
+  ],
+  "author": "MailStudio",
+  "subject": "An invitation for our best customers",
+  "preheader": "A private offer, just for you — before anyone else.",
+  "document": {
+    "schema": 2,
+    "brand": {
+      "width": 600,
+      "padding": 48,
+      "radius": 2,
+      "fontSize": 16,
+      "fonts": {
+        "heading": "Georgia, serif",
+        "body": "Georgia, serif",
+        "small": "Georgia, serif"
+      },
+      "button": {
+        "bold": false,
+        "italic": true
+      },
+      "flatFeatured": false,
+      "light": {
+        "outer": "#efe7ee",
+        "background": "#fffcfe",
+        "featured": "#f4e8f1",
+        "text": "#4d3a48",
+        "heading": "#2a1426",
+        "link": "#7e2a6b",
+        "accent": "#7e2a6b",
+        "buttonText": "#ffffff"
+      },
+      "dark": {
+        "outer": "#120a11",
+        "background": "#1b1119",
+        "featured": "#2e1a2a",
+        "text": "#e2d2de",
+        "heading": "#fbf0f8",
+        "link": "#e5a5d6",
+        "accent": "#c66bb0",
+        "buttonText": "#1a0716"
+      }
+    },
+    "sections": [
+      {
+        "id": "header",
+        "type": "header",
+        "settings": {
+          "tagline": "Members",
+          "featured": "off"
+        }
+      },
+      {
+        "id": "hero",
+        "type": "hero",
+        "settings": {
+          "eyebrow": "For our best customers",
+          "title": "A little thank-you, before anyone else",
+          "description": "A warm, personal note. Tell your regulars why they matter and what you've saved for them.",
+          "featured": "off"
+        }
+      },
+      {
+        "id": "divider",
+        "type": "divider",
+        "settings": {
+          "featured": "off"
+        }
+      },
+      {
+        "id": "offer",
+        "type": "offer",
+        "settings": {
+          "eyebrow": "Members only",
+          "title": "20% off, plus early access",
+          "body": "Shop the new collection two days before everyone else. Valid until the end of the month.",
+          "code": "MEMBER20",
+          "button": "Shop early",
+          "url": "https://example.com",
+          "featured": "on"
+        }
+      },
+      {
+        "id": "perks",
+        "type": "columns",
+        "settings": {
+          "leftTitle": "Early access",
+          "leftBody": "New arrivals, two days before they go on sale.",
+          "rightTitle": "Members' events",
+          "rightBody": "Invitations to tastings, previews and evenings in store.",
+          "featured": "off"
+        }
+      },
+      {
+        "id": "quote",
+        "type": "quote",
+        "settings": {
+          "text": "Being a member feels like being a friend of the shop.",
+          "author": "A long-time customer",
+          "featured": "off"
+        }
+      },
+      {
+        "id": "button",
+        "type": "button",
+        "settings": {
+          "text": "See what's new",
+          "url": "https://example.com",
+          "featured": "off"
+        }
+      },
+      {
+        "id": "footer",
+        "type": "footer",
+        "settings": {
+          "note": "You're receiving this as a valued member. This offer is personal and can't be shared.",
+          "featured": "on"
+        }
+      }
+    ]
+  }
+}

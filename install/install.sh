@@ -1,28 +1,28 @@
 #!/usr/bin/env bash
-# Mail Studio installer: https://mailstudio.email
+# MailStudio installer: https://mailstudio.email
 #
 #   curl -fsSL https://get.mailstudio.email | sudo bash
 #
 # On a fresh Ubuntu or Debian server, this:
 #   1. installs Docker (if it isn't there),
 #   2. checks your domain points at this server,
-#   3. sets up Mail Studio with Caddy, which gets and renews the HTTPS certificate,
+#   3. sets up MailStudio with Caddy, which gets and renews the HTTPS certificate,
 #   4. adds a `mailstudio` command for updates, backups and logs, and a daily backup.
 #
 # Running it again is safe: it keeps your data and settings and updates the setup.
 #
 # Options (all optional; you're asked for anything missing):
-#   --domain mail.example.com   the address Mail Studio will live at
+#   --domain mail.example.com   the address MailStudio will live at
 #   --email you@example.com     for certificate expiry notices from Let's Encrypt
 #   --dir /opt/mailstudio       where it's installed
-#   --image IMAGE               the Mail Studio container image to run
+#   --image IMAGE               the MailStudio container image to run
 #   --yes                       don't ask questions (needs --domain)
 #   --skip-dns-check            don't check the domain points here
 #   --dry-run                   write the files, but don't install or start anything
 
 # Plain `sh` (dash on Ubuntu) can't run this script. Say so before it trips over Bash syntax.
 if [ -z "${BASH_VERSION:-}" ]; then
-  echo "Mail Studio's installer needs bash. Run it like this:" >&2
+  echo "MailStudio's installer needs bash. Run it like this:" >&2
   echo "  curl -fsSL https://get.mailstudio.email | sudo bash" >&2
   exit 1
 fi
@@ -106,7 +106,7 @@ load_existing() {
 
 check_system() {
   step "Checking this server"
-  [ "$(uname -s)" = "Linux" ] || die "Mail Studio installs on Linux servers."
+  [ "$(uname -s)" = "Linux" ] || die "MailStudio installs on Linux servers."
   if [ "$DRY_RUN" -eq 0 ] && [ "$(id -u)" -ne 0 ]; then
     die "Run it as root: curl -fsSL https://get.mailstudio.email | sudo bash"
   fi
@@ -135,8 +135,8 @@ check_internet() {
   local problem=""
   if command -v ip >/dev/null 2>&1 && ! ip -4 route show default 2>/dev/null | grep -q .; then
     problem="This server has no public IPv4 address (it has no IPv4 route to the internet).
-Mail Studio needs one: your domain's A record points to it, and it's how the server downloads
-Docker and Mail Studio. In your hosting provider's dashboard, make sure the server has a public
+MailStudio needs one: your domain's A record points to it, and it's how the server downloads
+Docker and MailStudio. In your hosting provider's dashboard, make sure the server has a public
 IPv4 address (some providers offer IPv6-only or private-network-only servers). Then restart the
 server and run the installer again."
   elif command -v curl >/dev/null 2>&1 && ! curl -4 -fsS --max-time 15 -o /dev/null https://get.docker.com 2>/dev/null; then
@@ -150,10 +150,10 @@ connections must be allowed), then run the installer again."
 }
 
 choose_domain() {
-  step "Your Mail Studio address"
+  step "Your MailStudio address"
   if [ -z "$DOMAIN" ]; then
     if [ "$YES" -eq 1 ] || ! has_tty; then die "Give the address with --domain, e.g. --domain mail.yourbusiness.com"; fi
-    say "Mail Studio needs its own address, like ${bold}mail.yourbusiness.com${reset}."
+    say "MailStudio needs its own address, like ${bold}mail.yourbusiness.com${reset}."
     say "In your domain's DNS settings, add an ${bold}A record${reset} for it pointing to this server's IP address."
     while :; do
       DOMAIN=$(ask "Address" | tr '[:upper:]' '[:lower:]' | sed 's|^https\{0,1\}://||; s|/.*$||')
@@ -243,7 +243,7 @@ open_firewall() {
 
 write_env() {
   cat > "$DIR/.env" <<EOF
-# Mail Studio settings, read by docker compose. Edit, then run: mailstudio restart
+# MailStudio settings, read by docker compose. Edit, then run: mailstudio restart
 MAILSTUDIO_DOMAIN=$DOMAIN
 ACME_EMAIL=$ACME_EMAIL
 MAILSTUDIO_IMAGE=$IMAGE
@@ -253,7 +253,7 @@ EOF
 
 write_compose() {
   cat > "$DIR/compose.yml" <<'EOF'
-# Written by the Mail Studio installer; re-running it replaces this file.
+# Written by the MailStudio installer; re-running it replaces this file.
 # Your settings are in .env; your data is in ./data.
 name: mailstudio
 
@@ -300,7 +300,7 @@ EOF
 
 write_caddyfile() {
   {
-    printf '# Written by the Mail Studio installer. Caddy gets and renews the HTTPS certificate.\n'
+    printf '# Written by the MailStudio installer. Caddy gets and renews the HTTPS certificate.\n'
     if [ -n "$ACME_EMAIL" ]; then printf '{\n\temail %s\n}\n\n' "$ACME_EMAIL"; fi
     cat <<'EOF'
 {$MAILSTUDIO_DOMAIN} {
@@ -331,7 +331,7 @@ install_command() {
   if [ "$DRY_RUN" -eq 1 ]; then bin="$DIR/mailstudio"; cron="$DIR/mailstudio-backup.cron"; fi
   write_ctl > "$bin"
   chmod 755 "$bin"
-  printf '#!/bin/sh\n# Daily Mail Studio backup, keeping two weeks.\n%s backup --keep 14 --quiet\n' "$bin" > "$cron"
+  printf '#!/bin/sh\n# Daily MailStudio backup, keeping two weeks.\n%s backup --keep 14 --quiet\n' "$bin" > "$cron"
   chmod 755 "$cron"
   ok "Added the 'mailstudio' command and a daily backup"
 }
@@ -340,7 +340,7 @@ install_command() {
 write_ctl() {
   printf '#!/usr/bin/env bash\nMAILSTUDIO_DIR=%q\n' "$DIR"
   cat <<'EOF'
-# Manage Mail Studio. Installed by the Mail Studio installer.
+# Manage MailStudio. Installed by the MailStudio installer.
 set -euo pipefail
 cd "$MAILSTUDIO_DIR"
 compose() { docker compose --project-directory "$MAILSTUDIO_DIR" "$@"; }
@@ -384,7 +384,7 @@ backup() {
 restore() {
   local file=${1:-} work answer
   [ -f "$file" ] || { echo "Usage: mailstudio restore backups/mailstudio-....tar.gz" >&2; exit 1; }
-  printf 'This replaces ALL current Mail Studio data with %s. A backup of the current data is made first.\nType "restore" to continue: ' "$file"
+  printf 'This replaces ALL current MailStudio data with %s. A backup of the current data is made first.\nType "restore" to continue: ' "$file"
   read -r answer
   [ "$answer" = "restore" ] || { echo "Cancelled."; exit 1; }
   backup
@@ -431,7 +431,7 @@ EOF
 # ---------------------------------------------------------------------------
 
 start() {
-  step "Starting Mail Studio"
+  step "Starting MailStudio"
   if [ "$DRY_RUN" -eq 1 ]; then say "${dim}(dry run: would run docker compose pull and up)${reset}"; return; fi
   (cd "$DIR" && docker compose pull --quiet --ignore-pull-failures && docker compose up -d --remove-orphans) \
     || die "Starting failed. See: cd $DIR && docker compose logs"
@@ -445,13 +445,13 @@ start() {
     sleep 3
     [ $((i % 10)) -eq 0 ] && say "${dim}still waiting...${reset}"
   done
-  warn "Mail Studio started, but https://$DOMAIN isn't answering yet."
+  warn "MailStudio started, but https://$DOMAIN isn't answering yet."
   say "Check the domain's A record, and that ports 80 and 443 are open in your provider's firewall."
   say "Then see what Caddy says: mailstudio logs caddy"
 }
 
 finish() {
-  printf '\n%sMail Studio is installed.%s\n\n' "$bold" "$reset"
+  printf '\n%sMailStudio is installed.%s\n\n' "$bold" "$reset"
   if [ "$EXISTING" -eq 1 ]; then
     say "  Open ${bold}https://$DOMAIN${reset} and log in as usual."
   else
@@ -467,7 +467,7 @@ finish() {
 main() {
   parse_args "$@"
   load_existing
-  printf '%sMail Studio installer%s\n' "$bold" "$reset"
+  printf '%sMailStudio installer%s\n' "$bold" "$reset"
   check_system
   check_internet
   choose_domain

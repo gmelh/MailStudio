@@ -1,5 +1,5 @@
 /**
- * Talking to the Mail Studio API from the browser.
+ * Talking to the MailStudio API from the browser.
  *
  * The session cookie travels automatically. Every change also carries the
  * session's CSRF token, which the server checks so other websites can't act
@@ -130,6 +130,10 @@ export interface Brand {
   logo: string;
   light: Palette;
   dark: Palette;
+  /** Plain feature sections: they use the email's background instead of their own colour. */
+  flatFeatured?: boolean;
+  /** A small "View in browser" link above the email (on unless turned off). */
+  webLink?: boolean;
 }
 
 export interface Section {
@@ -154,7 +158,7 @@ export interface Campaign extends CampaignSummary {
   document: CampaignDocument;
 }
 
-export type FieldKind = 'text' | 'textarea' | 'url' | 'image' | 'number' | 'select';
+export type FieldKind = 'text' | 'textarea' | 'url' | 'image' | 'number' | 'select' | 'toggle' | 'colour';
 
 export interface FieldDef {
   key: string;
@@ -164,6 +168,10 @@ export interface FieldDef {
   max?: number;
   options?: Array<[string, string]>;
   fallback?: string;
+  /** Help shown under the field. */
+  hint?: string;
+  /** Hidden while the named settings have these values, e.g. {"imageStretch": "on"} or {"colour": ["a", "b"]}. */
+  hideWhen?: Record<string, string | string[]>;
 }
 
 export interface SectionDef {
@@ -176,13 +184,47 @@ export interface SectionDef {
 export interface Preset {
   label: string;
   description: string;
-  brand: Partial<Pick<Brand, 'fonts' | 'radius' | 'padding' | 'fontSize' | 'button'>>;
-  flatFeatured?: boolean;
+  brand: Partial<Pick<Brand, 'fonts' | 'radius' | 'padding' | 'fontSize' | 'button' | 'flatFeatured'>>;
 }
 
 export interface SectionLibrary {
   sections: Record<string, SectionDef>;
   presets: Record<string, Preset>;
+}
+
+export type TemplateCategory = 'newsletter' | 'promotion' | 'event' | 'announcement' | 'welcome' | 'other';
+export type TemplateColours = 'template' | 'brand';
+
+/** A designed email to start a campaign from (see server/mailstudio/gallery.py). */
+export interface EmailTemplate {
+  format: 'mailstudio-template';
+  version: 1;
+  id: string;
+  name: string;
+  description: string;
+  category: TemplateCategory;
+  tags: string[];
+  author: string;
+  subject: string;
+  preheader: string;
+  document: CampaignDocument;
+}
+
+/** An online gallery entry: the full template is fetched when it's previewed or used. */
+export interface GalleryEntry {
+  id: string;
+  name: string;
+  description: string;
+  category: TemplateCategory;
+  tags: string[];
+  author: string;
+  preview: string;
+}
+
+export interface TemplateList {
+  templates: EmailTemplate[];
+  categories: TemplateCategory[];
+  gallery: boolean;
 }
 
 export interface RenderedEmail {
@@ -304,12 +346,34 @@ export interface Settings {
   smtp: { host: string; port: number; username: string; security: 'starttls' | 'tls' | 'none'; password_set: boolean };
   sending: { rate_per_second: number };
   ses: { region: string; access_key_id: string; configuration_set: string; notification_topic_arn: string; secret_set: boolean };
+  provider: { active: ProviderName | '' };
+  postmark: { message_stream: string; own_unsubscribes: boolean; server_token_set: boolean };
+  mailgun: { domain: string; region: 'us' | 'eu'; api_key_set: boolean; webhook_signing_key_set: boolean };
+  smtp2go: { api_key_set: boolean };
+  relay: {
+    host: string; port: number; username: string; security: 'starttls' | 'tls' | 'none'; bounce_address: string | null;
+    imap_host: string; imap_port: number; imap_username: string; password_set: boolean; imap_password_set: boolean;
+  };
   base_url: string;
+}
+
+export type ProviderName = 'postmark' | 'mailgun' | 'smtp2go' | 'authsmtp' | 'smtp' | 'ses';
+
+export interface ConnectionCheck {
+  provider: ProviderName;
+  ok: boolean;
+  message: string;
 }
 
 export interface SendingAccount {
   provider: string | null;
+  /** The service's name for people, like "Postmark". */
+  label: string | null;
   notifications: 'confirmed' | 'pending' | 'none' | 'unknown';
+  /** Where Postmark, Mailgun or SMTP2GO should send bounces and spam reports. */
+  webhook_url: string | null;
+  /** SMTP relays: the last check of the bounce mailbox. */
+  mailbox: { checked_at?: string; error?: string; last_count?: number } | null;
   ses: {
     region: string;
     production_access: boolean;
@@ -324,12 +388,13 @@ export interface SendingAccount {
 export interface SetupStatus {
   steps: Array<{ key: SetupStep; done: boolean }>;
   complete: boolean;
+  provider: ProviderName | null;
   domain: string;
   base_url: string;
   https: boolean;
 }
 
-export type SetupStep = 'business' | 'sender' | 'ses' | 'domain' | 'notifications' | 'production' | 'audience';
+export type SetupStep = 'business' | 'sender' | 'provider' | 'domain' | 'notifications' | 'production' | 'audience';
 
 export interface DnsRecord {
   purpose: string;
@@ -343,6 +408,9 @@ export interface DnsRecord {
 
 export interface DomainCheck {
   domain: string;
+  provider: ProviderName | '';
+  /** Where to verify the domain with the sending service (all but Amazon SES). */
+  provider_note: string;
   registered_with_ses: boolean;
   ses_verified: boolean;
   dkim_status: string;

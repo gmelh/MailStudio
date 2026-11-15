@@ -1,0 +1,126 @@
+{
+  "format": "mailstudio-template",
+  "version": 1,
+  "id": "hearth",
+  "name": "Hearth",
+  "description": "A cosy seasonal greeting in pine green and berry red: a thank-you for the year, holiday hours, and a small gift.",
+  "category": "other",
+  "tags": [
+    "seasonal",
+    "holiday",
+    "greetings",
+    "season's greetings"
+  ],
+  "author": "MailStudio",
+  "subject": "Season's greetings from all of us",
+  "preheader": "A thank-you for the year, our holiday hours, and a little gift.",
+  "document": {
+    "schema": 2,
+    "brand": {
+      "width": 600,
+      "padding": 44,
+      "radius": 8,
+      "fontSize": 17,
+      "fonts": {
+        "heading": "Georgia, serif",
+        "body": "Georgia, serif",
+        "small": "Georgia, serif"
+      },
+      "button": {
+        "bold": false,
+        "italic": true
+      },
+      "flatFeatured": false,
+      "light": {
+        "outer": "#ece6dc",
+        "background": "#fffdf8",
+        "featured": "#f7ebe5",
+        "text": "#45413a",
+        "heading": "#173523",
+        "link": "#a61e2c",
+        "accent": "#1f5f3b",
+        "buttonText": "#ffffff"
+      },
+      "dark": {
+        "outer": "#0b110d",
+        "background": "#121a15",
+        "featured": "#2a1a1a",
+        "text": "#ddd6cb",
+        "heading": "#f8f3ea",
+        "link": "#f39aa3",
+        "accent": "#3f9a68",
+        "buttonText": "#071209"
+      }
+    },
+    "sections": [
+      {
+        "id": "header",
+        "type": "header",
+        "settings": {
+          "tagline": "Season's greetings",
+          "featured": "off"
+        }
+      },
+      {
+        "id": "hero",
+        "type": "hero",
+        "settings": {
+          "eyebrow": "From all of us",
+          "title": "Thank you for a wonderful year",
+          "description": "A heartfelt note about the year — the people, the moments, and what you're grateful for.",
+          "featured": "on"
+        }
+      },
+      {
+        "id": "year",
+        "type": "text",
+        "settings": {
+          "heading": "Our year in a few words",
+          "body": "Two or three highlights you're proud of, and a thank-you to the people who made them happen.",
+          "featured": "off"
+        }
+      },
+      {
+        "id": "hours",
+        "type": "columns",
+        "settings": {
+          "leftTitle": "Holiday hours",
+          "leftBody": "Closed 25–26 December and 1 January. Open as usual otherwise.",
+          "rightTitle": "Last orders",
+          "rightBody": "Order by 18 December for delivery before Christmas.",
+          "featured": "off"
+        }
+      },
+      {
+        "id": "gift",
+        "type": "offer",
+        "settings": {
+          "eyebrow": "A small gift",
+          "title": "15% off, with our thanks",
+          "body": "On anything, until 31 December.",
+          "code": "THANKYOU15",
+          "button": "Treat yourself",
+          "url": "https://example.com",
+          "featured": "on"
+        }
+      },
+      {
+        "id": "signoff",
+        "type": "text",
+        "settings": {
+          "heading": "See you in the new year",
+          "body": "A warm sign-off, signed by name. Readers like to hear from a person.",
+          "featured": "off"
+        }
+      },
+      {
+        "id": "footer",
+        "type": "footer",
+        "settings": {
+          "note": "Wishing you a happy and restful holiday season.",
+          "featured": "on"
+        }
+      }
+    ]
+  }
+}

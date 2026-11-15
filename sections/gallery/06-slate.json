@@ -1,0 +1,131 @@
+{
+  "format": "mailstudio-template",
+  "version": 1,
+  "id": "slate",
+  "name": "Slate",
+  "description": "A tidy, businesslike update in steel blue: headlines at a glance, numbers that matter, and what's next.",
+  "category": "newsletter",
+  "tags": [
+    "company",
+    "team",
+    "update",
+    "internal"
+  ],
+  "author": "MailStudio",
+  "subject": "Our November update",
+  "preheader": "What we shipped, what we learned, and what's next.",
+  "document": {
+    "schema": 2,
+    "brand": {
+      "width": 600,
+      "padding": 32,
+      "radius": 4,
+      "fontSize": 15,
+      "fonts": {
+        "heading": "Tahoma, Geneva, sans-serif",
+        "body": "Tahoma, Geneva, sans-serif",
+        "small": "Tahoma, Geneva, sans-serif"
+      },
+      "button": {
+        "bold": true,
+        "italic": false
+      },
+      "flatFeatured": true,
+      "light": {
+        "outer": "#e9edf1",
+        "background": "#ffffff",
+        "featured": "#eef2f6",
+        "text": "#44505c",
+        "heading": "#18222d",
+        "link": "#2f5f8a",
+        "accent": "#3b5b7a",
+        "buttonText": "#ffffff"
+      },
+      "dark": {
+        "outer": "#0c1015",
+        "background": "#141a21",
+        "featured": "#1d2631",
+        "text": "#cbd5df",
+        "heading": "#f3f6f9",
+        "link": "#8fbbe3",
+        "accent": "#5b86b0",
+        "buttonText": "#0a1520"
+      }
+    },
+    "sections": [
+      {
+        "id": "header",
+        "type": "header",
+        "settings": {
+          "tagline": "Monthly update",
+          "featured": "off"
+        }
+      },
+      {
+        "id": "hero",
+        "type": "hero",
+        "settings": {
+          "eyebrow": "November",
+          "title": "A month of steady progress",
+          "description": "Two or three sentences that sum up the month. If readers stop here, what should they know?",
+          "featured": "on"
+        }
+      },
+      {
+        "id": "glance",
+        "type": "contents",
+        "settings": {
+          "title": "At a glance",
+          "items": "The headline result this month\nA new customer, partner or hire\nSomething we improved\nWhat's coming up",
+          "featured": "off"
+        }
+      },
+      {
+        "id": "numbers",
+        "type": "columns",
+        "settings": {
+          "leftTitle": "128 new customers",
+          "leftBody": "Say what the number means and how it compares with last month.",
+          "rightTitle": "98% satisfaction",
+          "rightBody": "Pick figures people care about, and keep them honest.",
+          "featured": "off"
+        }
+      },
+      {
+        "id": "story",
+        "type": "text",
+        "settings": {
+          "heading": "What we learned",
+          "body": "One lesson from the month, told plainly. What happened, what you changed, and what it means for readers.",
+          "featured": "off"
+        }
+      },
+      {
+        "id": "next",
+        "type": "text",
+        "settings": {
+          "heading": "What's next",
+          "body": "The one or two things you're focused on next month, and how readers can help or get involved.",
+          "featured": "on"
+        }
+      },
+      {
+        "id": "button",
+        "type": "button",
+        "settings": {
+          "text": "Read the full update",
+          "url": "https://example.com",
+          "featured": "off"
+        }
+      },
+      {
+        "id": "footer",
+        "type": "footer",
+        "settings": {
+          "note": "You're receiving this because you're a customer, partner or friend of the team.",
+          "featured": "on"
+        }
+      }
+    ]
+  }
+}

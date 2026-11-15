@@ -4,6 +4,10 @@
  *
  * The iframe runs no scripts (sandboxed). It shares the app's origin so the editor
  * can listen for clicks and outline the selected section inside it.
+ *
+ * The iframe is as tall as the email and doesn't scroll itself: the canvas around it
+ * scrolls, so the scrollbar sits at the canvas's edge, next to the right-hand panel,
+ * and follows it when the panels are resized.
  */
 
 import { useEffect, useRef, useState } from 'preact/hooks';
@@ -24,6 +28,7 @@ interface Props {
 }
 
 const EDITOR_STYLES = `
+  html, body { overflow: hidden !important; }
   [class*="ms-s-"] { cursor: pointer; }
   [class*="ms-s-"]:hover { outline: 2px dashed rgba(71, 104, 218, .45); outline-offset: -2px; }
 `;
@@ -32,7 +37,8 @@ export function Preview({ document, subject, preheader, scheme, device, selected
   const frame = useRef<HTMLIFrameElement>(null);
   const [html, setHtml] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const scroll = useRef(0);
+  const [height, setHeight] = useState<number | null>(null);
+  const resize = useRef<ResizeObserver | null>(null);
   const ids = useRef(new Map<string, string>());
   const onSelectRef = useRef(onSelect);
   onSelectRef.current = onSelect;
@@ -42,9 +48,8 @@ export function Preview({ document, subject, preheader, scheme, device, selected
     const timer = setTimeout(() => {
       api<RenderedEmail>('/render', 'POST', { document, subject, preheader, scheme })
         .then((rendered) => {
-          scroll.current = frame.current?.contentWindow?.scrollY ?? 0;
           setError(null);
-          setHtml(rendered.html);
+          setHtml(forScheme(rendered.html));
         })
         .catch((e: unknown) => setError(describe(e)));
     }, RENDER_DELAY_MS);
@@ -65,7 +70,19 @@ export function Preview({ document, subject, preheader, scheme, device, selected
     doc.head.append(marker);
     paintSelection(doc, selected);
     doc.getElementById('editor-styles')!.textContent = EDITOR_STYLES;
-    frame.current?.contentWindow?.scrollTo(0, scroll.current);
+
+    // Keep the frame as tall as the email: it changes as images load and as the
+    // panels are resized (which reflows the email).
+    const measure = () => {
+      const el = frame.current;
+      const borders = el ? el.offsetHeight - el.clientHeight : 0; // the phone outline in mobile view
+      setHeight(contentHeight(doc) + borders);
+    };
+    measure();
+    resize.current?.disconnect();
+    resize.current = new ResizeObserver(measure);
+    resize.current.observe(doc.body);
+    for (const image of doc.images) image.addEventListener('load', measure);
 
     doc.addEventListener('click', (event) => {
       const target = event.target as Element | null;
@@ -77,10 +94,17 @@ export function Preview({ document, subject, preheader, scheme, device, selected
     });
   };
 
+  useEffect(() => () => resize.current?.disconnect(), []);
+
   useEffect(() => {
     const doc = frame.current?.contentDocument;
     if (doc) paintSelection(doc, selected);
   }, [selected, html]);
+
+  // Bring a newly selected section into view (choosing it in the outline, or adding one).
+  useEffect(() => {
+    if (selected && frame.current) reveal(frame.current, selected);
+  }, [selected]);
 
   return (
     <div class={`preview preview--${device}`}>
@@ -91,6 +115,8 @@ export function Preview({ document, subject, preheader, scheme, device, selected
           ref={frame}
           title="Email preview"
           class="preview__frame"
+          style={{ colorScheme: scheme, height: height === null ? undefined : `${height}px` }}
+          scrolling="no"
           sandbox="allow-same-origin"
           srcdoc={html}
           onLoad={onLoad}
@@ -100,18 +126,47 @@ export function Preview({ document, subject, preheader, scheme, device, selected
   );
 }
 
+/**
+ * The light email carries its dark palette in an `@media (prefers-color-scheme: dark)`
+ * block, so mail apps in dark mode can switch to it. In the editor that block would follow
+ * the computer's (or MailStudio's) dark mode and cover the light palette being edited, so
+ * it's switched off: the preview always shows the palette chosen under Brand & style.
+ * (The dark preview is rendered with the dark palette directly and has no such block.)
+ */
+export function forScheme(html: string): string {
+  return html.replace(/@media\s*\(\s*prefers-color-scheme\s*:\s*dark\s*\)/gi, '@media not all');
+}
+
 function paintSelection(doc: Document, selected: string | null): void {
   const marker = doc.getElementById('editor-selection');
   if (!marker) return;
   marker.textContent = selected
     ? `.ms-s-${CSS.escape(cssId(selected))} { outline: 3px solid #4768da !important; outline-offset: -3px; }`
     : '';
-  if (selected) {
-    const el = doc.querySelector(`.ms-s-${CSS.escape(cssId(selected))}`);
-    const box = el?.getBoundingClientRect();
-    const view = doc.defaultView;
-    if (box && view && (box.top < 0 || box.bottom > view.innerHeight)) {
-      el!.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
-    }
+}
+
+/** The email's height: the bottom of its content, which (unlike the page's scroll
+ * height) shrinks again when the email gets shorter. */
+function contentHeight(doc: Document): number {
+  const bottoms = [...doc.body.children].map((el) => el.getBoundingClientRect().bottom);
+  return Math.ceil(Math.max(0, ...bottoms));
+}
+
+/** Scroll the canvas just enough to show the selected section. */
+function reveal(frame: HTMLIFrameElement, selected: string): void {
+  const doc = frame.contentDocument;
+  const el = doc?.querySelector(`.ms-s-${CSS.escape(cssId(selected))}`);
+  const canvas = frame.closest('.editor__canvas');
+  if (!el || !canvas) return;
+  const view = canvas.getBoundingClientRect();
+  const top = frame.getBoundingClientRect().top + el.getBoundingClientRect().top;
+  const bottom = top + el.getBoundingClientRect().height;
+  const margin = 24;
+  if (top < view.top + margin) {
+    canvas.scrollBy({ top: top - view.top - margin, behavior: 'smooth' });
+  } else if (bottom > view.bottom - margin) {
+    // Show its bottom, unless it's taller than the view: then show its top.
+    const by = Math.min(bottom - view.bottom + margin, top - view.top - margin);
+    canvas.scrollBy({ top: by, behavior: 'smooth' });
   }
 }
