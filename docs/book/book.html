@@ -122,7 +122,7 @@
     <h1>The MailStudio Book</h1>
     <p class="sub">Install it on your own server, get it ready to send, and write your first email campaign. Step by step, no technical background needed.</p>
   </div>
-  <div class="foot">Version 0.7 · mailstudio.email · MIT licence</div>
+  <div class="foot">Version 0.8 · mailstudio.email · MIT licence</div>
 </section>
 
 <!-- ====================================================================== -->
@@ -144,7 +144,7 @@
   <table>
     <tr><th style="width:28%">Part</th><th>What you'll do</th><th style="width:22%">Time</th></tr>
     <tr><td><strong>1. Install</strong></td><td>Rent a server, point an address at it, run one command.</td><td>20–30 minutes</td></tr>
-    <tr><td><strong>2. Get set up</strong></td><td>Your business details, Amazon SES (which delivers your email), your domain, and permission to send to anyone.</td><td>45 minutes, then up to a day waiting for Amazon</td></tr>
+    <tr><td><strong>2. Get set up</strong></td><td>Your business details, the sending service that delivers your email, your domain, and handling bounces.</td><td>30–45 minutes (with Amazon SES, then up to a day waiting for Amazon)</td></tr>
     <tr><td><strong>3. Everyday use</strong></td><td>Bring in your subscribers, write an email, send it, see how it went.</td><td>Your first email: about 5 minutes</td></tr>
     <tr><td><strong>4. Looking after it</strong></td><td>Updates, backups, and what to do when something goes wrong.</td><td>A few minutes a month</td></tr>
   </table>
@@ -180,8 +180,8 @@
     <ul class="checklist">
       <li><strong>A domain name you control</strong>, such as <code>yourbusiness.com</code>, and the login for wherever its DNS is managed (usually where you bought it: GoDaddy, Crazy Domains, Cloudflare, VentraIP and so on).</li>
       <li><strong>An email address at that domain</strong>, such as <code>news@yourbusiness.com</code>. Your campaigns will come from it. It can't be a Gmail, Outlook or Yahoo address.</li>
-      <li><strong>A credit card</strong> for the server (a few dollars a month) and for Amazon Web Services (about US$0.10 per thousand emails).</li>
-      <li><strong>About an hour</strong>, plus up to a day for Amazon to approve your account for sending.</li>
+      <li><strong>A credit card</strong> for the server (a few dollars a month) and for a sending service: Postmark, Mailgun, SMTP2GO, AuthSMTP or Amazon SES (Chapter 7 helps you choose). What it costs depends on the service and how much you send.</li>
+      <li><strong>About an hour</strong>. If you choose Amazon SES, allow up to a day more for Amazon to approve your account for sending.</li>
       <li><strong>A list of people who agreed to hear from you</strong>, if you have one: a spreadsheet with an email column is fine.</li>
     </ul>
   </div>
@@ -191,17 +191,17 @@
   <table>
     <tr><th style="width:26%">Piece</th><th>What it does</th><th style="width:26%">Where it lives</th></tr>
     <tr><td><strong>MailStudio</strong></td><td>Where you keep your contacts, design emails and press Send. It runs on your server.</td><td>Your server, at e.g. <code>mail.yourbusiness.com</code></td></tr>
-    <tr><td><strong>Amazon SES</strong></td><td>Simple Email Service. It actually delivers the emails, reliably and cheaply. MailStudio hands each email to it.</td><td>Your own AWS account</td></tr>
+    <tr><td><strong>Your sending service</strong></td><td>Postmark, Mailgun, SMTP2GO, AuthSMTP, Amazon SES or another mail server. It actually delivers the emails, and tells MailStudio about bounces and spam reports. MailStudio hands each email to it.</td><td>Your own account with that service</td></tr>
     <tr><td><strong>Your domain's DNS</strong></td><td>The public address book for your domain. You add a few records so the world can find your server and trust your emails.</td><td>Where you manage your domain</td></tr>
   </table>
-  <p>Your server never sends email directly, so it doesn't matter that many hosting companies block email ports. Everything goes through Amazon.</p>
+  <p>Your server never delivers email itself, so it doesn't matter that many hosting companies block the port mail servers use to talk to each other (port 25). Everything goes through your sending service: most are reached over ordinary web connections, and SMTP services over ports 587 or 2525, which hosting companies rarely block.</p>
 
   <h2>Choose your MailStudio address</h2>
   <p>MailStudio needs its own address. A subdomain of your website works best. For example, if your website is <code>yourbusiness.com</code>, use:</p>
   <pre>mail.yourbusiness.com</pre>
   <p>This is where you'll log in, where your signup page lives, and where unsubscribe links point. Your subscribers will see it in links, so keep it tidy. You'll use it in Chapter 3.</p>
 
-  <div class="box tip"><span class="box-title">Tip</span><p>Keep a note open while you work through Parts 1 and 2 and jot down your server's IP address, your MailStudio address, your AWS region and your access key ID. You'll need them more than once.</p></div>
+  <div class="box tip"><span class="box-title">Tip</span><p>Keep a note open while you work through Parts 1 and 2 and jot down your server's IP address, your MailStudio address, and which sending service you chose (with Amazon SES, your AWS region too). You'll need them more than once.</p></div>
 </section>
 
 <section class="chapter" data-toc="Rent a server">
@@ -363,7 +363,7 @@ MailStudio is installed.
 <section class="part" data-toc-part="Part 2 · Get set up">
   <div class="kicker">Part 2</div>
   <h1>Get set up</h1>
-  <p>Seven steps in the app's Get set up guide. Each one ticks itself off once it's really working, and the bar at the top shows how many are left.</p>
+  <p>Six steps in the app's Get set up guide (seven with Amazon SES). Each one ticks itself off once it's really working, and the bar at the top shows how many are left.</p>
 </section>
 
 <section class="chapter" data-toc="The setup guide, and your business details">
@@ -383,27 +383,76 @@ MailStudio is installed.
     <li><strong>From name:</strong> what people see in their inbox, usually your business name.</li>
     <li><strong>From address:</strong> an address at your own domain, e.g. <code>news@yourbusiness.com</code>.</li>
     <li><strong>Replies go to</strong> (optional): if replies should go somewhere else, like <code>hello@yourbusiness.com</code>.</li>
-    <li><strong>Emails per second:</strong> leave it at 10 for now. New Amazon accounts allow 14 per second.</li>
+    <li><strong>Emails per second:</strong> leave it at 10 unless your sending service's plan allows less. (New Amazon SES accounts allow 14 per second.)</li>
   </ul>
-  <div class="box warn"><span class="box-title">Watch out</span><p>The from address must be at a domain you control: Amazon will only send from a domain you've proved is yours (Chapter 8). Gmail, Outlook and Yahoo addresses won't work. The address should be able to receive replies, so set up the mailbox (or a forwarder) with your email provider too.</p></div>
+  <div class="box warn"><span class="box-title">Watch out</span><p>The from address must be at a domain you control: sending services only send from a domain you've proved is yours (Chapter 8). Gmail, Outlook and Yahoo addresses won't work. The address should be able to receive replies, so set up the mailbox (or a forwarder) with your email provider too.</p></div>
 </section>
 
-<section class="chapter" data-toc="Connect Amazon SES">
+<section class="chapter" data-toc="Choose how your emails are sent">
   <header>
     <div class="kicker">Chapter 7</div>
-    <h1>Connect Amazon SES</h1>
-    <p class="lead">Amazon Simple Email Service delivers your emails. You'll create a user in your AWS account that's allowed to send email and nothing else, and give MailStudio its keys.</p>
+    <h1>Choose how your emails are sent</h1>
+    <p class="lead">A sending service delivers your emails and reports back on bounces and spam complaints. You sign up with one, give MailStudio its key or login, and MailStudio checks the connection.</p>
   </header>
 
+  <figure><img src="img/provider-chooser.png"><figcaption>Step 3 in Get set up (also under Settings → Sending service). Pick a service and its form and instructions appear underneath.</figcaption></figure>
+
+  <h2>Which one?</h2>
+  <p>If you already have an account with one of these, use it. Otherwise, these notes help you pick. You can change later: your contacts, campaigns and reports stay as they are.</p>
+  <table>
+    <tr><th style="width:22%">Service</th><th>Good for</th><th style="width:30%">Setup</th></tr>
+    <tr><td><strong>Postmark</strong></td><td>Excellent delivery and helpful support. Newsletters go through a separate “Broadcasts” stream.</td><td>Quick, though Postmark approves new accounts before they can email anyone.</td></tr>
+    <tr><td><strong>Mailgun</strong></td><td>Popular and flexible, with US or EU data storage.</td><td>Quick.</td></tr>
+    <tr><td><strong>SMTP2GO</strong></td><td>Fast signup and a simple dashboard.</td><td>Quick.</td></tr>
+    <tr><td><strong>AuthSMTP</strong></td><td>A long-running SMTP relay. Bounces arrive in a mailbox that MailStudio reads.</td><td>Quick, plus a bounce mailbox.</td></tr>
+    <tr><td><strong>Amazon SES</strong></td><td>The cheapest at volume.</td><td>The most work: an AWS account, a user with permissions, and a request to leave the “sandbox”.</td></tr>
+    <tr><td><strong>Other SMTP server</strong></td><td>Any service or mail server that accepts SMTP logins.</td><td>Depends on the service, plus a bounce mailbox.</td></tr>
+  </table>
+
+  <div class="box tip"><span class="box-title">Tip</span><p>Every form has a <span class="ui">Where to find these</span> panel with the steps for that service, and links straight to its dashboard. Dashboards change from time to time; if a menu name below doesn't match, look for the nearest thing to it.</p></div>
+
+  <h2>Postmark</h2>
+  <ol class="steps">
+    <li><strong>Create a server</strong> in Postmark (or open yours).</li>
+    <li><strong>Add a Broadcasts stream.</strong> Newsletters must go through one. Under <span class="ui">Message Streams</span>, add a Broadcasts stream if the server doesn't have one. Its ID is usually <code>broadcast</code>.</li>
+    <li><strong>Copy the Server API token</strong> from the server's <span class="ui">API Tokens</span> tab.</li>
+    <li><strong>In MailStudio,</strong> choose <span class="ui">Postmark</span>, paste the token, check the Broadcast stream ID, and choose <span class="ui">Save and check</span>.</li>
+  </ol>
+  <p>Postmark adds its own unsubscribe link to broadcasts as well as MailStudio's, until its support team switches that off for your stream on request. Once they have, tick <span class="ui">Postmark lets me manage unsubscribes myself</span>. Either way, people who unsubscribe through Postmark's link are unsubscribed in MailStudio too (Chapter 9).</p>
+
+  <h2>Mailgun</h2>
+  <ol class="steps">
+    <li><strong>Add your sending domain</strong> under <span class="ui">Sending → Domains</span>, and add the DNS records Mailgun shows (Chapter 8).</li>
+    <li><strong>Create an API key</strong> under <span class="ui">API Security</span>, and copy the <strong>HTTP webhook signing key</strong> from the same page.</li>
+    <li><strong>In MailStudio,</strong> choose <span class="ui">Mailgun</span>, paste both keys, enter the sending domain exactly as Mailgun lists it, choose <span class="ui">EU</span> if your Mailgun account is in its EU region, and choose <span class="ui">Save and check</span>.</li>
+  </ol>
+
+  <h2>SMTP2GO</h2>
+  <ol class="steps">
+    <li><strong>Verify your sending domain</strong> under <span class="ui">Sending → Verified Senders</span> (Chapter 8).</li>
+    <li><strong>Create an API key</strong> under <span class="ui">Sending → API Keys</span>. Let it send email (MIME) and read stats.</li>
+    <li><strong>In MailStudio,</strong> choose <span class="ui">SMTP2GO</span>, paste the key, and choose <span class="ui">Save and check</span>.</li>
+  </ol>
+
+  <h2>AuthSMTP, or another SMTP server</h2>
+  <ol class="steps">
+    <li><strong>Enter the SMTP server, port, username and password.</strong> For AuthSMTP these are in its welcome email, and MailStudio fills in <code>mail.authsmtp.com</code> and port 2525, which gets through most firewalls. Leave <span class="ui">Security</span> on <span class="ui">STARTTLS</span> for ports 587 and 2525, or choose <span class="ui">TLS</span> for port 465.</li>
+    <li><strong>Choose a bounce address</strong>, a mailbox used only for bounce reports, such as <code>bounces@yourbusiness.com</code>, and enter its IMAP login (the details your email provider gives for mail apps). SMTP can't report bounces directly, so they go to this mailbox, and MailStudio reads it every five minutes.</li>
+    <li><strong>With AuthSMTP,</strong> authorise both your from address and the bounce address in the AuthSMTP control panel. It refuses mail from addresses it doesn't know.</li>
+    <li><strong>Choose</strong> <span class="ui">Save and check</span>.</li>
+  </ol>
+
+  <h2>Amazon SES</h2>
+  <p>Amazon Simple Email Service needs the most setup: you'll create a user in your AWS account that's allowed to send email and nothing else, give MailStudio its keys, and later ask Amazon to let you send to anyone (Chapter 10).</p>
   <div class="box need"><span class="box-title">You'll need</span><p>An Amazon Web Services account. If you don't have one, create it at <code>aws.amazon.com</code> (it asks for a card and a phone number). Then sign in to the AWS console.</p></div>
 
-  <h2>Choose your region</h2>
-  <p>At the top right of the AWS console is a region menu. Pick the one nearest your subscribers, for example <span class="ui">Asia Pacific (Sydney) ap-southeast-2</span>, and stay in it for every step in this part. Amazon SES settings are separate in each region.</p>
+  <h3>Choose your region</h3>
+  <p>At the top right of the AWS console is a region menu. Pick the one nearest your subscribers, for example <span class="ui">Asia Pacific (Sydney) ap-southeast-2</span>, and stay in it for every Amazon step in this part. Amazon SES settings are separate in each region.</p>
 
-  <h2>Create a user for MailStudio</h2>
-  <figure><img src="img/ses-guide.png"><figcaption>Step 3 in the app shows these instructions, with the permissions ready to copy.</figcaption></figure>
+  <h3>Create a user for MailStudio</h3>
+  <figure><img src="img/ses-guide.png"><figcaption>Choosing Amazon SES shows these instructions, with the permissions ready to copy.</figcaption></figure>
   <ol class="steps">
-    <li><strong>Copy the permissions.</strong> In MailStudio's step 3, choose <span class="ui">Copy policy</span>. (It's also printed in Appendix C.)</li>
+    <li><strong>Copy the permissions.</strong> In MailStudio, choose <span class="ui">Copy policy</span>. (It's also printed in Appendix C.)</li>
     <li><strong>Open IAM.</strong> In the AWS console, search for <span class="ui">IAM</span> and open it, then choose <span class="ui">Users → Create user</span>.</li>
     <li><strong>Name it</strong> <code>mailstudio</code>. Leave <span class="ui">Provide user access to the AWS Management Console</span> unticked: this user is only for MailStudio. Choose <span class="ui">Next</span>.</li>
     <li><strong>Add the permissions.</strong> Choose <span class="ui">Attach policies directly</span>, then <span class="ui">Create policy</span>. A new tab opens. Choose <span class="ui">JSON</span>, delete what's there, paste the policy, choose <span class="ui">Next</span>, name it <code>MailStudio</code> and choose <span class="ui">Create policy</span>.</li>
@@ -412,7 +461,7 @@ MailStudio is installed.
     <li><strong>Copy both keys</strong>: the <strong>Access key ID</strong> (starts with <code>AKIA</code>) and the <strong>Secret access key</strong>. The secret is shown only once; if you lose it, delete the key and make another.</li>
   </ol>
 
-  <h2>Enter them in MailStudio</h2>
+  <h3>Enter them in MailStudio</h3>
   <ol class="steps">
     <li><strong>Choose the same region</strong> in the <span class="ui">Region</span> menu.</li>
     <li><strong>Paste the Access key ID and Secret access key.</strong></li>
@@ -421,20 +470,31 @@ MailStudio is installed.
   <figure class="half"><img src="img/ses-card.png"><figcaption>The Amazon SES form. Once saved, the secret is never shown again; type in it only to replace it.</figcaption></figure>
   <p>You'll almost certainly see “<em>Your SES account is in the sandbox</em>”. That's normal for every new account, and Chapter 10 deals with it.</p>
 
-  <div class="box stop"><span class="box-title">Keep the keys secret</span><p>Anyone with these keys can send email as you. Don't email them or put them in a shared document. If they leak, delete the access key in IAM straight away, create a new one, and paste it into MailStudio.</p></div>
+  <h2>When it's connected</h2>
+  <p><span class="ui">Save and check</span> shows a green message when MailStudio could log in, or says what went wrong, usually a key pasted with a space at the end or the wrong region. Step 3 then ticks itself off.</p>
+  <div class="box stop"><span class="box-title">Keep keys and passwords secret</span><p>Anyone with them can send email as you. Don't email them or put them in a shared document. Once saved, MailStudio never shows them again. If one leaks, delete it in the service's dashboard straight away, create a new one, and paste it into MailStudio.</p></div>
 </section>
 
 <section class="chapter" data-toc="Prove your emails are really from you">
   <header>
     <div class="kicker">Chapter 8</div>
     <h1>Prove your emails are really from you</h1>
-    <p class="lead">Inboxes trust email that's cryptographically signed by the domain it claims to come from. You'll add four records to your domain's DNS, and MailStudio checks each one for you.</p>
+    <p class="lead">Inboxes trust email that's cryptographically signed by the domain it claims to come from. You'll add a few records to your domain's DNS, and MailStudio checks them for you.</p>
   </header>
 
+  <p>Two kinds of record matter. <strong>DKIM</strong> records let your sending service sign your emails on your domain's behalf; each service gives you its own. One <strong>DMARC</strong> record tells inboxes what to do with email that claims to be from you but isn't signed; Gmail and Yahoo require one from bulk senders. Open step 4 (or <span class="ui">Settings → Sending domain</span>): the domain from your from address is already filled in.</p>
+
+  <h2>With Postmark, Mailgun, SMTP2GO, AuthSMTP or another SMTP service</h2>
   <ol class="steps">
-    <li><strong>Open step 4</strong> (or <span class="ui">Settings → Sending domain</span>). The domain from your from address is already filled in.</li>
+    <li><strong>Add your domain in the service's dashboard</strong>, as step 4 describes for your service (for example <span class="ui">Sender Signatures → Domains</span> in Postmark, or <span class="ui">Sending → Domains</span> in Mailgun). It shows the DKIM records to add, and sometimes a Return-Path or SPF record.</li>
+    <li><strong>Add each record</strong> at your DNS provider, the same way you added the A record in Chapter 3, and let the service verify them. The service checks its own records.</li>
+    <li><strong>Add the DMARC record</strong> that MailStudio shows, if your domain doesn't have one yet, and choose <span class="ui">Check again</span>. Step 4 ticks itself off once DMARC is found and nothing is wrong with SPF.</li>
+  </ol>
+
+  <h2>With Amazon SES</h2>
+  <ol class="steps">
     <li><strong>Choose</strong> <span class="ui">Set up</span>. MailStudio registers the domain with Amazon and lists the records to add.</li>
-    <li><strong>Add each record</strong> at your DNS provider, the same way you added the A record in Chapter 3. Each one has a <span class="ui">Copy</span> button for the name and the value.</li>
+    <li><strong>Add each record</strong> at your DNS provider. Each one has a <span class="ui">Copy</span> button for the name and the value.</li>
     <li><strong>Choose</strong> <span class="ui">Check again</span> after a few minutes. Each record shows <span class="ui">✓ Found</span> when it's right. Amazon then verifies the domain, which can take up to an hour or so after the records appear.</li>
   </ol>
   <figure><img src="img/domain-card.png"><figcaption>The sending domain step. After Set up, a table of records appears here, each with Copy buttons and its status.</figcaption></figure>
@@ -442,40 +502,55 @@ MailStudio is installed.
   <h2>The records you'll add</h2>
   <table>
     <tr><th style="width:12%">Type</th><th style="width:44%">Name (host)</th><th>Why</th></tr>
-    <tr><td>CNAME ×3</td><td><code>xxxx._domainkey.yourbusiness.com</code><br><span class="small">three different, long codes</span></td><td><strong>DKIM.</strong> Lets Amazon sign your emails on your domain's behalf. Each points to a value ending in <code>.dkim.amazonses.com</code>.</td></tr>
+    <tr><td>CNAME or TXT</td><td><code>xxxx._domainkey.yourbusiness.com</code><br><span class="small">one to three, with long codes</span></td><td><strong>DKIM.</strong> Your sending service signs your emails with it. Amazon SES uses three CNAMEs pointing to values ending in <code>.dkim.amazonses.com</code>; other services show theirs in their dashboard.</td></tr>
     <tr><td>TXT</td><td><code>_dmarc.yourbusiness.com</code></td><td><strong>DMARC.</strong> Required by Gmail and Yahoo for bulk senders. MailStudio suggests <code>v=DMARC1; p=none; rua=mailto:dmarc@yourbusiness.com</code>, which asks for reports without blocking anything.</td></tr>
+    <tr><td>TXT</td><td><code>yourbusiness.com</code></td><td><strong>SPF</strong>, only if your service asks for it. Your domain may have just one SPF record, so add the service's part to the one you have rather than adding a second.</td></tr>
   </table>
 
   <div class="box warn"><span class="box-title">The most common mistake</span><p>Many DNS providers add your domain to the end of the name automatically. If yours does, enter only the part before <code>.yourbusiness.com</code>, e.g. <code>abc123._domainkey</code>, otherwise you end up with <code>abc123._domainkey.yourbusiness.com.yourbusiness.com</code> and the check stays at “Missing”. If you're unsure, add it one way and press Check again.</p></div>
 
-  <div class="box tip"><span class="box-title">Already have a DMARC record?</span><p>If <code>_dmarc</code> already exists (perhaps your email provider set one up), keep it and don't add a second: a domain may only have one. MailStudio shows it as found. SPF needs no change for Amazon SES; MailStudio only warns if your domain has two SPF records, which breaks SPF for all your email.</p></div>
+  <div class="box tip"><span class="box-title">Already have a DMARC or SPF record?</span><p>If <code>_dmarc</code> already exists (perhaps your email provider set one up), keep it and don't add a second: a domain may only have one. MailStudio shows it as found. MailStudio also warns if your domain has two SPF records, which breaks SPF for all your email; merge them into one.</p></div>
 </section>
 
 <section class="chapter" data-toc="Bounces and spam reports">
   <header>
     <div class="kicker">Chapter 9</div>
     <h1>Bounces and spam reports</h1>
-    <p class="lead">When an address doesn't exist, or someone marks your email as spam, Amazon tells MailStudio, and that address is never emailed again. One button sets this up.</p>
+    <p class="lead">When an address doesn't exist, or someone marks your email as spam, your sending service tells MailStudio, and that address is never emailed again. Step 5 sets this up.</p>
   </header>
 
+  <h2>Postmark, Mailgun and SMTP2GO: a webhook</h2>
+  <p>These services report bounces by calling a private address on your MailStudio, called a <em>webhook</em>. Step 5 shows the address with a <span class="ui">Copy</span> button, and the steps for your service:</p>
+  <table>
+    <tr><th style="width:18%">Service</th><th>Where to add it, and which events to tick</th></tr>
+    <tr><td>Postmark</td><td>Your server → your Broadcasts stream → <span class="ui">Webhooks → Add webhook</span>. Tick <span class="ui">Bounce</span>, <span class="ui">Spam complaint</span> and <span class="ui">Subscription change</span>, save, then use <span class="ui">Send test</span>.</td></tr>
+    <tr><td>Mailgun</td><td><span class="ui">Sending → Webhooks</span>, for your sending domain. Add the address for permanent failure, temporary failure, spam complaints and unsubscribes. With the signing key saved in MailStudio (Chapter 7), use <span class="ui">Test webhook</span>.</td></tr>
+    <tr><td>SMTP2GO</td><td><span class="ui">Settings → Webhooks → Add webhook</span>. Choose the bounce, spam and unsubscribe events, and save. It shows as working when the first event arrives, for example after a test campaign.</td></tr>
+  </table>
+  <p>Step 5 turns to <span class="ui">Working</span> as soon as MailStudio receives a report. Choose <span class="ui">Check again</span> to look.</p>
+  <div class="box warn"><span class="box-title">Keep the webhook address private</span><p>Anyone who has it can report addresses as bounced. It only works on MailStudio's secure https:// address, which the installer sets up.</p></div>
+
+  <h2>AuthSMTP and other SMTP servers: a bounce mailbox</h2>
+  <p>The bounce address and its mailbox login were entered in Chapter 7. MailStudio checks that mailbox every five minutes, handles bounce and spam reports, marks them as read, and leaves any other email alone. Step 5 shows when it last checked and how many reports it handled, or why it couldn't get in.</p>
+
+  <h2>Amazon SES: one button</h2>
   <ol class="steps">
     <li><strong>Open step 5</strong> and choose <span class="ui">Set it up for me</span>.</li>
     <li><strong>Wait a few seconds.</strong> MailStudio creates a notification topic and a configuration set, both named <code>mailstudio</code>, in your AWS account, and connects them to your server. Amazon then sends a confirmation message, which MailStudio accepts by itself.</li>
     <li><strong>Check it says</strong> <span class="ui">Set up and working</span>. If it says it's waiting for Amazon, choose <span class="ui">Check again</span> in a minute.</li>
   </ol>
-  <figure class="half"><img src="img/notifications-card.png"><figcaption>Bounces and spam reports. The button needs SES connected and MailStudio on its https:// address.</figcaption></figure>
+  <figure class="half"><img src="img/notifications-card.png"><figcaption>Bounces and spam reports with Amazon SES. The button needs SES connected and MailStudio on its https:// address.</figcaption></figure>
+  <div class="box warn"><span class="box-title">If it says “Access denied”</span><p>The <code>mailstudio</code> user is missing a permission. Open the <code>MailStudio</code> policy in IAM, choose <span class="ui">Edit → JSON</span>, replace it with the current one from step 3, save, and try again.</p></div>
 
   <h2>Why this matters</h2>
-  <p>Amazon watches your <strong>bounce rate</strong> (emails to addresses that don't exist) and <strong>complaint rate</strong> (people pressing “Report spam”). If they climb too high, around 5% bounces or 0.1% complaints, Amazon reviews and can pause your account. Stopping at once when an address bounces or complains keeps you well clear. Every campaign report shows both rates, in red if they're getting risky.</p>
-
-  <div class="box warn"><span class="box-title">If it says “Access denied”</span><p>The <code>mailstudio</code> user is missing a permission. Open the <code>MailStudio</code> policy in IAM, choose <span class="ui">Edit → JSON</span>, replace it with the current one from step 3, save, and try again.</p></div>
+  <p>Every sending service watches your <strong>bounce rate</strong> (emails to addresses that don't exist) and <strong>complaint rate</strong> (people pressing “Report spam”). If they climb too high, around 5% bounces or 0.1% complaints, the service can review or pause your account. Stopping at once when an address bounces or complains keeps you well clear. Every campaign report shows both rates, in red if they're getting risky.</p>
 </section>
 
 <section class="chapter" data-toc="Ask Amazon to let you send to anyone">
   <header>
     <div class="kicker">Chapter 10</div>
     <h1>Ask Amazon to let you send to anyone</h1>
-    <p class="lead">Every new SES account starts in a “sandbox” where it can only send to addresses it has verified. A short form lifts that, usually within a day.</p>
+    <p class="lead">Amazon SES only. Every new SES account starts in a “sandbox” where it can only send to addresses it has verified. A short form lifts that, usually within a day.</p>
   </header>
 
   <ol class="steps">
@@ -485,10 +560,12 @@ MailStudio is installed.
     <li><strong>Use case description:</strong> describe honestly how you collect addresses and send. For example:
       <div class="box need"><p><em>“We are a bakery in Fremantle. We email a monthly newsletter to customers who signed up on our website or in our shop. Website signups confirm their address by email before they're added. Every email has a one-click unsubscribe link and our postal address. Bounces and complaints are handled automatically through SNS notifications, and those addresses are never emailed again. We expect to send about 2,000 emails a month.”</em></p></div>
     </li>
-    <li><strong>Submit</strong> and wait. Amazon replies by email, usually within 24 hours. Step 6 in MailStudio ticks itself once it's approved.</li>
+    <li><strong>Submit</strong> and wait. Amazon replies by email, usually within 24 hours. Step 6 in MailStudio ticks itself off once it's approved.</li>
   </ol>
 
   <div class="box tip"><span class="box-title">Testing while you wait</span><p>You can still send test emails while in the sandbox, to addresses Amazon has verified. Once your domain is verified (Chapter 8), any address at that domain counts, so send tests to yourself at <code>you@yourbusiness.com</code>. To test with another address, such as your Gmail, add it in SES under <span class="ui">Identities → Create identity → Email address</span> and click the link Amazon sends.</p></div>
+
+  <div class="box tip"><span class="box-title">Using another service?</span><p>This step doesn't appear in Get set up, and you can skip this chapter. Some services review new accounts in their own way (Postmark, for example, approves accounts before they can email anyone); their dashboard tells you what they need.</p></div>
 
   <div class="box warn"><span class="box-title">If Amazon says no</span><p>They usually want more detail. Reply explaining how people sign up, how you handle unsubscribes, bounces and complaints, and roughly how much you'll send. Mention that you only email people who asked to hear from you.</p></div>
 </section>
@@ -507,7 +584,7 @@ MailStudio is installed.
     <p class="lead">A contact is a person. A list is a group of people who agreed to get a particular kind of email from you. Most businesses need just one list, such as “Newsletter”.</p>
   </header>
 
-  <div class="box stop"><span class="box-title">Only email people who asked</span><p>Never import a bought list, people from a business card pile, or customers who weren't told they'd get marketing email. It's against the law in most countries, Amazon will suspend your account for it, and it ruins how well your emails get delivered to everyone else. MailStudio asks how each person agreed, and keeps the answer.</p></div>
+  <div class="box stop"><span class="box-title">Only email people who asked</span><p>Never import a bought list, people from a business card pile, or customers who weren't told they'd get marketing email. It's against the law in most countries, sending services suspend accounts for it, and it ruins how well your emails get delivered to everyone else. MailStudio asks how each person agreed, and keeps the answer.</p></div>
 
   <h2>Create a list</h2>
   <p>Choose <span class="ui">Lists → New list</span>, give it a name (subscribers may see it, e.g. in confirmation emails) and, if you like, a description for yourself.</p>
@@ -564,25 +641,59 @@ MailStudio is installed.
     <li><strong>The form for your website:</strong> choose <span class="ui">Copy HTML</span> and paste it into your website where the form should appear. On most website builders that's an “HTML”, “Embed” or “Custom code” block. It's plain HTML, so it can be styled to match your site. Keep the hidden <code>website</code> field: it catches spam bots.</li>
   </ul>
   <p>People waiting to confirm appear on the list's <span class="ui">Waiting for confirmation</span> tab. They aren't emailed until they confirm, and confirmation links expire after 14 days.</p>
-  <div class="box warn"><span class="box-title">Watch out</span><p>Confirmation emails are sent through Amazon SES. Until your account leaves the sandbox (Chapter 10), they only reach verified addresses, so test the form with your own address at your domain.</p></div>
+  <div class="box warn"><span class="box-title">Watch out</span><p>Confirmation emails go out through your sending service, so it must be connected (Chapter 7). With Amazon SES, until your account leaves the sandbox (Chapter 10) they only reach verified addresses, so test the form with your own address at your domain.</p></div>
 </section>
 
 <section class="chapter" data-toc="Write an email">
   <header>
     <div class="kicker">Chapter 13</div>
     <h1>Write an email</h1>
-    <p class="lead">Emails are built from sections, like a header, a feature, some text and a button. Change the words and pictures, rearrange them, and see exactly what your readers will get.</p>
+    <p class="lead">Emails are built from sections, like a header, a feature, some text and a button. Start from a template, change the words and pictures, rearrange the sections, and see exactly what your readers will get.</p>
   </header>
 
+  <h2>Start from a template</h2>
   <ol class="steps">
-    <li><strong>Choose</strong> <span class="ui">Campaigns → New campaign</span>. A starter email opens in the editor, already in your brand.</li>
+    <li><strong>Choose</strong> <span class="ui">Campaigns → New campaign</span>. The template picker opens. Every card is a live preview, already showing your logo and business details.</li>
+    <li><strong>Narrow it down</strong> with the <span class="ui">All kinds</span> menu: newsletters, sales and offers, events, announcements, welcome emails and more.</li>
+    <li><strong>Choose whose colours to start with:</strong> <span class="ui">Template colours</span>, or <span class="ui">My brand colours</span> from your default brand. The template's fonts and shape are used either way. <span class="ui">Light</span> and <span class="ui">Dark</span> show how each one looks in a mail app's dark mode.</li>
+    <li><strong>Click a template</strong>, then choose <span class="ui">Use …</span> (or double-click it). It opens in the editor with a subject line, preview text and placeholder words that explain what to write where.</li>
+  </ol>
+  <figure><img src="img/template-picker.png"><figcaption>The template picker. Blank starts with a headline, some text, a button and your footer, in your brand.</figcaption></figure>
+  <p>Anything in a template can be changed: words, sections, colours and fonts. MailStudio comes with sixteen templates, and more are published at <code>mailstudio.email</code>. Where the gallery is available, the <span class="ui">mailstudio.email gallery</span> tab shows them. If someone sends you a template file, choose <span class="ui">Open a template file…</span>.</p>
+
+  <h2>The editor</h2>
+  <ol class="steps">
     <li><strong>Choose “Email details”</strong> (top left) and write the <strong>subject line</strong> and <strong>preview text</strong>, the short line most inboxes show after the subject.</li>
     <li><strong>Click any part of the email</strong> in the middle to select it. Its settings open on the right: change the words, links and pictures there.</li>
     <li><strong>Add sections</strong> from <span class="ui">Add a section</span> at the bottom left. A new section goes below the selected one. Drag sections in the list to reorder them, or use <span class="ui">Up</span>, <span class="ui">Down</span>, <span class="ui">Duplicate</span> and <span class="ui">Delete</span>.</li>
-    <li><strong>Check it</strong> with <span class="ui">Mobile</span> at the top right: most people read email on a phone. To see how it looks in dark mode, choose <span class="ui">Brand &amp; style</span> and then <span class="ui">Dark mode</span> under Colours. (<span class="ui">Light</span> and <span class="ui">Dark</span> at the top right switch MailStudio itself between light and dark.)</li>
+    <li><strong>Check it</strong> with <span class="ui">Mobile</span> at the top right: most people read email on a phone. To see the dark mode colours, choose <span class="ui">Brand &amp; style</span> and then <span class="ui">Dark mode</span> under Colours.</li>
   </ol>
   <figure><img src="img/ed-4-reloaded.png"><figcaption>The editor: sections on the left, the email in the middle, settings on the right. Changes save by themselves.</figcaption></figure>
-  <div class="box tip"><span class="box-title">Tip</span><p>Drag the thin bars either side of the email to make the side panels wider or narrower (double-click one to put it back); MailStudio remembers your widths. The logo and the menu along the top take you anywhere else in the app, and save your changes first.</p></div>
+  <div class="box tip"><span class="box-title">Tip</span><p>Drag the thin bars either side of the email to make the side panels wider or narrower. Each panel's width shows while you drag; double-click a bar to put it back. MailStudio remembers your widths. The ☾ / ☀ button next to your name switches MailStudio itself between light and dark; it doesn't change the email.</p></div>
+
+  <h2>The sections</h2>
+  <table>
+    <tr><th style="width:24%">Section</th><th>What it's for</th></tr>
+    <tr><td><strong>Header</strong></td><td>Your logo or business name, with an optional tagline. Or a header image, which <span class="ui">Stretch to edges</span> spreads across the whole header.</td></tr>
+    <tr><td><strong>Feature</strong></td><td>A big headline with a short line above it and an introduction underneath.</td></tr>
+    <tr><td><strong>Hero image</strong></td><td>A large photo with a headline, text and a button on top of it.</td></tr>
+    <tr><td><strong>Text</strong></td><td>A heading and paragraphs.</td></tr>
+    <tr><td><strong>Image</strong></td><td>One picture, optionally a link.</td></tr>
+    <tr><td><strong>Image + Text</strong></td><td>A picture beside some text, on the left or the right. On phones they stack.</td></tr>
+    <tr><td><strong>Button</strong></td><td>A single call to action.</td></tr>
+    <tr><td><strong>Product cards</strong></td><td>Two or three products, each with a picture, name, a line of text, a price and a button.</td></tr>
+    <tr><td><strong>Offer</strong></td><td>A promotion, with an optional discount code shown so it's easy to copy.</td></tr>
+    <tr><td><strong>Event</strong></td><td>The date, time and place (with a map link), a description and an RSVP button.</td></tr>
+    <tr><td><strong>Video</strong></td><td>A YouTube or Vimeo link shown as a picture with a play button. Email can't play video, so it opens the video in the browser. A YouTube thumbnail is found automatically.</td></tr>
+    <tr><td><strong>Two Columns</strong></td><td>Two short blocks of text side by side, stacked on phones.</td></tr>
+    <tr><td><strong>Contents</strong></td><td>A short list, such as what's in this issue.</td></tr>
+    <tr><td><strong>Quote</strong></td><td>A testimonial or quote, with who said it.</td></tr>
+    <tr><td><strong>Social Links</strong></td><td>Icons for your website and social media, in each network's colour, your accent or heading colour, or a colour of your own.</td></tr>
+    <tr><td><strong>Divider</strong>, <strong>Spacer</strong></td><td>A line, or some space, between sections.</td></tr>
+    <tr><td><strong>Unsubscribe</strong></td><td>A message with the unsubscribe link, if you want it somewhere particular.</td></tr>
+    <tr><td><strong>Footer</strong></td><td>Your business name, postal address and a note about why people get your emails.</td></tr>
+  </table>
+  <p>Every section has a <span class="ui">Feature background</span> tick-box, which gives it the feature colour from Brand &amp; style. Two featured sections next to each other join into one coloured block.</p>
 
   <h2>Words</h2>
   <p>Text boxes understand a little formatting, written as plain characters:</p>
@@ -597,15 +708,29 @@ MailStudio is installed.
   <p><strong>Personal details:</strong> the <span class="ui">Insert personal detail…</span> menu above a text box adds the reader's first name, last name or email. <code>{{first_name|there}}</code> means “their first name, or ‘there’ if we don't know it”, so “Hi {{first_name|there}}” becomes “Hi Ada” or “Hi there”.</p>
 
   <h2>Pictures</h2>
-  <p>In an image setting, choose <span class="ui">Upload…</span> and pick a photo, or paste the address of an image already online. Uploads are resized and compressed for email automatically. Always fill in the <strong>description</strong>: it's shown when pictures are switched off, and read aloud to blind readers.</p>
+  <p>In an image setting, choose <span class="ui">Upload…</span> and pick a photo, or paste the address of an image already online. Uploads are resized and compressed for email automatically. Always fill in the <strong>description</strong>: it's shown when pictures are switched off, and read aloud to blind readers. Say what the picture shows (“Fresh loaves on the counter”), not “photo” or a file name.</p>
+  <p>Image, Hero image, Image + Text and Video sections have a <span class="ui">to the edges</span> tick-box that pushes the picture right to the edges of the email, with no space around it. Pictures keep their shape and are never stretched. In the Header, <span class="ui">Stretch to edges</span> does the same for a header image.</p>
+  <div class="box tip"><span class="box-title">MailStudio checks your pictures</span><p>Before you send, MailStudio looks at every picture and suggests fixes: a missing or vague description, a picture too small to look sharp on modern screens, files slow to load on mobile data, plain <code>http</code> addresses, or an email that's mostly pictures (spam filters distrust those). Pictures readers couldn't load at all, such as one deleted since, stop the email from being sent until they're fixed. You'll see all of this on the send page (Chapter 14).</p></div>
 
   <h2>Your brand</h2>
-  <p>Choose <span class="ui">Brand &amp; style</span> (top left) to set your logo, colours, fonts and spacing, or apply one of the three styles: <span class="ui">Modern</span>, <span class="ui">Editorial</span> or <span class="ui">Minimal</span>. Any section can have the feature background colour: select it and tick <span class="ui">Feature background</span> in its settings (Feature, Offer, Image + Text and Footer start with it on). Under Colours, <span class="ui">Light</span> and <span class="ui">Dark mode</span> choose which palette you're editing, and the preview shows that palette. <span class="ui">Dark mode</span> colours are used by mail apps like Apple Mail and Outlook when the reader has dark mode on. When it looks right, choose <span class="ui">Use as default brand</span> so every new campaign starts with it.</p>
+  <p>Choose <span class="ui">Brand &amp; style</span> (top left) to set how the email looks:</p>
+  <ul>
+    <li><strong>Style:</strong> <span class="ui">Modern</span>, <span class="ui">Editorial</span> or <span class="ui">Minimal</span> changes fonts, spacing, corners and feature backgrounds in one go. Your colours and logo stay.</li>
+    <li><strong>Logo:</strong> shown in Header sections that don't have their own image.</li>
+    <li><strong>Colours:</strong> <span class="ui">Light</span> and <span class="ui">Dark mode</span> choose which palette you're editing, and the preview shows that palette. Dark mode colours are used by mail apps like Apple Mail and Outlook when the reader has dark mode on; Gmail uses its own. Untick <span class="ui">Feature backgrounds</span> to give every section the email's own background.</li>
+    <li><strong>Fonts</strong> for headings, body text and small text, and whether button text is bold or italic.</li>
+    <li><strong>Web version:</strong> a small <span class="ui">View in browser</span> link above the email, for readers whose mail app shows it badly. Each reader sees their own copy.</li>
+    <li><strong>Layout:</strong> the email's width, side padding, corner radius and text size.</li>
+  </ul>
+  <p>When it looks right, choose <span class="ui">Use as default brand</span> so every new campaign, and the <span class="ui">My brand colours</span> choice in the template picker, starts with it.</p>
   <div class="two">
     <figure><img src="img/ed-3-mobile.png"><figcaption>Mobile preview.</figcaption></figure>
     <figure><img src="img/ed-2-dark.png"><figcaption>Dark mode preview and the Brand &amp; style panel.</figcaption></figure>
   </div>
   <p>Every email automatically gets your postal address and a working unsubscribe link at the bottom, even if you delete the footer section.</p>
+
+  <h2>Save your own templates</h2>
+  <p>Designed an email you'll reuse? Choose <span class="ui">Save as template</span> at the top of the editor. It downloads a template file with the design and words. Your logo and business details are left out, so it's safe to share. Open it again from <span class="ui">Open a template file…</span> in the template picker, on this MailStudio or any other.</p>
 </section>
 
 <section class="chapter" data-toc="Send it, and see how it went">
@@ -620,6 +745,7 @@ MailStudio is installed.
     <li><strong>Who gets it:</strong> tick the lists. To send to only part of a list, enter tags (e.g. <code>fremantle</code>). The count underneath is exactly how many people will get it: anyone who unsubscribed, bounced or complained is always left out.</li>
     <li><strong>Who it's from:</strong> already filled in from your settings; change it for this campaign if you need to.</li>
     <li><strong>Send yourself a test.</strong> Look at it on your phone and your computer. Click the links. Read the subject line as a stranger would. Typos are much cheaper to fix now.</li>
+    <li><strong>Check the pictures.</strong> Any suggestions for your images are listed here (Chapter 13). They're worth fixing, but don't stop you sending. A picture readers can't load at all does: its link takes you back to the editor to fix it.</li>
     <li><strong>Ready to send?</strong> Everything should have a green tick.</li>
     <li><strong>When:</strong> <span class="ui">Now</span>, or <span class="ui">Later</span> with a date and time (your computer's time zone).</li>
     <li><strong>Send</strong>, and confirm. Once it's going, it can't be edited.</li>
@@ -630,13 +756,18 @@ MailStudio is installed.
   <figure><img src="img/sc-8-report.png"><figcaption>A campaign report: sent, bounces, spam reports and unsubscribes, and the email itself.</figcaption></figure>
   <table>
     <tr><th style="width:26%">Number</th><th>What it means</th></tr>
-    <tr><td>Sent</td><td>Handed to Amazon for delivery.</td></tr>
-    <tr><td>Delivered</td><td>Accepted by the reader's mail server (needs Chapter 9 set up).</td></tr>
+    <tr><td>Sent</td><td>Handed to your sending service for delivery.</td></tr>
+    <tr><td>Delivered</td><td>Accepted by the reader's mail server. Appears once your sending service reports deliveries through the setup in Chapter 9. Services that report through a bounce mailbox (AuthSMTP and other SMTP servers) only report failures.</td></tr>
     <tr><td>Bounced</td><td>The address doesn't exist or refused it permanently. It won't be emailed again. Keep this under 2%.</td></tr>
     <tr><td>Spam reports</td><td>People pressed “Report spam”. They won't be emailed again. Keep this under 0.1% (one in a thousand).</td></tr>
     <tr><td>Unsubscribed</td><td>People who used the unsubscribe link in this campaign.</td></tr>
   </table>
   <p>MailStudio doesn't track who opens your emails or clicks links. That keeps your subscribers' privacy, and avoids the tracking that makes opens unreliable anyway.</p>
+
+  <h2>Share it</h2>
+  <p>The report shows a <span class="ui">Share it</span> link: a web copy of the email that anyone can open, with readers' personal details left out. Post it on social media or your website so people who aren't subscribed yet can see what they're missing. Readers themselves get the <span class="ui">View in browser</span> link at the top of the email (Chapter 13), which opens their own copy.</p>
+
+  <div class="box tip"><span class="box-title">A test that never arrived?</span><p>Look in your spam folder first, then in your sending service's activity or log page (Postmark's <span class="ui">Activity</span>, Mailgun's <span class="ui">Logs</span>, SMTP2GO's <span class="ui">Reports → Activity</span>): it shows whether the email was accepted, delivered, bounced or blocked, and why. With Amazon SES in the sandbox, tests only reach verified addresses (Chapter 10).</p></div>
 
   <div class="box tip"><span class="box-title">Next time</span><p>On the report, choose <span class="ui">Copy to a new draft</span> to start the next campaign from this one: same design, same lists, ready for new words.</p></div>
 </section>
@@ -657,7 +788,8 @@ MailStudio is installed.
 
   <h2>Updating</h2>
   <pre>mailstudio update</pre>
-  <p>It backs everything up, downloads the latest version and restarts. Any changes to the database happen automatically on start, with a copy kept first. Update every month or two, or when a release note mentions a fix you need. Choose a time when no campaign is going out: an email that's halfway to Amazon at the moment of the restart is marked as not sent rather than risk sending it twice.</p>
+  <p>It backs everything up, downloads the latest version and restarts. Any changes to the database happen automatically on start, with a copy kept first. Update every month or two, or when a release note mentions a fix you need. Choose a time when no campaign is going out: an email that's halfway to your sending service at the moment of the restart is marked as not sent rather than risk sending it twice.</p>
+  <p>Now and then a release also improves the setup files (the Caddy settings, or the <code>mailstudio</code> command itself). To get those too, run the installer again (Chapter 4). It keeps your data, settings and address, and only asks about anything missing.</p>
   <p>It's also worth updating the server itself now and then:</p>
   <pre>apt update &amp;&amp; apt upgrade -y</pre>
 
@@ -702,11 +834,13 @@ MailStudio is installed.
     <tr><td>The installer says the server has no public IPv4 address, or can't reach the internet</td><td>See Chapter 2: the server needs Public IPv4 on, and outgoing connections allowed. Check with <code>curl -sSI https://github.com</code>.</td></tr>
     <tr><td>The address doesn't open, or the browser warns it isn't secure</td><td>The certificate couldn't be issued. Check the A record points to the server (Chapter 3), the provider's firewall allows ports 80 and 443, and Cloudflare is set to “DNS only”. Then <code>mailstudio logs caddy</code>; it retries by itself.</td></tr>
     <tr><td>Forgot your password</td><td>On the server, run <code>mailstudio reset-password you@yourbusiness.com</code>. It prints a new password; change it under your name at the top right once you're in.</td></tr>
-    <tr><td>“Not connected yet” for Amazon SES</td><td>Check the region matches the one you used in AWS, and re-paste both keys. A secret pasted with a space at the end is a common culprit.</td></tr>
-    <tr><td>Test email never arrives</td><td>In the sandbox, tests only reach verified addresses (Chapter 10). Check spam. In <span class="ui">Settings</span>, Amazon SES shows any warnings.</td></tr>
+    <tr><td><span class="ui">Save and check</span> says it couldn't connect to the sending service</td><td>Re-paste the key or password: one pasted with a space at the end is a common culprit. With Mailgun, check the sending domain and the US/EU region; with Amazon SES, check the region matches the one you used in AWS; with SMTP, check the server, port and security (587 or 2525 with STARTTLS, 465 with TLS).</td></tr>
+    <tr><td>Test email never arrives</td><td>Check spam, then the activity or log page in your sending service's dashboard (Chapter 14). Your from address's domain must be verified there (Chapter 8). With Amazon SES in the sandbox, tests only reach verified addresses (Chapter 10).</td></tr>
+    <tr><td>Bounces and spam reports never shows as working</td><td>For a webhook, check it's added for your Broadcasts stream (Postmark) or sending domain (Mailgun), with the right events ticked, and send the service's test. For a bounce mailbox, check its IMAP login; step 5 shows the error.</td></tr>
     <tr><td>Domain records stay “Missing”</td><td>The DNS provider may have added your domain twice (Chapter 8's “most common mistake”). Or wait: some providers take an hour.</td></tr>
-    <tr><td>“Set it up for me” says it needs https://</td><td>MailStudio isn't on its secure address. Re-run the installer (Chapter 4).</td></tr>
-    <tr><td>A campaign paused by itself</td><td>The report says why, usually a problem with Amazon (sending paused, account suspended, or domain not verified). Fix it in Settings or the AWS console, then choose <span class="ui">Resume</span>. Nobody gets the email twice.</td></tr>
+    <tr><td>“Set it up for me”, or a webhook, says it needs https://</td><td>MailStudio isn't on its secure address. Re-run the installer (Chapter 4).</td></tr>
+    <tr><td>The send page says a picture can't be seen by recipients</td><td>It was deleted, uploaded to another MailStudio, or points at an address only your own network can reach. Upload it again in the editor (Chapter 13).</td></tr>
+    <tr><td>A campaign paused by itself</td><td>The report says why, usually a problem at the sending service (a key that stopped working, sending paused, the account under review, or the domain not verified). Fix it in Settings or the service's dashboard, then choose <span class="ui">Resume</span>. Nobody gets the email twice.</td></tr>
     <tr><td>“Nobody on those lists can be emailed right now”</td><td>Everyone on the chosen lists has unsubscribed, bounced or is blocked, or the tag filter matches nobody.</td></tr>
     <tr><td>Signup form says “Too many signups from here”</td><td>More than 20 signups from one internet address in an hour, usually a bot. Real people can try again in an hour.</td></tr>
     <tr><td>High bounce rate on the first send</td><td>The list has old or mistyped addresses. They're now blocked automatically; the next send will be cleaner. Don't import that list again without cleaning it.</td></tr>
@@ -784,11 +918,11 @@ mailstudio update</pre>
   <p>Edit <code>/opt/mailstudio/.env</code>, change the <code>MAILSTUDIO_IMAGE=</code> line to the published image (e.g. <code>ghcr.io/gmelh/mailstudio:latest</code>), and run <code>mailstudio update</code>. Your data stays as it is.</p>
 </section>
 
-<section class="chapter" data-toc="C · The Amazon permissions" data-appendix>
+<section class="chapter" data-toc="C · The Amazon SES permissions" data-appendix>
   <header>
     <div class="kicker">Appendix C</div>
-    <h1>The Amazon permissions</h1>
-    <p class="lead">The policy for the mailstudio user (Chapter 7). Copy it from step 3 in the app if you can, as it's always current.</p>
+    <h1>The Amazon SES permissions</h1>
+    <p class="lead">Only for Amazon SES: the policy for the mailstudio user (Chapter 7). Copy it from step 3 in the app if you can, as it's always current.</p>
   </header>
 <pre>{
   "Version": "2012-10-17",
@@ -850,8 +984,9 @@ grace@example.com,Grace,Hopper,Perth</pre>
   <table>
     <tr><th style="width:28%">Word</th><th>Meaning</th></tr>
     <tr><td>A record</td><td>A DNS record that says which IP address a name (like mail.yourbusiness.com) lives at.</td></tr>
-    <tr><td>Amazon SES</td><td>Amazon Simple Email Service: the service that delivers your emails.</td></tr>
+    <tr><td>Amazon SES</td><td>Amazon Simple Email Service, one of the sending services MailStudio works with.</td></tr>
     <tr><td>AWS</td><td>Amazon Web Services, Amazon's cloud services. SES is one of them.</td></tr>
+    <tr><td>Bounce address</td><td>A mailbox that receives bounce reports for an SMTP service. MailStudio reads it every five minutes.</td></tr>
     <tr><td>Bounce</td><td>An email that couldn't be delivered, usually because the address doesn't exist.</td></tr>
     <tr><td>Caddy</td><td>The part of a MailStudio install that handles the secure https:// connection and its certificate.</td></tr>
     <tr><td>CNAME record</td><td>A DNS record that says one name is an alias of another.</td></tr>
@@ -863,12 +998,19 @@ grace@example.com,Grace,Hopper,Perth</pre>
     <tr><td>DNS</td><td>The internet's address book: it turns names into server addresses and holds records about your domain.</td></tr>
     <tr><td>Docker</td><td>Software that runs MailStudio in a self-contained package on your server.</td></tr>
     <tr><td>Double opt-in</td><td>New subscribers confirm their address by clicking a link before they're added.</td></tr>
+    <tr><td>Feature background</td><td>A section's own background colour, set in Brand &amp; style.</td></tr>
     <tr><td>IAM</td><td>Identity and Access Management: where you create AWS users and set what they may do.</td></tr>
+    <tr><td>IMAP</td><td>The way mail apps read a mailbox. MailStudio uses it to read the bounce address.</td></tr>
     <tr><td>Production access</td><td>Amazon's permission to send to anyone, not just verified addresses.</td></tr>
     <tr><td>Sandbox</td><td>A new SES account's starting state: it can only send to verified addresses.</td></tr>
+    <tr><td>Section</td><td>One building block of an email: a header, some text, a button and so on.</td></tr>
+    <tr><td>Sending service</td><td>The company that delivers your emails: Postmark, Mailgun, SMTP2GO, AuthSMTP, Amazon SES or another SMTP service.</td></tr>
+    <tr><td>SMTP</td><td>The standard way of handing email to a mail server. AuthSMTP and many email providers offer it.</td></tr>
     <tr><td>SSH</td><td>A secure way to type commands on your server from your own computer.</td></tr>
     <tr><td>Suppressed / never emailed</td><td>An address MailStudio will never send to: it bounced, complained, or you blocked it.</td></tr>
+    <tr><td>Template</td><td>A ready-made email design with placeholder words, to start a campaign from.</td></tr>
     <tr><td>VPS</td><td>Virtual private server: the small computer you rent to run MailStudio.</td></tr>
+    <tr><td>Webhook</td><td>A private web address on your MailStudio that a sending service calls to report bounces, spam reports and unsubscribes.</td></tr>
   </table>
 </section>
 

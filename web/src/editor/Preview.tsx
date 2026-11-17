@@ -134,8 +134,17 @@ export function Preview({ document, subject, preheader, scheme, device, selected
  * (The dark preview is rendered with the dark palette directly and has no such block.)
  */
 export function forScheme(html: string): string {
-  return html.replace(/@media\s*\(\s*prefers-color-scheme\s*:\s*dark\s*\)/gi, '@media not all');
+  return html
+    .replace(/@media\s*\(\s*prefers-color-scheme\s*:\s*dark\s*\)/gi, '@media not all')
+    .replace(/<head(\s[^>]*)?>/i, (head) => head + OWN_COLOURS);
 }
+
+/**
+ * Browsers that darken pages by themselves (Chrome's auto dark mode and the like) would
+ * also darken the email, so the preview stops being what readers see. "only light" turns
+ * that off; the email's own colours, light or dark palette, do the rest.
+ */
+const OWN_COLOURS = '<meta name="color-scheme" content="only light">';
 
 function paintSelection(doc: Document, selected: string | null): void {
   const marker = doc.getElementById('editor-selection');

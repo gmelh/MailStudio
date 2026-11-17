@@ -14,7 +14,6 @@ import { Outline, type Selection } from './Outline';
 import { Preview } from './Preview';
 import { Splitter, usePanelWidths } from './Splitter';
 import { oneOf, usePref } from '../prefs';
-import { useTheme } from '../theme';
 
 const SAVE_DELAY_MS = 800;
 type SaveState = 'saved' | 'pending' | 'saving' | 'error';
@@ -66,8 +65,6 @@ function Editor({ initial, library }: { initial: Campaign; library: SectionLibra
   const [device, setDevice] = usePref('editor-device', 'desktop', oneOf('desktop', 'mobile'));
   // Which of the email's palettes is being edited and previewed (Brand & style → Colours).
   const [scheme, setScheme] = usePref('editor-scheme', 'light', oneOf('light', 'dark'));
-  // Light or dark MailStudio itself (the toolbar switch; the same choice as the ☾ button).
-  const [theme, setTheme] = useTheme();
   const [saveState, setSaveState] = useState<SaveState>('saved');
   const [saveError, setSaveError] = useState<string | null>(null);
   const firstRender = useRef(true);
@@ -172,10 +169,6 @@ function Editor({ initial, library }: { initial: Campaign; library: SectionLibra
           <div class="segmented" role="group" aria-label="Preview width">
             <button type="button" class={device === 'desktop' ? 'is-active' : ''} onClick={() => setDevice('desktop')}>Desktop</button>
             <button type="button" class={device === 'mobile' ? 'is-active' : ''} onClick={() => setDevice('mobile')}>Mobile</button>
-          </div>
-          <div class="segmented" role="group" aria-label="MailStudio colours" title="Light or dark MailStudio (not the email)">
-            <button type="button" class={theme === 'light' ? 'is-active' : ''} aria-pressed={theme === 'light'} onClick={() => setTheme('light')}>Light</button>
-            <button type="button" class={theme === 'dark' ? 'is-active' : ''} aria-pressed={theme === 'dark'} onClick={() => setTheme('dark')}>Dark</button>
           </div>
           <Button onClick={() => void saveAsTemplate()}>Save as template</Button>
           {readOnly

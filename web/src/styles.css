@@ -1,28 +1,33 @@
 /* MailStudio web app. Colours come from --ui-* tokens, switched by [data-theme]. */
 
 :root {
-  --ui-scrollbar: rgba(15, 23, 42, .2);
-  --ui-scrollbar-hover: rgba(15, 23, 42, .42);
-  --ui-bg: #f5f7fb;
-  --ui-surface: #ffffff;
-  --ui-surface-hover: #f3f6fc;
-  --ui-border: #e4e9f1;
-  --ui-input-border: #dce3ee;
-  --ui-text: #243044;
-  --ui-label: #506078;
-  --ui-muted: #6f7d93;
+  /* Studio Apps standard palette (shared with LedgerStudio).
+     Light: warm linen, with MailStudio's blue as the accent. */
+  --ui-scrollbar: rgba(60, 50, 35, .22);
+  --ui-scrollbar-hover: rgba(60, 50, 35, .42);
+  --ui-bg: #f1ece2;
+  --ui-surface: #faf7f1;
+  --ui-surface-hover: #f2ede3;
+  --ui-border: #e2d9c8;
+  --ui-input-border: #d5cab6;
+  --ui-text: #2f2a22;
+  --ui-label: #5c5244;
+  --ui-muted: #7a6f5e;
   --ui-accent: #4768da;
   --ui-accent-hover: #3656c7;
-  --ui-accent-soft: #eaf0ff;
-  --ui-accent-text: #3757c6;
-  --ui-danger: #c2413b;
-  --ui-danger-soft: #fbecea;
+  --ui-accent-soft: #e3e5ee;
+  --ui-accent-text: #3552b8;
+  --ui-danger: #b83c33;
+  --ui-danger-soft: #f6e5dd;
   --ui-success: #237a4b;
-  --ui-success-soft: #e6f4ec;
-  --ui-focus: #6b8aec33;
+  --ui-success-soft: #e3ede0;
+  --ui-focus: #4768da33;
+  --ui-link: var(--ui-accent-text);
   --radius: 10px;
 
-  color-scheme: light;
+  /* "only" stops browsers that darken pages by themselves (Chrome's auto dark mode,
+     Edge, Samsung Internet) from turning the linen theme dark. */
+  color-scheme: only light;
   font-family: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Arial, sans-serif;
   font-size: 15px;
   line-height: 1.5;
@@ -31,22 +36,27 @@
 }
 
 :root[data-theme="dark"] {
-  --ui-scrollbar: rgba(226, 232, 240, .2);
-  --ui-scrollbar-hover: rgba(226, 232, 240, .4);
-  --ui-bg: #10151f;
-  --ui-surface: #171f2c;
-  --ui-surface-hover: #222d3e;
-  --ui-border: #2c3749;
-  --ui-input-border: #425169;
-  --ui-text: #e8edf6;
-  --ui-label: #bac8da;
-  --ui-muted: #9eacc0;
-  --ui-accent-soft: #2c3d5e;
-  --ui-accent-text: #dbe5ff;
-  --ui-danger: #f08a84;
-  --ui-danger-soft: #3a2224;
-  --ui-success: #7fd3a3;
-  --ui-success-soft: #1d3327;
+  /* Dark: MindForce navy and blue, identical to LedgerStudio. */
+  --ui-scrollbar: rgba(200, 215, 240, .22);
+  --ui-scrollbar-hover: rgba(200, 215, 240, .42);
+  --ui-bg: #172338;
+  --ui-surface: #1f2e4a;
+  --ui-surface-hover: #283a5a;
+  --ui-border: #31446a;
+  --ui-input-border: #435a85;
+  --ui-text: #e9eef8;
+  --ui-label: #c2cde2;
+  --ui-muted: #9dabc6;
+  --ui-accent: #3b7dd8;
+  --ui-accent-hover: #4a8be3;
+  --ui-accent-soft: #25406a;
+  --ui-accent-text: #cfe1fb;
+  --ui-danger: #f29890;
+  --ui-danger-soft: #45283a;
+  --ui-success: #86d6a8;
+  --ui-success-soft: #1f3f3a;
+  --ui-focus: #5b9bea44;
+  --ui-link: #8db9f2;
   color-scheme: dark;
 }
 
@@ -54,7 +64,7 @@
 body { margin: 0; }
 h1, h2, h3, p { margin: 0; }
 button, input, select, textarea { font: inherit; color: inherit; }
-a { color: var(--ui-accent); }
+a { color: var(--ui-link); }
 code { font-size: 0.9em; }
 .muted { color: var(--ui-muted); }
 .small { font-size: 13px; }
@@ -330,7 +340,7 @@ textarea.code {
 }
 .setup-nudge span { font-size: 12px; opacity: .85; }
 .setup-nudge.is-active, .setup-nudge:hover { border-color: var(--ui-accent); }
-.setup-progress { height: 8px; border-radius: 999px; background: var(--ui-surface-hover); overflow: hidden; }
+.setup-progress { height: 8px; border-radius: 999px; background: var(--ui-border); overflow: hidden; }
 .setup-progress__bar { height: 100%; background: var(--ui-success); transition: width .4s; }
 .setup-count { margin: 8px 0 16px; font-size: 14px; }
 .steps { list-style: none; margin: 16px 0 0; padding: 0; display: flex; flex-direction: column; gap: 10px; }
